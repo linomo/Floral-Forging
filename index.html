@@ -2,33 +2,36 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>刀劍鍛造師徒弟 - 數據驅動版</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>刀劍鍛造師徒弟 - FF_E 完整版</title>
     <style>
-        :root { --border: #5d4037; --bg: #fdfaf6; }
+        :root { --border: #5d4037; --bg: #fdfaf6; --main-brown: #8d6e63; }
         body { font-family: "Microsoft JhengHei", sans-serif; background: #eee; display: flex; justify-content: center; margin: 0; padding: 10px; }
-        .game-world { width: 100%; max-width: 800px; background: var(--bg); border: 3px solid var(--border); display: flex; flex-direction: column; height: 98vh; }
+        .game-world { width: 100%; max-width: 800px; background: var(--bg); border: 3px solid var(--border); display: flex; flex-direction: column; height: 98vh; box-shadow: 0 0 15px rgba(0,0,0,0.2); }
         
         /* 狀態區 */
-        .status-bar { padding: 12px; background: #efebe9; border-bottom: 2px solid var(--border); }
-        .status-line { display: flex; justify-content: space-between; margin-bottom: 5px; }
-        .mood-container { width: 150px; height: 12px; background: #ccc; border-radius: 6px; overflow: hidden; margin-left: 8px; }
+        .status-bar { padding: 12px; background: #efebe9; border-bottom: 2px solid var(--border); font-size: 0.95em; }
+        .status-line { display: flex; justify-content: space-between; margin-bottom: 5px; align-items: center; }
+        .mood-container { width: 120px; height: 10px; background: #ccc; border-radius: 5px; overflow: hidden; margin-left: 8px; }
         #mood-bar { height: 100%; background: linear-gradient(to right, #ff5252, #ffeb3b, #4caf50); transition: 0.5s; }
+        .money-text { color: #b8860b; font-weight: bold; }
 
-        /* 劇情區 (固定顯示約10行) */
-        #story-area { height: 200px; padding: 15px; overflow-y: auto; border-bottom: 2px solid #ddd; background: #fff; line-height: 1.6; }
+        /* 劇情區 (固定 10 行左右) */
+        #story-area { height: 180px; padding: 15px; overflow-y: auto; border-bottom: 2px solid #ddd; background: #fff; line-height: 1.6; font-size: 1em; }
 
-        /* 中間互動區 */
-        .interaction-zone { flex: 1; display: flex; border-bottom: 2px solid var(--border); }
-        .location-nav { width: 120px; border-right: 2px solid #ddd; display: flex; flex-direction: column; background: #f5f5f5; }
-        .action-pad { flex: 1; padding: 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; align-content: start; }
-        .nav-btn { padding: 15px; border: none; border-bottom: 1px solid #ddd; cursor: pointer; font-weight: bold; background: none; }
+        /* 互動區 */
+        .interaction-zone { flex: 1; display: flex; border-bottom: 2px solid var(--border); min-height: 150px; }
+        .location-nav { width: 110px; border-right: 2px solid #ddd; display: flex; flex-direction: column; background: #f5f5f5; }
+        .action-pad { flex: 1; padding: 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; align-content: start; }
+        .nav-btn { padding: 15px 5px; border: none; border-bottom: 1px solid #ddd; cursor: pointer; font-weight: bold; background: none; font-size: 0.9em; }
         .nav-btn.active { background: var(--border); color: white; }
-        .action-btn { padding: 12px; background: #8d6e63; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .action-btn { padding: 12px; background: var(--main-brown); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 1em; }
+        .action-btn:hover { background: #6d4c41; }
 
         /* 下方背包區 */
         .inventory-zone { height: 180px; display: grid; grid-template-columns: repeat(3, 1fr); background: #f9f9f9; }
         .bag-column { border-right: 1px solid #ddd; padding: 8px; overflow-y: auto; }
-        .bag-title { font-size: 0.8em; font-weight: bold; text-align: center; border-bottom: 1px solid #ddd; margin-bottom: 5px; }
+        .bag-title { font-size: 0.8em; font-weight: bold; text-align: center; border-bottom: 1px solid #ddd; margin-bottom: 6px; padding-bottom: 3px; color: var(--border); }
         .item-slot { font-size: 0.85em; background: white; padding: 4px 8px; margin-bottom: 4px; border: 1px solid #eee; display: flex; justify-content: space-between; }
     </style>
 </head>
@@ -41,21 +44,21 @@
             <div>👤 <b>小哈</b></div>
         </div>
         <div class="status-line">
-            <div style="color: #b8860b; font-weight: bold;">💰 靈石：<span id="s-money">0</span></div>
+            <div class="money-text">💰 靈石：<span id="s-money">0</span></div>
             <div style="display:flex; align-items:center;">
                 心情：<span id="mood-text">平凡</span>
                 <div class="mood-container"><div id="mood-bar"></div></div>
             </div>
         </div>
-        <div class="status-line" style="font-size: 0.9em;">
-            <span>💪 力:<span id="s-str">3</span></span>
-            <span>🧠 智:<span id="s-int">5</span></span>
-            <span>🏃 敏:<span id="s-agi">4</span></span>
-            <span>🔋 體:<span id="s-sta">6</span>/10</span>
+        <div class="status-line" style="font-size: 0.9em; color: #444;">
+            <span>💪 力量:<span id="s-str">3</span></span>
+            <span>🧠 智力:<span id="s-int">5</span></span>
+            <span>🏃 敏捷:<span id="s-agi">4</span></span>
+            <span>🔋 體力:<span id="s-sta">6</span>/10</span>
         </div>
     </div>
 
-    <div id="story-area">載入中...</div>
+    <div id="story-area">系統讀取中...</div>
 
     <div class="interaction-zone">
         <div class="location-nav">
@@ -74,21 +77,8 @@
 </div>
 
 <script>
-    // 1. 數據注入 (對應你的 CSV)
-    const actionDatabase = [
-        { loc: "房間", act: "睡覺", req: "mood", val: "<30", stat: "s-sta", gain: 8, weight: 0.6, text: "睡不好，頭好痛。", re: 0 },
-        { loc: "房間", act: "睡覺", req: "mood", val: "30<=&>=70", stat: "s-sta", gain: 8, weight: 1, text: "睡覺睡覺喜歡睡覺。", re: 0 },
-        { loc: "房間", act: "睡覺", req: "mood", val: ">70", stat: "s-sta", gain: 8, weight: 1.2, text: "我成為了鑄劍之王...是夢？好夢！", re: 0 },
-        { loc: "房間", act: "整理", req: "s-str", val: "<3", stat: "mood", gain: 1, weight: -1, text: "唉呦搬個東西就好累。", re: 1 },
-        { loc: "房間", act: "整理", req: "s-str", val: "3<=&>=7", stat: "mood", gain: 1, weight: 1, text: "整理一下感覺變乾淨了一點？", re: 1 },
-        { loc: "房間", act: "整理", req: "s-str", val: ">7", stat: "mood", gain: 1, weight: 0, text: "輕輕鬆鬆啦！", re: 1 }
-    ];
-
-    const eventDatabase = [
-        { trigger: "整理", prob: 0.5, stat: "money", gain: 10, text: "撿到錢太好了！" }
-    ];
-
-    // 2. 玩家初始狀態
+    let actionDatabase = [];
+    let eventDatabase = [];
     let player = {
         name: "小哈", money: 0, mood: 50,
         stats: { "s-str": 3, "s-int": 5, "s-agi": 4, "s-sta": 6 },
@@ -97,113 +87,135 @@
         inv: { materials: [], products: [], books: [{n:"初階小小書", c:1}] }
     };
 
-    // 3. 核心邏輯：條件判斷器
-    function checkCondition(currentVal, conditionStr) {
-        if (conditionStr.includes("<=")) {
-            let parts = conditionStr.split("&"); // 處理 30<=&>=70
-            let low = parseFloat(parts[0]);
-            let high = parseFloat(parts[1].replace(">=",""));
-            return currentVal >= low && currentVal <= high;
+    async function loadCSV(file) {
+        const response = await fetch(file);
+        const text = await response.text();
+        const rows = text.split('\n').map(row => row.split(',').map(cell => cell.trim()));
+        const headers = rows[0];
+        return rows.slice(1).filter(row => row.length >= headers.length).map(row => {
+            let obj = {};
+            headers.forEach((header, i) => obj[header] = row[i]);
+            return obj;
+        });
+    }
+
+    async function initGame() {
+        try {
+            actionDatabase = await loadCSV('FF_E_Act.csv');
+            eventDatabase = await loadCSV('FF_E_Event.csv');
+            log("讀取成功。你在床頭醒來，看著窗外。");
+            updateUI();
+        } catch (e) {
+            log("<span style='color:red;'>[錯誤] 無法讀取 CSV 檔案，請確認檔名是否為 FF_E_Act.csv 與 FF_E_Event.csv 且已上傳。</span>");
         }
+    }
+
+    function checkCondition(currentVal, conditionStr) {
+        if (!conditionStr || conditionStr === "") return true;
+        if (conditionStr.includes("&")) {
+            let parts = conditionStr.split("&");
+            let low = parseFloat(parts[0].replace(/[<>=]/g, ""));
+            let high = parseFloat(parts[1].replace(/[<>=]/g, ""));
+            return currentVal >= Math.min(low, high) && currentVal <= Math.max(low, high);
+        }
+        if (conditionStr.startsWith(">=")) return currentVal >= parseFloat(conditionStr.substring(2));
+        if (conditionStr.startsWith("<=")) return currentVal <= parseFloat(conditionStr.substring(2));
         if (conditionStr.startsWith(">")) return currentVal > parseFloat(conditionStr.substring(1));
         if (conditionStr.startsWith("<")) return currentVal < parseFloat(conditionStr.substring(1));
         return false;
     }
 
-    // 4. 執行動作
-function doAction(actName) {
-    // 1. 尋找動作數據
-    let currentStatVal = (actName === "睡覺") ? player.mood : player.stats["s-str"];
-    let match = actionDatabase.find(d => 
-        d.Action === actName && 
-        d.Loc === player.location && 
-        checkCondition(currentStatVal, d.Req_Value)
-    );
-
-    if (!match) return;
-
-    // 2. 結算變動
-    let baseChange = parseFloat(match.Change_Value);
-    let weight = parseFloat(match.Weighted);
-    let finalChange = baseChange * weight;
-
-    // 執行變更 (體力現在可以變為負數)
-    applyStatChange(match.Change_Stat, finalChange);
-    log(match.Content);
-
-    // 3. 隨機事件處理
-    if (match["R_E_Check?"] === "1") {
-        handleRandomEvent(actName);
-    }
-
-    // 4. 透支判定 (透支且動作不是睡覺時觸發)
-    if (player.stats["s-sta"] <= 0 && actName !== "睡覺") {
-        log("<br><span style='color:red; font-weight:bold;'>[！！體力透支！！]</span>");
-        log("<span style='color:red;'>你眼前一黑，體力徹底耗盡，昏倒在地上...</span>");
-        
-        // 強制跳到後天
-        player.date.day += 2; 
-        player.stats["s-sta"] = 10; // 昏睡後體力全滿
-        player.mood = Math.max(0, player.mood - 15); // 昏迷醒來心情會大打折扣
-        
-        log(`<span style='color:#8e44ad;'>你在病床上醒來，時間已經到了後天（${player.date.mon}月${player.date.day}日），體力雖然恢復了，但心情感到很糟。</span>`);
-    } else if (actName === "睡覺") {
-        // 正常睡覺只跳一天
-        player.date.day += 1;
-    }
-
-    updateUI();
-}
-
-        // 2. 隨機事件檢查 (支援 3 組數值變動)
-        if (match["R_E_Check?"] === "1") {
-            let prob = Math.random();
-            let ev = eventDatabase.find(e => e.Column_B === actName && prob < (parseFloat(e.Probability)/100));
-            
-            if (ev) {
-                let eventEffects = [];
-                
-                // 迴圈檢查 Stat_1, Stat_2, Stat_3
-                for (let i = 1; i <= 3; i++) {
-                    let statKey = `Stat_${i}`;
-                    let valKey = `Val_${i}`;
-                    
-                    if (ev[statKey] && ev[valKey] && ev[statKey] !== "") {
-                        let val = parseFloat(ev[valKey]);
-                        applyStatChange(ev[statKey], val);
-                        eventEffects.push(`${ev[statKey]} ${val >= 0 ? '+' : ''}${val}`);
-                    }
-                }
-                
-                log(`<span style="color:goldenrod;">★事件：${ev.Content} (${eventEffects.join(', ')})</span>`);
+    function applyStatChange(statName, value) {
+        if (!statName || statName === "") return;
+        if (statName === "money") {
+            player.money += parseInt(value);
+        } else if (statName === "mood") {
+            player.mood = Math.max(0, Math.min(100, player.mood + parseFloat(value)));
+        } else if (player.stats[statName] !== undefined) {
+            if (statName === "s-sta") {
+                player.stats[statName] = Math.round((player.stats[statName] + parseFloat(value)) * 10) / 10;
+            } else {
+                player.stats[statName] = Math.max(0, player.stats[statName] + parseFloat(value));
             }
         }
+    }
 
-        if (actName === "睡覺") player.date.day++;
+    function handleRandomEvent(actName) {
+        let prob = Math.random();
+        // 尋找對應動作的隨機事件
+        let ev = eventDatabase.find(e => e.Column_B === actName && prob < (parseFloat(e.Probability)/100));
+        
+        if (ev) {
+            let changes = [];
+            // 讀取 Stat_1, Stat_2, Stat_3 (與對應的 Val)
+            for (let i = 1; i <= 3; i++) {
+                let sKey = i === 1 ? "Stat_1" : `Stat_${i}`;
+                let vKey = i === 1 ? "Change_Value" : `Val_${i}`;
+                
+                // 修正你的 CSV 欄位名稱差異，相容 Change_Value 或 Val_i
+                let sName = ev[sKey] || ev[`Change_Stat_${i}`]; 
+                let vVal = ev[vKey] || ev[`Change_Value_${i}`];
+
+                if (sName && sName !== "") {
+                    applyStatChange(sName, vVal);
+                    changes.push(`${sName} ${vVal > 0 ? '+' : ''}${vVal}`);
+                }
+            }
+            log(`<span style="color:goldenrod;">★事件：${ev.Content} (${changes.join(', ')})</span>`);
+        }
+    }
+
+    function doAction(actName) {
+        let currentReqVal = (actName === "睡覺") ? player.mood : player.stats["s-str"];
+        let match = actionDatabase.find(d => 
+            d.Action === actName && 
+            d.Loc === player.location && 
+            checkCondition(currentReqVal, d.Req_Value)
+        );
+
+        if (!match) return;
+
+        // 1. 執行基礎動作
+        let finalChange = parseFloat(match.Change_Value) * parseFloat(match.Weighted);
+        applyStatChange(match.Change_Stat, finalChange);
+        log(match.Content);
+
+        // 2. 隨機事件
+        if (match["R_E_Check?"] === "1") {
+            handleRandomEvent(actName);
+        }
+
+        // 3. 睡覺邏輯：正常加一天
+        if (actName === "睡覺") {
+            player.date.day += 1;
+            player.stats["s-sta"] = Math.min(10, player.stats["s-sta"]); // 確保睡醒體力上限
+        }
+
+        // 4. 透支判定
+        if (player.stats["s-sta"] <= 0 && actName !== "睡覺") {
+            log("<br><span style='color:red; font-weight:bold;'>[！！體力透支！！]</span>");
+            log("<span style='color:red;'>你眼前一黑，徹底脫力昏倒在地上...</span>");
+            
+            player.date.day += 2; // 強制跳到後天
+            player.stats["s-sta"] = 10; // 昏睡醒來體力滿
+            player.mood = Math.max(0, player.mood - 15); // 心情大跌
+            
+            log(`<span style='color:#8e44ad;'>你在病床上醒來，時間已過兩天，感覺身體很沉重。</span>`);
+        }
+
+        // 月底進位處理 (簡單 30 天制)
+        if (player.date.day > 30) {
+            player.date.day -= 30;
+            player.date.mon += 1;
+        }
+
         updateUI();
     }
 
-    // 統一處理數值變更的輔助函式 (數據化管理的核心)
-    function applyStatChange(statName, value) {
-        if (statName === "money") {
-            player.money += value;
-        } else if (statName === "mood") {
-            player.mood = Math.max(0, Math.min(100, player.mood + value));
-        } else if (player.stats[statName] !== undefined) {
-            // 處理 s-sta, s-str, s-int, s-agi
-            if (statName === "s-sta") {
-                player.stats[statName] = Math.max(0, Math.min(10, player.stats[statName] + value));
-            } else {
-                player.stats[statName] = Math.max(0, player.stats[statName] + value);
-            }
-        }
-    }
-
-    // 5. 其他功能 (UI更新等)
     function changeLoc(loc) {
         player.location = loc;
         updateUI();
-        log(`你移動到了${loc}。`);
+        log(`你來到了${loc}。`);
     }
 
     function log(msg) {
@@ -213,29 +225,27 @@ function doAction(actName) {
     }
 
     function updateUI() {
-        // 更新顯示
         document.getElementById('date-display').innerText = `墨玲元年${player.date.mon}月${player.date.day}日`;
         document.getElementById('s-money').innerText = player.money;
-        document.getElementById('s-sta').innerText = Math.round(player.stats["s-sta"] * 10) / 10;
+        document.getElementById('s-sta').innerText = player.stats["s-sta"];
         document.getElementById('s-str').innerText = player.stats["s-str"];
         document.getElementById('s-int').innerText = player.stats["s-int"];
         document.getElementById('s-agi').innerText = player.stats["s-agi"];
-        document.getElementById('mood-bar').style.width = player.mood + "%";
         
-        // 更新按鈕 (過濾地點動作)
-        const acts = Array.from(new Set(actionDatabase.filter(d => d.loc === player.location).map(d => d.act)));
+        const bar = document.getElementById('mood-bar');
+        bar.style.width = player.mood + "%";
+        document.getElementById('mood-text').innerText = player.mood > 70 ? "開心" : (player.mood < 30 ? "鬱悶" : "平凡");
+
+        const acts = [...new Set(actionDatabase.filter(d => d.Loc === player.location).map(d => d.Action))];
         document.getElementById('action-buttons').innerHTML = acts.map(a => `<button class="action-btn" onclick="doAction('${a}')">${a}</button>`).join('');
         
-        // 更新導覽標籤
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.innerText.includes(player.location)));
-
+        
         // 更新背包
-        document.getElementById('bag-books').innerHTML = player.inv.books.map(b => `<div class="item-slot"><span>${b.n}</span><span>x${b.c}</span></div>`).join('');
+        document.getElementById('bag-books').innerHTML = player.inv.books.map(b => `<div class="item-slot"><span>📖 ${b.n}</span><span>x${b.c}</span></div>`).join('');
     }
 
-    // 初始化劇情
-    document.getElementById('story-area').innerHTML = "遊戲開始。你站在房間裡，思考著今天的安排。";
-    updateUI();
+    initGame();
 </script>
 </body>
 </html>
