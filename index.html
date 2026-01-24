@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>刀劍鍛造師徒弟 - FF_E 數據版</title>
+    <style>
+        :root { --border: #5d4037; --bg: #fdfaf6; }
+        body { font-family: "Microsoft JhengHei", sans-serif; background: #eee; display: flex; justify-content: center; margin: 0; padding: 10px; }
+        .game-world { width: 100%; max-width: 800px; background: var(--bg); border: 3px solid var(--border); display: flex; flex-direction: column; height: 98vh; }
+        
+        /* 狀態區 */
+        .status-bar { padding: 12px; background: #efebe9; border-bottom: 2px solid var(--border); }
+        .status-line { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .mood-container { width: 150px; height: 12px; background: #ccc; border-radius: 6px; overflow: hidden; margin-left: 8px; }
+        #mood-bar { height: 100%; background: linear-gradient(to right, #ff5252, #ffeb3b, #4caf50); transition: 0.5s; }
+        .money-text { color: #b8860b; font-weight: bold; }
+
+        /* 劇情區 */
+        #story-area { height: 200px; padding: 15px; overflow-y: auto; border-bottom: 2px solid #ddd; background: #fff; line-height: 1.6; }
+
+        /* 互動區 */
+        .interaction-zone { flex: 1; display: flex; border-bottom: 2px solid var(--border); }
+        .location-nav { width: 120px; border-right: 2px solid #ddd; display: flex; flex-direction: column; background: #f5f5f5; }
+        .action-pad { flex: 1; padding: 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; align-content: start; }
+        .nav-btn { padding: 15px; border: none; border-bottom: 1px solid #ddd; cursor: pointer; font-weight: bold; background: none; }
+        .nav-btn.active { background: var(--border); color: white; }
+        .action-btn { padding: 12px; background: #8d6e63; color: white; border: none; border-radius: 4px; cursor: pointer; }
+
+        /* 背包區 */
+        .inventory-zone { height: 180px; display: grid; grid-template-columns: repeat(3, 1fr); background: #f9f9f9; }
+        .bag-column { border-right: 1px solid #ddd; padding: 8px; overflow-y: auto; }
+        .bag-title { font-size: 0.8em; font-weight: bold; text-align: center; border-bottom: 1px solid #ddd; margin-bottom: 5px; }
+        .item-slot { font-size: 0.85em; background: white; padding: 4px 8px; margin-bottom: 4px; border: 1px solid #eee; display: flex; justify-content: space-between; }
+    </style>
+</head>
+<body>
+
+<div class="game-world">
+    <div class="status-bar">
+        <div class="status-line">
+            <div>📅 <span id="date-display">墨玲元年一月一日</span></div>
+            <div>👤 <b>小哈</b></div>
+        </div>
+        <div class="status-line">
+            <div class="money-text">💰 靈石：<span id="s-money">0</span></div>
+            <div style="display:flex; align-items:center;">
+                心情：<span id="mood-text">平凡</span>
+                <div class="mood-container"><div id="mood-bar"></div></div>
+            </div>
+        </div>
+        <div class="status-line" style="font-size: 0.9em;">
+            <span>💪 力:<span id="s-str">3</span></span>
+            <span>🧠 智:<span id="s-int">5</span></span>
+            <span>🏃 敏:<span id="s-agi">4</span></span>
+            <span>🔋 體:<span id="s-sta">6</span>/10</span>
+        </div>
+    </div>
+
+    <div id="story-area">系統啟動中...</div>
+
+    <div class="interaction-zone">
+        <div class="location-nav" id="loc-nav">
+            <button class="nav-btn active" onclick="changeLoc('房間')">🏠 房間</button>
+            <button class="nav-btn" onclick="changeLoc('庭院')">🌳 庭院</button>
+            <button class="nav-btn" onclick="changeLoc('鍛造室')">⚒️ 鍛造室</button>
+        </div>
+        <div class="action-pad" id="action-buttons"></div>
+    </div>
+
+    <div class="inventory-zone">
+        <div class="bag-column"><div class="bag-title">材料 (金屬)</div><div id="bag-materials"></div></div>
+        <div class="bag-column"><div class="bag-title">成品 (刀劍)</div><div id="bag-products"></div></div>
+        <div class="bag-column"><div class="bag-title">書架 (知識)</div><div id="bag-books"></div></div>
+    </div>
+</div>
+
+<script>
+    let actionDatabase = [];
+    let eventDatabase = [];
+    let player = {
+        name: "小哈", money: 0, mood: 50,
+        stats: { "s-str": 3, "s-int": 5, "s-agi": 4, "s-sta": 6 },
+        date: { year: 1, mon: 1, day: 1 },
+        location: "房間",
+        inv: { materials: [], products: [], books: [{n:"初階小小書", c:1}] }
+    };
+
+    // 解析 CSV 核心功能
+    async function loadCSV(file) {
+        const response = await fetch(file);
+        const text = await response.text();
+        const rows = text.split('\n').map(row => row.split(',').map(cell => cell.trim()));
+        const headers = rows[0];
+        return rows.slice(1).filter(row => row.length === headers.length).map(row => {
+            let obj = {};
+            headers.forEach((header, i) => obj[header] = row[i]);
+            return obj;
+        });
+    }
+
+    // 初始化讀取
+    async function initGame() {
+        try {
+            // 使用你指定的 FF_E 名稱
+            actionDatabase = await loadCSV('FF_E_Act.csv');
+            eventDatabase = await loadCSV('FF_E_Event.csv');
+            log("讀取成功。今天的冒險也要加油！");
+            updateUI();
+        } catch (e) {
+            log("<span style='color:red;'>錯誤：無法讀取 FF_E_Act.csv 或 FF_E_Event.csv。請確認檔案是否存在於同一個資料夾。</span>");
+        }
+    }
+
+    // 條件判斷邏輯
+    function checkCondition(currentVal, conditionStr) {
+        if (!conditionStr) return true;
+        if (conditionStr.includes("&")) {
+            let parts = conditionStr.split("&"); // 處理 30<=&>=70
+            let low = parseFloat(parts[0].replace("<=","").replace(">=",""));
+            let high = parseFloat(parts[1].replace("<=","").replace(">=",""));
+            return currentVal >= Math.min(low, high) && currentVal <= Math.max(low, high);
+        }
+        if (conditionStr.startsWith(">=")) return currentVal >= parseFloat(conditionStr.substring(2));
+        if (conditionStr.startsWith("<=")) return currentVal <= parseFloat(conditionStr.substring(2));
+        if (conditionStr.startsWith(">")) return currentVal > parseFloat(conditionStr.substring(1));
+        if (conditionStr.startsWith("<")) return currentVal < parseFloat(conditionStr.substring(1));
+        return false;
+    }
+
+    // 執行動作
+    function doAction(actName) {
+        let currentStatVal = (actName === "睡覺") ? player.mood : player.stats["s-str"];
+        let match = actionDatabase.find(d => 
+            d.Action === actName && 
+            d.Loc === player.location && 
+            checkCondition(currentStatVal, d.Req_Value)
+        );
+
+        if (!match) return;
+
+        // 結算變動值
+        let baseChange = parseFloat(match.Change_Value);
+        let weight = parseFloat(match.Weighted);
+        let finalChange = baseChange * weight;
+
+        if (match.Change_Stat === "s-sta") player.stats["s-sta"] = Math.max(0, Math.min(10, player.stats["s-sta"] + finalChange));
+        if (match.Change_Stat === "mood") player.mood = Math.max(0, Math.min(100, player.mood + finalChange));
+
+        log(match.Content);
+
+        // 隨機事件檢查
+        if (match["R_E_Check?"] === "1") {
+            let prob = Math.random();
+            let ev = eventDatabase.find(e => e.Column_B === actName && prob < (parseFloat(e.Probability)/100));
+            if (ev) {
+                if (ev.Change_Stat === "money") player.money += parseInt(ev.Change_Value);
+                log(`<span style="color:goldenrod;">★事件：${ev.Content}</span>`);
+            }
+        }
+
+        if (actName === "睡覺") player.date.day++;
+        updateUI();
+    }
+
+    function changeLoc(loc) {
+        player.location = loc;
+        updateUI();
+        log(`你來到了${loc}。`);
+    }
+
+    function log(msg) {
+        const area = document.getElementById('story-area');
+        area.innerHTML += `<div>> ${msg}</div>`;
+        area.scrollTop = area.scrollHeight;
+    }
+
+    function updateUI() {
+        document.getElementById('date-display').innerText = `墨玲元年${player.date.mon}月${player.date.day}日`;
+        document.getElementById('s-money').innerText = player.money;
+        document.getElementById('s-sta').innerText = Math.round(player.stats["s-sta"] * 10) / 10;
+        document.getElementById('s-str').innerText = player.stats["s-str"];
+        document.getElementById('s-int').innerText = player.stats["s-int"];
+        document.getElementById('s-agi').innerText = player.stats["s-agi"];
+        document.getElementById('mood-bar').style.width = player.mood + "%";
+        document.getElementById('mood-text').innerText = player.mood > 70 ? "開心" : (player.mood < 30 ? "鬱悶" : "平凡");
+
+        const availableActions = [...new Set(actionDatabase.filter(d => d.Loc === player.location).map(d => d.Action))];
+        document.getElementById('action-buttons').innerHTML = availableActions.map(a => `<button class="action-btn" onclick="doAction('${a}')">${a}</button>`).join('');
+        
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.innerText.includes(player.location)));
+        document.getElementById('bag-books').innerHTML = player.inv.books.map(b => `<div class="item-slot"><span>${b.n}</span><span>x${b.c}</span></div>`).join('');
+    }
+
+    initGame();
+</script>
+</body>
+</html>
