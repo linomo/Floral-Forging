@@ -1,2 +1,3 @@
-Table,Column_A,Column_B,Probability,Change_Stat,Change_Value,Content
-LtA,æˆ¿é–“,æ•´ç†,50%,money,10,æ’¿åˆ°éŒ¢å¤ªå¥½äº†ï¼
+Table,Column_A,Column_B,Probability,Change_Stat_1,Change_Value,Change_Stat_2,Change_Value,Content
+LtA,©Ğ¶¡,¾ã²z,50%,money,10,mood,5,¾ß¨ì¿ú¤Ó¦n¤F¡I
+LtA,©Ğ¶¡,¾ã²z,10%,mood,-5,,,½ğ¨ì¸}³k­üËç¡I
