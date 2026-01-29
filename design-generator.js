@@ -210,10 +210,6 @@ function draw() {
   // 決定顯示品級（天才白癡線）
   const displayGrade = mental.miracle ? '奇‽' : overallGrade;
   
-  // 取得材料
-  const metalMat = getMaterial('metal', overallGrade);
-  const woodMat = getMaterial('wood', overallGrade);
-  
   // 計算材料需求
   const baseMetalCost = parseInt(weapon.metal) || 0;
   const baseWoodCost = parseInt(weapon.wood) || 0;
@@ -227,8 +223,11 @@ function draw() {
   metalNeed = Math.max(0, metalNeed);
   woodNeed = Math.max(0, woodNeed);
   
-  // 計算價格
-  const price = calcPrice(weapon, overallGrade, physical, metalMat, woodMat);
+  // 計算設計圖價格：30元 × 品級倍率 × 物理前綴倍率
+  const gradeData = DATA.grades.find(g => g.grade === overallGrade);
+  const gradeMulti = parseFloat(gradeData?.effect_value_?.replace('*', '')) || 1;
+  const physicalMulti = parseFloat(physical.effect_value_2?.replace('*', '')) || 1;
+  const price = Math.floor(30 * gradeMulti * physicalMulti);
   
   // EP
   const ep = weapon.maker_point || '??';
@@ -262,11 +261,11 @@ function draw() {
     <div class="card-info">
       <div class="info-item">
         <span class="info-label">⚙️ 金</span>
-        <span class="info-value metal">${metalNeed} (${metalMat.name})</span>
+        <span class="info-value metal">${metalNeed}</span>
       </div>
       <div class="info-item">
         <span class="info-label">🪵 木</span>
-        <span class="info-value wood">${woodNeed} (${woodMat.name})</span>
+        <span class="info-value wood">${woodNeed}</span>
       </div>
       <div class="info-item">
         <span class="info-label">💰 價格</span>
@@ -277,12 +276,10 @@ function draw() {
         <span class="info-value ep">${ep}</span>
       </div>
     </div>
-    ${effects.length > 0 ? `
     <div class="card-effects">
-      <div class="effect-title">📝 設計時效果</div>
-      <div class="effect-row">${effects.join('')}</div>
+      <div class="effect-title">📝 讓我看看！</div>
+      <div class="effect-row">${effects.length > 0 ? effects.join('') : '&nbsp;'}</div>
     </div>
-    ` : ''}
     <div class="card-comments">
       ${comments.map(c => `
         <div class="comment-line">
