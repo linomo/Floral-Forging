@@ -23,7 +23,8 @@ let DATA = {
   weapons: [],
   metal: [],
   wood: [],
-  comments: []
+  comments: [],
+  luckRandom: []
 };
 
 // === 初始化載入所有 CSV ===
@@ -36,6 +37,7 @@ async function initData() {
     DATA.metal = await loadCSV('metal.csv');
     DATA.wood = await loadCSV('wood.csv');
     DATA.comments = await loadCSV('grade_comments.csv');
+    DATA.luckRandom = await loadCSV('luck_random.csv');
     
     // 啟用按鈕
     document.getElementById('drawBtn').disabled = false;
@@ -66,10 +68,29 @@ function getGradeIndex(grade) {
 }
 
 // === 計算函數 ===
-function calcOverall(str, int, dex, luck) {
-  const base = (str + int + dex) / 3;
-  const luckAdj = (luck - 50) / 100;
-  return clamp(base * (1 + luckAdj) + random(-5, 5), 0, 100);
+function drawGradeByLuck(luck) {
+  // 根據 LUCK 找到對應的機率表
+  const row = DATA.luckRandom.find(r => {
+    const min = parseInt(r.luck_min) || 0;
+    const max = parseInt(r.luck_max) || 100;
+    return luck >= min && luck <= max;
+  });
+  
+  if (!row) return '普'; // 預設
+  
+  // 取得各品級機率
+  const prob爛 = parseInt(row['爛']) || 0;
+  const prob普 = parseInt(row['普']) || 0;
+  const prob好 = parseInt(row['好']) || 0;
+  const prob奇 = parseInt(row['奇']) || 0;
+  
+  // 擲骰
+  const roll = Math.random() * 100;
+  
+  if (roll < prob爛) return '爛';
+  if (roll < prob爛 + prob普) return '普';
+  if (roll < prob爛 + prob普 + prob好) return '好';
+  return '奇';
 }
 
 function calcPhysical(str, luck) {
@@ -193,12 +214,11 @@ function draw() {
   const mood = parseInt(document.getElementById('mood').value) || 0;
   
   // 計算數值
-  const overallVal = calcOverall(str, int, dex, luck);
   const physicalVal = calcPhysical(str, luck);
   const mentalVal = calcMental(int, mood);
   
-  // 決定品級
-  const overallGrade = getGrade(overallVal);
+  // 決定品級（根據 LUCK 查表抽卡）
+  const overallGrade = drawGradeByLuck(luck);
   
   // 抽前綴
   const physical = drawPhysicalPrefix(physicalVal);
