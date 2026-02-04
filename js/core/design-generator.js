@@ -57,14 +57,16 @@ const DesignGenerator = {
         const overallGrade = this.drawGradeByLuck(player.luck);
         
         // 2. 隨機選取前綴
-        const physical = CSVLoader.data.physical.find(p => p.grade === this.getGradeLabel(physVal)) || this.pick(CSVLoader.data.physical);
-        const mental = CSVLoader.data.mental.find(m => m.grade === this.getGradeLabel(mentVal)) || this.pick(CSVLoader.data.mental);
+        const physicalPool = CSVLoader.data.physical.filter(p => p.grade === this.getGradeLabel(physVal));
+        const mentalPool = CSVLoader.data.mental.filter(m => m.grade === this.getGradeLabel(mentVal));
+        const physical = physicalPool.length > 0 ? this.pick(physicalPool) : this.pick(CSVLoader.data.physical);
+        const mental = mentalPool.length > 0 ? this.pick(mentalPool) : this.pick(CSVLoader.data.mental);
 
         // 3. 武器過濾：檢查 weapon.unlock_trigger 是否在 player.readBooks 中
         const availableWeapons = CSVLoader.data.weapons.filter(w => 
             !w.unlock_trigger || player.readBooks.includes(w.unlock_trigger)
         );
-        const weapon = this.pick(availableWeapons) || CSVLoader.data.weapons[0];
+        const weapon = availableWeapons.length > 0 ? this.pick(availableWeapons) : CSVLoader.data.weapons[0];
         
         // 奇‽ 特殊觸發 (心情爛但骰出奇)
         const displayGrade = (this.getGradeLabel(mentVal) === '爛' && overallGrade === '奇' && Math.random() < 0.1) ? '奇‽' : overallGrade;
@@ -83,8 +85,9 @@ const DesignGenerator = {
             }
         });
 
+        // 🔧 修正：使用 effect_value_ 而不是 effect_value_1
         const gData = CSVLoader.data.grades.find(g => g.grade === overallGrade.replace('‽',''));
-        const gMulti = gData ? parseFloat(gData.effect_value_1.replace('*','')) : 1;
+        const gMulti = gData ? parseFloat(gData.effect_value_.replace('*','')) : 1;
         
         // 5. 標籤處理
         const effects = [];
@@ -108,8 +111,8 @@ const DesignGenerator = {
             ep: weapon.maker_point,
             effects,
             comments: CSVLoader.data.comments.filter(c => 
-                c.grade === displayGrade.replace('‽','') &&    // ✅ 改這裡（從 prefixes_grade 改成 grade）
-                (!c.unlock_trigger || c.unlock_trigger === physical.pp_id)  // ✅ 改這裡（從 trigger_type 改成 unlock_trigger）
+                c.grade === displayGrade.replace('‽','') && 
+                (!c.unlock_trigger || c.unlock_trigger === physical.pp_id)
             )
         };
     }
