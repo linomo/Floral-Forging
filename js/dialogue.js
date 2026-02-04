@@ -33,10 +33,10 @@ const DialogueSystem = {
       commentsBox.id = 'design-comments-box';
       commentsBox.className = 'design-comments-box';
       
-      // 插入到彈窗後面
-      const modal = document.getElementById('designModal');
-      if (modal) {
-        modal.parentNode.insertBefore(commentsBox, modal.nextSibling);
+      // 🔧 修正：插入到 modal-overlay 裡面，而不是外面
+      const modalOverlay = document.getElementById('designModal');
+      if (modalOverlay) {
+        modalOverlay.appendChild(commentsBox);
       }
     }
     
