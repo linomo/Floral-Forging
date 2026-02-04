@@ -33,12 +33,18 @@
     .avatar-box {
       width: 80px; height: 80px;
       background: linear-gradient(135deg, #2a2a3d, #1a1a28);
-      border: 2px solid #4a90d9; border-radius: 12px;
+      border: 2px solid #FCFAF2; border-radius: 12px;
       margin: 0 auto 8px;
       display: flex; align-items: center; justify-content: center;
       font-size: 2.5em;
+      cursor: pointer;
+      transition: all 0.2s;
     }
-    .avatar-name { font-weight: bold; color: #4a90d9; }
+    .avatar-box:hover {
+      transform: scale(1.05);
+      box-shadow: 0 5px 15px rgba(252, 250, 242, 0.3);
+    }
+    .avatar-name { font-weight: bold; color: #FCFAF2; cursor: pointer; }
     
     .stats-section { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px; }
     .stat-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.85em; }
@@ -144,6 +150,7 @@
       background: rgba(0,0,0,0.85);
       display: none; align-items: center; justify-content: center;
       z-index: 100;
+      flex-direction: column;
     }
     .modal-overlay.show { display: flex; }
     
@@ -151,6 +158,7 @@
       background: linear-gradient(180deg, #252535 0%, #1a1a28 100%);
       border-radius: 16px; padding: 20px;
       max-width: 320px; width: 90%;
+      margin-bottom: 20px;
     }
     .modal-title { text-align: center; color: #f5a623; margin-bottom: 15px; font-size: 1.1em; }
     
@@ -210,11 +218,6 @@
     .effect-tag.negative { color: #f5576c; }
     .effect-tag.special { color: #f5a623; background: rgba(245,166,35,0.2); }
     
-    .card-comments { padding: 10px 12px; }
-    .comment-line { display: flex; gap: 6px; margin-bottom: 5px; font-size: 0.75em; line-height: 1.4; }
-    .comment-line:last-child { margin-bottom: 0; }
-    .comment-text { color: #bbb; }
-    
     .card-placeholder { padding: 40px 20px; text-align: center; color: #444; font-size: 0.9em; }
     
     .modal-actions { display: flex; gap: 10px; margin-top: 15px; }
@@ -226,6 +229,35 @@
     }
     .modal-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
     .modal-btn.primary { background: linear-gradient(90deg, #4ecdc4, #44a08d); border: none; color: #fff; }
+    
+    /* === 設計圖評論框（彈窗下方）=== */
+    .design-comments-box {
+      width: 500px;
+      max-width: 90%;
+      background: rgba(30, 30, 45, 0.95);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 15px;
+      display: none;
+    }
+    .design-comment-line {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+    .design-comment-line:last-child {
+      margin-bottom: 0;
+    }
+    .design-comment-icon {
+      font-size: 1.2em;
+      flex-shrink: 0;
+    }
+    .design-comment-text {
+      flex: 1;
+      font-size: 0.9em;
+    }
     
     .effect-toast {
       position: fixed; top: 20px; left: 50%;
@@ -304,11 +336,11 @@
     <div class="dialogue-area">
       <div class="dialogue-box">
         <div class="dialogue-header">
-          <div class="color-block" id="speaker-color" style="background: #f5a623"></div>
-          <div class="speaker-name" id="speaker-name" style="color: #f5a623">師父</div>
+          <div class="color-block" id="speaker-color" style="background: #B5CAA0"></div>
+          <div class="speaker-name" id="speaker-name" style="color: #B5CAA0">師父</div>
         </div>
         <div class="dialogue-content">
-          <span class="dialogue-emoji" id="dialogue-emoji">🧔</span>
+          <span class="dialogue-emoji" id="dialogue-emoji">🌺</span>
           <span class="dialogue-text" id="dialogue-text">今天開始學鍛造，先去書桌畫設計圖吧。</span>
           <button class="continue-btn" onclick="nextDialogue()">▶</button>
         </div>
@@ -329,10 +361,16 @@
         <button class="modal-btn primary" id="saveBtn" onclick="saveDesign()" style="display:none;">收下設計圖</button>
       </div>
     </div>
+    <!-- 評論框會被 JS 動態插入這裡 -->
   </div>
   
   <div class="effect-toast" id="toast"></div>
 
-  <script src="game.js"></script>
+  <!-- 引入 JS 檔案 -->
+  <script src="js/csv-loader.js"></script>
+  <script src="js/character.js"></script>
+  <script src="js/dialogue.js"></script>
+  <script src="js/design-generator.js"></script>
+  <script src="js/game.js"></script>
 </body>
 </html>

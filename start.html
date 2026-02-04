@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FLORAL FORGER - 開始</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Microsoft JhengHei", "PingFang TC", sans-serif;
+      background: linear-gradient(135deg, #0d0d14 0%, #1a1a28 100%);
+      min-height: 100vh;
+      color: #eee;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .start-container {
+      text-align: center;
+      max-width: 500px;
+      padding: 40px;
+    }
+    
+    .game-title {
+      font-size: 3em;
+      font-weight: bold;
+      background: linear-gradient(90deg, #f093fb, #f5576c, #f5a623);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+    }
+    
+    .game-subtitle {
+      font-size: 1.2em;
+      color: #888;
+      margin-bottom: 60px;
+    }
+    
+    .menu-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .menu-btn {
+      padding: 20px 40px;
+      font-size: 1.3em;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 15px;
+      background: rgba(255,255,255,0.05);
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: inherit;
+    }
+    
+    .menu-btn:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.4);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    
+    .menu-btn.primary {
+      background: linear-gradient(90deg, #f093fb, #f5576c);
+      border: none;
+    }
+    
+    .menu-btn.primary:hover {
+      box-shadow: 0 10px 40px rgba(245, 87, 108, 0.4);
+    }
+    
+    /* 命名視窗 */
+    .name-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.8);
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    
+    .name-modal.show {
+      display: flex;
+    }
+    
+    .name-box {
+      background: linear-gradient(180deg, #252535 0%, #1a1a28 100%);
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 400px;
+      width: 90%;
+    }
+    
+    .name-title {
+      font-size: 1.5em;
+      margin-bottom: 10px;
+      color: #f5a623;
+    }
+    
+    .name-hint {
+      font-size: 0.9em;
+      color: #888;
+      margin-bottom: 25px;
+    }
+    
+    .name-input {
+      width: 100%;
+      padding: 15px;
+      font-size: 1.2em;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 10px;
+      background: rgba(0,0,0,0.3);
+      color: #fff;
+      font-family: inherit;
+      margin-bottom: 25px;
+    }
+    
+    .name-input:focus {
+      outline: none;
+      border-color: #f5a623;
+    }
+    
+    .name-actions {
+      display: flex;
+      gap: 15px;
+    }
+    
+    .name-btn {
+      flex: 1;
+      padding: 12px;
+      font-size: 1.1em;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    
+    .name-btn.cancel {
+      background: rgba(255,255,255,0.1);
+      color: #aaa;
+    }
+    
+    .name-btn.cancel:hover {
+      background: rgba(255,255,255,0.15);
+    }
+    
+    .name-btn.confirm {
+      background: linear-gradient(90deg, #4ecdc4, #44a08d);
+      color: #fff;
+      font-weight: bold;
+    }
+    
+    .name-btn.confirm:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(78, 205, 196, 0.4);
+    }
+  </style>
+</head>
+<body>
+  <div class="start-container">
+    <h1 class="game-title">FLORAL FORGER</h1>
+    <p class="game-subtitle">花之鍛造師</p>
+    
+    <div class="menu-buttons">
+      <button class="menu-btn primary" onclick="startNewGame()">
+        🔨 鍛造開始
+      </button>
+      <button class="menu-btn" onclick="continueGame()">
+        ⚒️ 繼續鍛造
+      </button>
+    </div>
+  </div>
+  
+  <!-- 命名視窗 -->
+  <div class="name-modal" id="nameModal">
+    <div class="name-box">
+      <div class="name-title">✨ 請輸入你的名字</div>
+      <div class="name-hint">這將是你在鍛造之路上的稱呼</div>
+      <input 
+        type="text" 
+        class="name-input" 
+        id="playerNameInput" 
+        placeholder="小哈" 
+        maxlength="10"
+        autofocus
+      >
+      <div class="name-actions">
+        <button class="name-btn cancel" onclick="closeNameModal()">取消</button>
+        <button class="name-btn confirm" onclick="confirmName()">確定</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 開始新遊戲
+    function startNewGame() {
+      document.getElementById('nameModal').classList.add('show');
+      document.getElementById('playerNameInput').focus();
+    }
+    
+    // 繼續遊戲
+    function continueGame() {
+      const savedGame = localStorage.getItem('floralForger_save');
+      if (savedGame) {
+        window.location.href = 'index.html';
+      } else {
+        alert('尚未有存檔，請開始新遊戲！');
+      }
+    }
+    
+    // 關閉命名視窗
+    function closeNameModal() {
+      document.getElementById('nameModal').classList.remove('show');
+    }
+    
+    // 確認名字
+    function confirmName() {
+      const name = document.getElementById('playerNameInput').value.trim();
+      if (!name) {
+        alert('請輸入名字！');
+        return;
+      }
+      
+      // 儲存玩家名字到 localStorage
+      const newGame = {
+        playerName: name,
+        playerAvatar: '🔨', // 預設頭像
+        isNewGame: true
+      };
+      
+      localStorage.setItem('floralForger_newGame', JSON.stringify(newGame));
+      
+      // 跳轉到主遊戲
+      window.location.href = 'index.html';
+    }
+    
+    // Enter 鍵確認
+    document.addEventListener('DOMContentLoaded', () => {
+      const input = document.getElementById('playerNameInput');
+      input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          confirmName();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
