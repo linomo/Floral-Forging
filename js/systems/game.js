@@ -59,17 +59,30 @@ function drawDesign() {
     card.className = `card grade-${design.grade}`;
     card.innerHTML = `
         <div class="card-header">
-            <div class="card-grade">${design.grade}！${design.physical}${design.mental}</div>
+            <div class="card-grade grade-${design.grade}">${design.grade}！${design.physical}${design.mental}</div>
             <div class="card-weapon">${design.weapon}</div>
         </div>
         <div class="card-info">
-            <div class="info-item">⚙️ 金: ${design.metalNeed}</div>
-            <div class="info-item">🥖 木: ${design.woodNeed}</div>
-            <div class="info-item">💰 價格: ${design.price}</div>
-            <div class="info-item">⚡ EP: ${design.ep}</div>
+            <div class="info-item">
+                <span class="info-label">⚙️ 金</span>
+                <span class="info-value metal">${design.metalNeed}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">🥖 木</span>
+                <span class="info-value wood">${design.woodNeed}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">💰 價格</span>
+                <span class="info-value price">${design.price}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">⚡ EP</span>
+                <span class="info-value ep">${design.ep}</span>
+            </div>
         </div>
         <div class="card-effects">
-            ${design.effects.join('')}
+            <div class="effect-title">📝 讓我看看！</div>
+            <div class="effect-row">${design.effects.length > 0 ? design.effects.join('') : '&nbsp;'}</div>
         </div>
     `;
     
@@ -77,14 +90,6 @@ function drawDesign() {
         DialogueSystem.showDesignComments(design.comments);
     }
     document.getElementById('saveBtn').style.display = 'block';
-}
-
-function saveDesign() {
-    if (currentDesign) {
-        player.designs.push(currentDesign);
-        alert(`📜 獲得設計圖：${currentDesign.grade}！${currentDesign.weapon}`);
-        closeDesignModal();
-    }
 }
 
 function closeDesignModal() {
