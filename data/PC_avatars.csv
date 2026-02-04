@@ -1,0 +1,8 @@
+avatars_id,avatars,avatars_trigger_01,avatars_trigger_value_01,avatars_trigger_02,avatars_trigger_value_02,avatars_trigger_03,avatars_trigger_value_03
+avatars01,🔨,,,,,,
+avatars02,🐣,STR,50,INT,50,DEX,50
+avatars03,🦚,STR,70,INT,70,DEX,70
+avatars04,🌟,LUCK,70,,,,
+avatars05,🌼,SF_FAVOR,60,,,,
+avatars06,🐟,SS_FAVOR,60,,,,
+avatars07,🔳,DS_FAVOR,60,,,,
