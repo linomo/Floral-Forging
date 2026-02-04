@@ -22,6 +22,6 @@ grade,pp_id,name,effect_sta_1,effect_value_1,effect_sta_2,effect_value_2
 奇,pp21,閃瞎狗眼的,metal,5,price,*3
 奇,pp22,兵兵乓乓的,metal,10,price,*3
 奇,pp23,五彩斑斕的,metal,6,price,*3
-奇,pp24,猶如江海的,SF,10,price,*2
-奇,pp25,砉然嚮然的,SS,10,price,*2
-奇,pp26,法儀巧工的,DS,10,price,*2
+奇,pp24,猶如江海的,SF_FAVOR,10,price,*2
+奇,pp25,砉然嚮然的,SS_FAVOR,10,price,*2
+奇,pp26,法儀巧工的,DS_FAVOR,10,price,*2
