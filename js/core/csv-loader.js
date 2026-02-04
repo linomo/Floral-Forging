@@ -1,3 +1,7 @@
+/**
+ * CSVLoader - 修正路徑對齊妳 GitHub 的實際資料夾位置
+ * 存放路徑：js/core/csv-loader.js
+ */
 const CSVLoader = {
     data: {
         characters: [], avatars: [], grades: [], physical: [],
@@ -22,7 +26,7 @@ const CSVLoader = {
                 return obj;
             });
         } catch (e) {
-            console.error('❌ CSV 載入報錯:', e);
+            console.error('❌ CSV 載入失敗:', e);
             return [];
         }
     },
@@ -30,26 +34,32 @@ const CSVLoader = {
     async loadAll() {
         console.log('📦 開始載入遊戲資料庫...');
         
-        // 分類路徑載入
+        // 1. 角色類 (chara 資料夾)
         this.data.characters = await this.loadCSV('data/chara/chara.csv');
         this.data.avatars = await this.loadCSV('data/chara/PC_avatars.csv');
         
+        // 2. 物品類 (items 資料夾)
         this.data.weapons = await this.loadCSV('data/items/weapon.csv');
         this.data.books = await this.loadCSV('data/items/book.csv');
         this.data.metal = await this.loadCSV('data/items/metal.csv');
         this.data.wood = await this.loadCSV('data/items/wood.csv');
         
-        // 🚩 妳說過搬到 forging 的檔案
+        // 3. 🚩 搬家到 forging/ 的鍛造規則
         this.data.grades = await this.loadCSV('data/forging/prefixes_grade.csv');
         this.data.physical = await this.loadCSV('data/forging/prefixes_physical.csv');
         this.data.mental = await this.loadCSV('data/forging/prefixes_mental.csv');
         this.data.comments = await this.loadCSV('data/forging/grade_comment.csv');
         
-        // 🚩 妳說過在 data 根目錄的檔案
+        // 4. 🚩 搬家到 data/ 根目錄的機率表
         this.data.luckRandom = await this.loadCSV('data/luck_random.csv');
         
         console.log('✅ 資料庫載入完畢', this.data);
         return true;
+    },
+
+    getCharacter(charaId) {
+        return this.data.characters.find(c => c.chara_id === charaId);
     }
 };
+
 window.CSVLoader = CSVLoader;
