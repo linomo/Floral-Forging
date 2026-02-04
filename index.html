@@ -4,24 +4,234 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>花卉鍛造室 - Floral Forging</title>
-    <link rel="stylesheet" href="style.css"> <style>
-        /* 介面基本調整 */
-        .effect-tag.special { 
-            background: rgba(245, 166, 35, 0.2); 
-            color: #f5a623; 
-            border: 1px solid rgba(245, 166, 35, 0.3);
+    <style>
+        :root {
+            --bg-color: #f4f1de;
+            --text-color: #3d405b;
+            --accent-color: #e07a5f;
+            --card-bg: #ffffff;
         }
-        /* 其他樣式略過，請保留你原本的 CSS */
+
+        body {
+            font-family: "Microsoft JhengHei", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* 頂部狀態欄 */
+        .status-bar {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.5);
+            border-bottom: 2px solid #ddd;
+        }
+
+        .player-info { display: flex; align-items: center; gap: 15px; }
+        .avatar-box {
+            width: 60px; height: 60px;
+            border: 4px solid #ccc;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 30px; background: white;
+        }
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-size: 14px; }
+
+        /* 工作室區域 */
+        .workshop {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            height: 450px;
+            background: #e9edc9;
+            margin-top: 20px;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 5px solid #d4a373;
+        }
+
+        .clickable {
+            position: absolute;
+            cursor: pointer;
+            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        .clickable:hover { transform: scale(1.1); background: rgba(255, 255, 255, 0.6); }
+
+        /* 對話框 */
+        #dialogue-container {
+            width: 100%;
+            max-width: 800px;
+            height: 120px;
+            background: white;
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+            cursor: pointer;
+        }
+
+        /* 設計圖彈窗 (Modal) */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            align-items: center; justify-content: center;
+            z-index: 1000;
+        }
+        .modal.show { display: flex; }
+        .modal-content {
+            background: #fff;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        /* 設計圖卡片樣式 */
+        .card {
+            border: 2px solid #ddd;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            background: #fafafa;
+            text-align: left;
+            transition: all 0.3s;
+        }
+        .grade-爛 { border-color: #999; background: #f0f0f0; }
+        .grade-普 { border-color: #81b29a; background: #f8fff8; }
+        .grade-好 { border-color: #f2cc8f; background: #fffcf0; }
+        .grade-奇 { border-color: #e07a5f; background: #fff5f2; box-shadow: 0 0 15px rgba(224,122,95,0.3); }
+        .grade-奇‽ { border-color: #3d405b; background: #eee; border-style: dashed; }
+
+        .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .card-grade { font-weight: bold; font-size: 1.2em; }
+        .card-weapon { color: #666; font-size: 0.9em; }
+
+        .card-info { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 15px 0; font-size: 14px; }
+        .info-label { color: #888; margin-right: 5px; }
+
+        /* 標籤樣式 */
+        .card-effects { margin-top: 15px; }
+        .effect-row { display: flex; flex-wrap: wrap; gap: 5px; min-height: 24px; }
+        .effect-tag {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .effect-tag.positive { background: #e8f5e9; color: #2e7d32; }
+        .effect-tag.negative { background: #ffebee; color: #c62828; }
+        .effect-tag.special { background: rgba(245, 166, 35, 0.2); color: #f5a623; border: 1px solid rgba(245, 166, 35, 0.3); }
+
+        /* 按鈕樣式 */
+        .btn {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .btn-primary { background: #81b29a; color: white; }
+        .btn-primary:hover { background: #6da087; }
+        .btn-secondary { background: #eee; color: #666; }
+
+        /* Toast 提示 */
+        #toast {
+            position: fixed;
+            bottom: 20px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            display: none;
+            z-index: 2000;
+        }
+        #toast.show { display: block; }
     </style>
 </head>
 <body>
-    <div id="game-container">
+
+    <div class="status-bar">
+        <div class="player-info">
+            <div class="avatar-box" id="avatar-box">🔨</div>
+            <div>
+                <strong id="avatar-name">小哈</strong>
+                <div class="stats-grid">
+                    <span>STR: <span id="str-val">30</span></span>
+                    <span>INT: <span id="int-val">25</span></span>
+                    <span>LUCK: <span id="luck-val">50</span></span>
+                    <span>DEX: <span id="dex-val">40</span></span>
+                </div>
+            </div>
         </div>
+        <div style="width: 200px;">
+            <div>心情</div>
+            <div style="background: #eee; height: 10px; border-radius: 5px; margin: 5px 0;">
+                <div id="mood-bar" style="width: 50%; height: 100%; background: #81b29a; border-radius: 5px;"></div>
+            </div>
+            <div>壓力</div>
+            <div style="background: #eee; height: 10px; border-radius: 5px; margin: 5px 0;">
+                <div id="stress-bar" style="width: 25%; height: 100%; background: #e07a5f; border-radius: 5px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="workshop">
+        <div class="clickable" style="top: 50px; left: 100px; width: 100px; height: 80px;" onclick="clickRoom('window')">窗戶</div>
+        <div class="clickable" style="top: 150px; left: 50px; width: 150px; height: 100px;" onclick="clickRoom('desk')">書桌<br>(設計圖)</div>
+        <div class="clickable" style="top: 100px; left: 250px; width: 120px; height: 150px;" onclick="clickRoom('shelf')">書架</div>
+        <div class="clickable" style="top: 250px; left: 300px; width: 120px; height: 100px;" onclick="clickRoom('anvil')">鐵砧</div>
+        <div class="clickable" style="top: 50px; right: 50px; width: 150px; height: 200px;" onclick="clickRoom('furnace')">熔爐</div>
+        <div class="clickable" style="bottom: 50px; right: 200px; width: 100px; height: 80px;" onclick="clickRoom('water')">冷卻水桶</div>
+    </div>
+
+    <div id="dialogue-container" onclick="nextDialogue()">
+        <div id="dialogue-speaker" style="font-weight: bold; margin-bottom: 5px; color: #e07a5f;"></div>
+        <div id="dialogue-text">遊戲載入中...</div>
+    </div>
+
+    <div id="designModal" class="modal">
+        <div class="modal-content">
+            <h3>鍛造設計圖</h3>
+            <div id="designCard" class="card">
+                <div style="text-align:center; color:#999; padding: 40px;">在腦中構思設計圖...</div>
+            </div>
+            
+            <div id="design-comments" style="display:none; margin-bottom: 15px; text-align: left; font-size: 14px; background: #f9f9f9; padding: 10px; border-radius: 8px;">
+                </div>
+
+            <div style="display: flex; justify-content: center; gap: 10px;">
+                <button class="btn btn-secondary" onclick="closeDesignModal()">暫時放棄</button>
+                <button class="btn btn-primary" onclick="drawDesign()">開始繪製</button>
+                <button id="saveBtn" class="btn btn-primary" style="display:none; background: #e07a5f;" onclick="saveDesign()">收下設計圖</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast"></div>
 
     <script src="js/core/csv-loader.js"></script>
     <script src="js/core/design-generator.js"></script>
     <script src="js/systems/character.js"></script>
     <script src="js/systems/dialogue.js"></script>
     <script src="js/systems/game.js"></script>
+
 </body>
 </html>
