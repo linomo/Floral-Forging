@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FLORAL FORGER</title>
   
+  <!-- 自動跳轉到開始畫面 -->
   <script>
-    if (!localStorage.getItem('floralForger_newGame')) {
+    if (!localStorage.getItem('floralForger_newGame') && !localStorage.getItem('floralForger_save')) {
       window.location.href = 'start.html';
     }
   </script>
   
   <style>
-    /* === 這裡完全是妳原本的深色排版與顏色，我絕對不動 === */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: "Microsoft JhengHei", "PingFang TC", sans-serif;
@@ -22,6 +22,7 @@
       display: flex;
     }
     
+    /* === 左側面板 === */
     .left-panel {
       width: 180px;
       background: linear-gradient(180deg, #1a1a28 0%, #12121a 100%);
@@ -55,6 +56,7 @@
     
     .stats-section { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px; }
     .stat-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.85em; }
+    .stat-row:last-child { margin-bottom: 0; }
     .stat-label { color: #888; }
     .stat-value { color: #fff; font-weight: bold; }
     
@@ -158,9 +160,9 @@
       align-items: center; 
       justify-content: center;
       z-index: 100;
-      flex-direction: column; 
-      gap: 20px; 
-      padding: 20px; 
+      flex-direction: column; /* 🔧 垂直排列 */
+      gap: 20px; /* 🔧 彈窗和評論框之間的間距 */
+      padding: 20px; /* 🔧 留一些邊距 */
     }
     .modal-overlay.show { display: flex; }
     
@@ -184,8 +186,6 @@
       background: rgba(0,0,0,0.3); border-radius: 12px;
       overflow: hidden; border: 2px solid #333;
     }
-    
-    /* 品級配色 */
     .card.grade-爛 { border-color: #555; }
     .card.grade-普 { border-color: #4ecdc4; }
     .card.grade-好 { border-color: #ffe66d; }
@@ -227,7 +227,6 @@
     .effect-tag { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 8px; }
     .effect-tag.positive { color: #7ed321; }
     .effect-tag.negative { color: #f5576c; }
-    /* 橘色特殊標籤樣式 */
     .effect-tag.special { color: #f5a623; background: rgba(245,166,35,0.2); }
     
     .card-placeholder { padding: 40px 20px; text-align: center; color: #444; font-size: 0.9em; }
@@ -242,6 +241,7 @@
     .modal-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
     .modal-btn.primary { background: linear-gradient(90deg, #4ecdc4, #44a08d); border: none; color: #fff; }
     
+    /* === 🔧 修正：評論框樣式 === */
     .design-comments-box {
       width: 500px;
       max-width: 90%;
@@ -250,6 +250,7 @@
       border-radius: 12px;
       padding: 15px;
       display: none;
+      /* 移除了 position 相關設定，讓它在 flexbox 中自然排列 */
     }
     .design-comment-line {
       display: flex;
@@ -282,6 +283,7 @@
   </style>
 </head>
 <body>
+  <!-- 左側面板 -->
   <div class="left-panel">
     <div class="date-section">
       <div class="date-year">元年</div>
@@ -289,8 +291,8 @@
       <div class="date-day">第三天</div>
     </div>
     <div class="avatar-section">
-      <div class="avatar-box" id="avatar-box">🔨</div>
-      <div class="avatar-name" id="avatar-name">小哈</div>
+      <div class="avatar-box">🔨</div>
+      <div class="avatar-name">小哈</div>
     </div>
     <div class="stats-section">
       <div class="stat-row"><span class="stat-label">力量</span><span class="stat-value" id="str-val">30</span></div>
@@ -324,6 +326,7 @@
     </div>
   </div>
   
+  <!-- 右側主區 -->
   <div class="right-main">
     <div class="operation-area">
       <div class="room-title">📍 鍛造室</div>
@@ -350,13 +353,14 @@
         </div>
         <div class="dialogue-content">
           <span class="dialogue-emoji" id="dialogue-emoji">🌺</span>
-          <span class="dialogue-text" id="dialogue-text">遊戲載入中...</span>
+          <span class="dialogue-text" id="dialogue-text">今天開始學鍛造，先去書桌畫設計圖吧。</span>
           <button class="continue-btn" onclick="nextDialogue()">▶</button>
         </div>
       </div>
     </div>
   </div>
   
+  <!-- 設計圖彈窗 -->
   <div class="modal-overlay" id="designModal">
     <div class="design-modal">
       <div class="modal-title">📜 繪製設計圖</div>
@@ -369,16 +373,16 @@
         <button class="modal-btn primary" id="saveBtn" onclick="saveDesign()" style="display:none;">收下設計圖</button>
       </div>
     </div>
-    <div id="design-comments-box" class="design-comments-box"></div>
+    <!-- 🔧 評論框會被 JS 動態插入這裡（在 modal-overlay 內部） -->
   </div>
   
   <div class="effect-toast" id="toast"></div>
 
-  <script src="js/core/csv-loader.js"></script>
-  <script src="js/core/design-generator.js"></script>
-  <script src="js/systems/character.js"></script>
-  <script src="js/systems/dialogue.js"></script>
-  <script src="js/systems/game.js"></script>
-
+  <!-- 引入 JS 檔案 -->
+  <script src="js/csv-loader.js"></script>
+  <script src="js/character.js"></script>
+  <script src="js/dialogue.js"></script>
+  <script src="js/design-generator.js"></script>
+  <script src="js/game.js"></script>
 </body>
 </html>
