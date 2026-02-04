@@ -12,6 +12,7 @@
   </script>
   
   <style>
+    /* 這裡保留妳原本所有的 CSS 樣式，完全不動 */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: "Microsoft JhengHei", "PingFang TC", sans-serif;
@@ -185,8 +186,6 @@
       background: rgba(0,0,0,0.3); border-radius: 12px;
       overflow: hidden; border: 2px solid #333;
     }
-    
-    /* 品級配色 */
     .card.grade-爛 { border-color: #555; }
     .card.grade-普 { border-color: #4ecdc4; }
     .card.grade-好 { border-color: #ffe66d; }
@@ -228,7 +227,6 @@
     .effect-tag { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 8px; }
     .effect-tag.positive { color: #7ed321; }
     .effect-tag.negative { color: #f5576c; }
-    /* 橘色特殊標籤樣式 */
     .effect-tag.special { color: #f5a623; background: rgba(245,166,35,0.2); }
     
     .card-placeholder { padding: 40px 20px; text-align: center; color: #444; font-size: 0.9em; }
@@ -290,8 +288,8 @@
       <div class="date-day">第三天</div>
     </div>
     <div class="avatar-section">
-      <div class="avatar-box">🔨</div>
-      <div class="avatar-name">小哈</div>
+      <div class="avatar-box" id="avatar-box">🔨</div>
+      <div class="avatar-name" id="avatar-name">小哈</div>
     </div>
     <div class="stats-section">
       <div class="stat-row"><span class="stat-label">力量</span><span class="stat-value" id="str-val">30</span></div>
@@ -301,3 +299,84 @@
     </div>
     <div class="bar-section">
       <div class="bar-item">
+        <div class="bar-header"><span class="bar-label">心情</span></div>
+        <div class="bar-icons"><span>🌸</span><span>🌋</span></div>
+        <div class="bar-track"><div class="bar-fill" id="mood-bar" style="width: 50%"></div></div>
+      </div>
+      <div class="bar-item">
+        <div class="bar-header"><span class="bar-label">壓力</span></div>
+        <div class="bar-icons"><span>☀️</span><span>🌪️</span></div>
+        <div class="bar-track"><div class="bar-fill" id="stress-bar" style="width: 25%"></div></div>
+      </div>
+    </div>
+    <div class="equip-section">
+      <div class="equip-label">裝備</div>
+      <div class="equip-slot">
+        <span class="equip-icon">🩲</span>
+        <span class="equip-name">師父的內褲</span>
+        <span class="equip-effect">心情+10</span>
+      </div>
+    </div>
+    <div class="save-section">
+      <button class="save-btn">💾 儲存</button>
+      <button class="save-btn">📂 讀取</button>
+    </div>
+  </div>
+  
+  <div class="right-main">
+    <div class="operation-area">
+      <div class="room-title">📍 鍛造室</div>
+      <div class="room-grid">
+        <div class="room-item" onclick="clickRoom('shelf')"><span class="icon">📚</span><span class="label">書架</span></div>
+        <div class="room-item" onclick="clickRoom('desk')"><span class="icon">📝</span><span class="label">書桌</span></div>
+        <div class="room-item empty"></div>
+        <div class="room-item" onclick="clickRoom('window')"><span class="icon">🪟</span><span class="label">窗</span></div>
+        <div class="room-item" onclick="clickRoom('anvil')"><span class="icon">⚒️</span><span class="label">鐵砧</span></div>
+        <div class="room-item" onclick="clickRoom('furnace')"><span class="icon">🔥</span><span class="label">爐</span></div>
+        <div class="room-item" onclick="clickRoom('water')"><span class="icon">🪣</span><span class="label">水桶</span></div>
+        <div class="room-item empty"></div>
+        <div class="room-item empty"></div>
+        <div class="room-item" onclick="clickRoom('materials')"><span class="icon">📦</span><span class="label">材料</span></div>
+        <div class="room-item empty"></div>
+        <div class="room-item" onclick="clickRoom('door')"><span class="icon">🚪</span><span class="label">門</span></div>
+      </div>
+    </div>
+    <div class="dialogue-area">
+      <div class="dialogue-box">
+        <div class="dialogue-header">
+          <div class="color-block" id="speaker-color" style="background: #B5CAA0"></div>
+          <div class="speaker-name" id="speaker-name" style="color: #B5CAA0">師父</div>
+        </div>
+        <div class="dialogue-content">
+          <span class="dialogue-emoji" id="dialogue-emoji">🌺</span>
+          <span class="dialogue-text" id="dialogue-text">載入中...</span>
+          <button class="continue-btn" onclick="nextDialogue()">▶</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal-overlay" id="designModal">
+    <div class="design-modal">
+      <div class="modal-title">📜 繪製設計圖</div>
+      <button class="draw-btn" onclick="drawDesign()">🎴 開始繪製！</button>
+      <div class="card" id="designCard">
+        <div class="card-placeholder">在腦中構思設計圖...</div>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn" onclick="closeDesignModal()">取消</button>
+        <button class="modal-btn primary" id="saveBtn" onclick="saveDesign()" style="display:none;">收下設計圖</button>
+      </div>
+    </div>
+    <div id="design-comments-box" class="design-comments-box"></div>
+  </div>
+  
+  <div class="effect-toast" id="toast"></div>
+
+  <script src="js/core/csv-loader.js"></script>
+  <script src="js/core/design-generator.js"></script>
+  <script src="js/systems/character.js"></script>
+  <script src="js/systems/dialogue.js"></script>
+  <script src="js/systems/game.js"></script>
+</body>
+</html>
