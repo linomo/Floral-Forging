@@ -4,6 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FLORAL FORGER</title>
+  
+  <!-- 🔧 修正：自動跳轉到開始畫面 -->
+  <script>
+    // 如果不是新遊戲也沒有存檔，跳轉到 start.html
+    if (!localStorage.getItem('floralForger_newGame') && !localStorage.getItem('floralForger_save')) {
+      window.location.href = 'start.html';
+    }
+  </script>
+  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
