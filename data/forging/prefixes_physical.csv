@@ -24,5 +24,4 @@ grade,pp_id,name,effect_sta_1,effect_value_1,effect_sta_2,effect_value_2,effect_
 奇,pp23,五彩斑斕的,metal,6,price,*3,,,
 奇,pp24,猶如江海的,metal,0,price,*3,SF_FAVOR,10,
 奇,pp25,砉然嚮然的,metal,0,price,*3,SS_FAVOR,10,
-
 奇,pp26,法儀巧工的,metal,0,price,*3,DS_FAVOR,10,
