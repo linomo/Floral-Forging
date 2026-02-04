@@ -64,7 +64,7 @@ function drawDesign() {
         </div>
         <div class="card-info">
             <div class="info-item">⚙️ 金: ${design.metalNeed}</div>
-            <div class="info-item">🪵 木: ${design.woodNeed}</div>
+            <div class="info-item">🥖 木: ${design.woodNeed}</div>
             <div class="info-item">💰 價格: ${design.price}</div>
             <div class="info-item">⚡ EP: ${design.ep}</div>
         </div>
