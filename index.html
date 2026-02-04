@@ -5,9 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FLORAL FORGER</title>
   
-  <!-- 🔧 修正：自動跳轉到開始畫面 -->
+  <!-- 自動跳轉到開始畫面 -->
   <script>
-    // 如果不是新遊戲也沒有存檔，跳轉到 start.html
     if (!localStorage.getItem('floralForger_newGame') && !localStorage.getItem('floralForger_save')) {
       window.location.href = 'start.html';
     }
@@ -157,9 +156,13 @@
     .modal-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.85);
-      display: none; align-items: center; justify-content: center;
+      display: none; 
+      align-items: center; 
+      justify-content: center;
       z-index: 100;
-      flex-direction: column;
+      flex-direction: column; /* 🔧 垂直排列 */
+      gap: 20px; /* 🔧 彈窗和評論框之間的間距 */
+      padding: 20px; /* 🔧 留一些邊距 */
     }
     .modal-overlay.show { display: flex; }
     
@@ -167,7 +170,6 @@
       background: linear-gradient(180deg, #252535 0%, #1a1a28 100%);
       border-radius: 16px; padding: 20px;
       max-width: 320px; width: 90%;
-      margin-bottom: 20px;
     }
     .modal-title { text-align: center; color: #f5a623; margin-bottom: 15px; font-size: 1.1em; }
     
@@ -239,7 +241,7 @@
     .modal-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
     .modal-btn.primary { background: linear-gradient(90deg, #4ecdc4, #44a08d); border: none; color: #fff; }
     
-    /* === 設計圖評論框（彈窗下方）=== */
+    /* === 🔧 修正：評論框樣式 === */
     .design-comments-box {
       width: 500px;
       max-width: 90%;
@@ -248,6 +250,7 @@
       border-radius: 12px;
       padding: 15px;
       display: none;
+      /* 移除了 position 相關設定，讓它在 flexbox 中自然排列 */
     }
     .design-comment-line {
       display: flex;
@@ -370,7 +373,7 @@
         <button class="modal-btn primary" id="saveBtn" onclick="saveDesign()" style="display:none;">收下設計圖</button>
       </div>
     </div>
-    <!-- 評論框會被 JS 動態插入這裡 -->
+    <!-- 🔧 評論框會被 JS 動態插入這裡（在 modal-overlay 內部） -->
   </div>
   
   <div class="effect-toast" id="toast"></div>
