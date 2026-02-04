@@ -12,9 +12,9 @@ const CharacterSystem = {
     }
     return {
       id: char.chara_id,
-      name: char.chara_name,
-      icon: char.chara_icon,
-      color: char.chara_color
+      name: char.name,           // ✅ 新名稱
+      icon: char.icon,           // ✅ 新名稱
+      color: char.color          // ✅ 新名稱
     };
   },
 
