@@ -4,7 +4,7 @@ grade,pp_id,name,effect_sta_1,effect_value_1,effect_sta_2,effect_value_2,effect_
 爛,pp03,殘燭的,metal,-2,price,*0.7,,,price
 爛,pp04,軟爛的,wood,-3,price,*0.7,,,0
 爛,pp05,母湯的,metal,3,price,*0.5,,,
-爛,pp06,醜到沒眼看的,metal,3,price,*0.5,,,
+爛,pp06,醜到冇眼睇的,metal,3,price,*0.5,,,
 普,pp07,普通的,metal,0,price,*1,,,
 普,pp08,雞肋的,wood,-1,price,*0.9,,,
 普,pp09,似是而非的,wood,1,price,*0.8,,,
@@ -24,4 +24,5 @@ grade,pp_id,name,effect_sta_1,effect_value_1,effect_sta_2,effect_value_2,effect_
 奇,pp23,五彩斑斕的,metal,6,price,*3,,,
 奇,pp24,猶如江海的,metal,0,price,*3,SF_FAVOR,10,
 奇,pp25,砉然嚮然的,metal,0,price,*3,SS_FAVOR,10,
+
 奇,pp26,法儀巧工的,metal,0,price,*3,DS_FAVOR,10,
