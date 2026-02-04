@@ -6,11 +6,13 @@
   <title>FLORAL FORGER</title>
   
   <!-- 自動跳轉到開始畫面 -->
-  <script>
-    if (!localStorage.getItem('floralForger_newGame') && !localStorage.getItem('floralForger_save')) {
-      window.location.href = 'start.html';
-    }
-  </script>
+<!-- 自動跳轉到開始畫面 -->
+<script>
+  // 🔧 改成：只要不是從 start.html 來的，就跳轉
+  if (!document.referrer.includes('start.html')) {
+    window.location.href = 'start.html';
+  }
+</script>
   
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
