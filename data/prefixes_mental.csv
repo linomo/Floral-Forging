@@ -22,6 +22,6 @@ grade,pm_id,name,effect_sta_1,effect_value_1,effect_sta_2,effect_value_2
 奇,pm21,意不意外的,MOOD,5,LUCK,3
 奇,pm22,愛你去死的,MOOD,5,INT,2
 奇,pm23,諸君我喜歡的,MOOD,5,LUCK,5
-奇,pm24,道非常道的,MOOD,10,SF,10
-奇,pm25,擊鼓夢蝶的,MOOD,10,SS,10
-奇,pm26,非命非樂的,MOOD,10,DS,10
+奇,pm24,道非常道的,MOOD,10,SF_FAVOR,10
+奇,pm25,擊鼓夢蝶的,MOOD,10,SS_FAVOR,10
+奇,pm26,非命非樂的,MOOD,10,DS_FAVOR,10
