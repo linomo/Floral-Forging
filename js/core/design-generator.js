@@ -108,8 +108,8 @@ const DesignGenerator = {
             ep: weapon.maker_point,
             effects,
             comments: CSVLoader.data.comments.filter(c => 
-                c.grade === displayGrade.replace('‽','') && 
-                (!c.unlock_trigger || c.unlock_trigger === physical.pp_id)
+                c.grade === displayGrade.replace('‽','') &&    // ✅ 改這裡（從 prefixes_grade 改成 grade）
+                (!c.unlock_trigger || c.unlock_trigger === physical.pp_id)  // ✅ 改這裡（從 trigger_type 改成 unlock_trigger）
             )
         };
     }
