@@ -12,8 +12,14 @@ const player = {
   luck: 50,
   mood: 50,
   stress: 25,
+  // 新增好感度物件
+  favor: {
+    SF: 20, // 師父
+    SS: 10, // 小師兄
+    DS: 0   // 大俠
+  },
   designs: [],
-  unlockedAvatars: ['avatars01'] // 預設解鎖🔨
+  unlockedAvatars: ['avatars01']
 };
 
 let currentDesign = null;
