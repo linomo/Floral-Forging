@@ -65,14 +65,23 @@ const DesignGenerator = {
     return { ...this.drawFromPool(CSVLoader.data.mental, '奇'), miracle: false };
   },
 
-  formatEffect(stat, value) {
-    const val = parseInt(value) || 0;
-    if (!stat || stat === 'NaN') return null;
-    // 判斷是否為特殊標籤（包含好感度）
+formatEffect(stat, value) {
+    if (!stat || stat === 'NaN' || !value) return null;
+
+    // 解析數值：如果是乘號開頭則抓數字部分，否則轉整數
+    const isMultiplier = typeof value === 'string' && value.includes('*');
+    const val = isMultiplier ? parseFloat(value.replace('*', '')) : parseInt(value);
+
+    // --- 關鍵邏輯：數值沒有改變則不顯示 ---
+    if (!isMultiplier && val === 0) return null; // 加法類：+0 不顯示
+    if (isMultiplier && val === 1) return null; // 乘法類：*1 不顯示
+
     const isSpecial = ['SF', 'SS', 'DS', 'SF_FAVOR', 'SS_FAVOR', 'DS_FAVOR'].includes(stat);
-    const isPositive = val > 0;
-    const sign = (typeof value === 'string' && value.includes('*')) ? '' : (isPositive ? '+' : '');
+    const isPositive = val > (isMultiplier ? 1 : 0);
+    const sign = isMultiplier ? '' : (isPositive ? '+' : '');
+    
     const className = isSpecial ? 'special' : (isPositive ? 'positive' : 'negative');
+
     return `<span class="effect-tag ${className}">${stat}${sign}${value}</span>`;
   },
 
