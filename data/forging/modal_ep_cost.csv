@@ -1,0 +1,6 @@
+modal_id,action_name,ep_cost,note
+design_modal,繪製,10,
+decoration_modal,裝飾,10,
+smelt_modal,,,處理：amount-(STR+DEX)/100 分解：amount-(STR+DEX)/50
+forge_modal,,,selectedDesign.ep
+book_modal,,,book.csvselectedBook.read_ep
