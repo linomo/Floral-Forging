@@ -45,8 +45,11 @@ async function initGame() {
   updatePlayerDisplay();
   updateStatsDisplay();
   
-  // 顯示歡迎對話
-  DialogueSystem.showDialogue('SF', '今天開始學鍛造，先去書桌畫設計圖吧。');
+  // 🔧 修正：從 CSV 讀取初始對話
+  const sfChar = CharacterSystem.getCharacter('SF');
+  if (sfChar) {
+    DialogueSystem.showDialogue('SF', '今天開始學鍛造，先去書桌畫設計圖吧。');
+  }
   
   console.log('✅ 遊戲初始化完成！');
 }
@@ -67,20 +70,103 @@ function updateStatsDisplay() {
   document.getElementById('stress-bar').style.width = player.stress + '%';
 }
 
-// === 房間互動 ===
-function clickRoom(item) {
-  const actions = {
-    desk: () => openDesignModal(),
-    shelf: () => DialogueSystem.showDialogue('PC', '書架上有好多鍛造的書......'),
-    anvil: () => DialogueSystem.showDialogue('SF', '先畫好設計圖再來打鐵。'),
-    furnace: () => DialogueSystem.showDialogue('PC', '爐火很旺，可以開始工作了。'),
-    water: () => DialogueSystem.showDialogue('PC', '淬火用的水桶，水還很乾淨。'),
-    materials: () => DialogueSystem.showDialogue('PC', '材料庫存......金: 50, 木: 50'),
-    window: () => DialogueSystem.showDialogue('PC', '外面天氣不錯。'),
-    door: () => DialogueSystem.showDialogue('SF', '做完事再出去！')
-  };
+// === 房間互動（從 CSV 讀取）===
+function clickRoom(objId) {
+  // 🔧 從 CSV 取得物件資料
+  const obj = CSVLoader.getForgeObject(objId);
+  if (!obj) {
+    console.error(`找不到物件: ${objId}`);
+    return;
+  }
   
-  if (actions[item]) actions[item]();
+  // 根據 action_type 執行不同動作
+  switch (obj.action_type) {
+    case 'open_modal':
+      handleOpenModal(obj);
+      break;
+    case 'dialogue':
+      handleDialogue(obj);
+      break;
+    case 'clean_room':
+      handleCleanRoom(obj);
+      break;
+    case 'confirm_exit':
+      handleConfirmExit(obj);
+      break;
+    default:
+      console.warn(`未知的動作類型: ${obj.action_type}`);
+  }
+}
+
+// === 處理開啟彈窗 ===
+function handleOpenModal(obj) {
+  // 先顯示對話
+  if (obj.comment) {
+    DialogueSystem.showDialogue(obj.chara_id, obj.comment);
+  }
+  
+  // 根據 modal 類型開啟
+  const modalId = obj.action_param;
+  switch (modalId) {
+    case 'design_modal':
+      openDesignModal();
+      break;
+    case 'book_modal':
+      // 書架彈窗（尚未實作）
+      showToast('書架系統開發中...');
+      break;
+    case 'forge_modal':
+      // 鍛造彈窗（尚未實作）
+      showToast('鍛造系統開發中...');
+      break;
+    case 'smelt_modal':
+      // 冶煉彈窗（尚未實作）
+      showToast('冶煉系統開發中...');
+      break;
+    case 'decoration_modal':
+      // 裝飾彈窗（尚未實作）
+      showToast('裝飾系統開發中...');
+      break;
+    case 'inventory_modal':
+      // 材料庫存（尚未實作）
+      showToast('材料庫存開發中...');
+      break;
+    default:
+      console.warn(`未知的 modal: ${modalId}`);
+  }
+}
+
+// === 處理純對話 ===
+function handleDialogue(obj) {
+  if (obj.comment) {
+    DialogueSystem.showDialogue(obj.chara_id, obj.comment);
+  }
+}
+
+// === 處理打掃 ===
+function handleCleanRoom(obj) {
+  const epCost = parseInt(obj.ep_cost) || 0;
+  
+  // TODO: 檢查 EP 是否足夠
+  // if (player.ep < epCost) { ... }
+  
+  // 顯示對話
+  if (obj.comment) {
+    DialogueSystem.showDialogue(obj.chara_id, obj.comment);
+  }
+  
+  // TODO: 執行打掃效果
+  showToast(`✨ 打掃完成！（消耗 ${epCost} EP）`);
+}
+
+// === 處理確認離開 ===
+function handleConfirmExit(obj) {
+  // TODO: 實作確認對話框
+  const confirmMsg = obj.confirm_message || '確定要離開嗎？';
+  if (confirm(confirmMsg)) {
+    showToast('離開鍛造室...');
+    // TODO: 實際的離開邏輯
+  }
 }
 
 // === 設計圖彈窗 ===
@@ -100,6 +186,10 @@ function closeDesignModal() {
 
 // === 繪製設計圖 ===
 function drawDesign() {
+  // 🔧 檢查 EP（從 CSV 讀取）
+  const epCost = CSVLoader.getModalEpCost('design_modal', '繪製');
+  // TODO: if (player.ep < epCost) { ... }
+  
   const design = DesignGenerator.draw(player);
   if (!design) {
     console.error('❌ 抽卡失敗！');
@@ -122,7 +212,7 @@ function drawDesign() {
         <span class="info-value metal">${design.metalNeed}</span>
       </div>
       <div class="info-item">
-        <span class="info-label">🥖 木</span>
+        <span class="info-label">🪵 木</span>
         <span class="info-value wood">${design.woodNeed}</span>
       </div>
       <div class="info-item">
