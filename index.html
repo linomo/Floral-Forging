@@ -174,7 +174,30 @@
     .room-item .label { font-size: 0.75em; color: #666; margin-top: 4px; }
     .room-item.empty { background: transparent; border-color: transparent; cursor: default; }
     .room-item.empty:hover { transform: none; background: transparent; }
+    /* === 💰 金錢框框樣式 === */
+    .money-section {
+      background: rgba(0,0,0,0.2);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+    }
     
+    .money-display {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .money-icon {
+      font-size: 1.5em;
+    }
+    
+    .money-value {
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #f5a623;
+    }
     .dialogue-area {
       flex: 4;
       background: linear-gradient(180deg, #151520 0%, #101018 100%);
