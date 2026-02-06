@@ -16,6 +16,8 @@ const player = {
   mood: 50,
   stress: 25,
   money: 100,
+  currentEP: 60,  // 當前元氣
+  maxEP: 60,      // 最大元氣
   dirtiness: 0,
   favor: { SF: 20, SS: 10, DS: 0 },
   
@@ -138,6 +140,9 @@ async function initGame() {
   }
   
   console.log('✅ 遊戲初始化完成！', player);
+  
+  player.maxEP = Math.floor(2 * (player.int + player.dex + player.str) / 3);// 計算最大 EP
+  player.currentEP = player.maxEP;
 }
 
 // === 更新玩家顯示 ===
