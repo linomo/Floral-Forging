@@ -16,6 +16,7 @@ const ForgeScene = {
   // === 渲染場景標題 ===
 // === 渲染場景標題 (修正 ID 與 數據源) ===
   renderHeader() {
+    player.maxEP = Math.floor(2 * (player.int + player.dex + player.str) / 3);
     return `
       <span style="font-weight: bold; font-size: 1.1em;">📍 鍛造室</span>
       <span style="margin-left: 15px; color: #888;">
