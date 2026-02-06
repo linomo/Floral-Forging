@@ -14,10 +14,12 @@ const ForgeScene = {
   },
   
 // === 渲染場景標題 (確保數據與 ID 完整) ===
-  renderHeader() {
-    // 渲染前重新計算一次
+renderHeader() {
+    // 只計算最大值，不要去動當前的 currentEP
     player.maxEP = Math.floor(2 * (player.int + player.dex + player.str) / 3);
-    player.currentEP = player.maxEP;
+    
+    // ❌ 刪除這行：player.currentEP = player.maxEP; 
+
     return `
       <span style="font-weight: bold; font-size: 1.1em;">📍 鍛造室</span>
       <span style="margin-left: 15px; color: #888;">
@@ -50,24 +52,21 @@ const ForgeScene = {
     }
   },
   // === 渲染場景內容 ===
-// === 僅將渲染內容改為從 CSV 讀取座標 ===
-  async renderContent() {
-    const forgeMap = CSVLoader.data.forgeMap || []; // 讀取你提供的 csv 資料
+async renderContent() {
+    const forgeMap = CSVLoader.data.forgeMap || [];
     
     if (forgeMap.length === 0) {
       return '<div style="padding: 40px; text-align: center; color: #666;">載入中...</div>';
     }
     
-    // 1. 動態計算網格的最大行列（確保畫布大小正確）
     const maxRow = Math.max(...forgeMap.map(o => parseInt(o.row) || 0));
     const maxCol = Math.max(...forgeMap.map(o => parseInt(o.col) || 0));
 
-    let html = '<div class="room-grid">';
+    // 🔧 修正：將 grid-template-columns 改為動態，根據 maxCol 決定
+    let html = `<div class="room-grid" style="grid-template-columns: repeat(${maxCol}, 80px);">`;
     
-    // 2. 使用雙層迴圈根據座標產出物件
     for (let r = 1; r <= maxRow; r++) {
       for (let c = 1; c <= maxCol; c++) {
-        // 在 CSV 中尋找符合目前 row 與 col 的物件
         const obj = forgeMap.find(o => parseInt(o.row) === r && parseInt(o.col) === c);
         
         if (obj && obj.obj_id !== 'empty') {
@@ -78,7 +77,6 @@ const ForgeScene = {
             </div>
           `;
         } else {
-          // 若該座標沒有物件，則顯示空格
           html += '<div class="room-item empty"></div>';
         }
       }
@@ -87,7 +85,6 @@ const ForgeScene = {
     html += '</div>';
     return html;
   },
-
   
   // === 完整渲染 ===
   async render() {
