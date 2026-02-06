@@ -17,7 +17,7 @@ const player = {
   stress: 25,
   money: 100,
   currentEP: maxEP,  // 當前元氣
-  maxEP: 2 * (player.int + player.dex + player.str) / 3),      // 最大元氣
+  maxEP:  Math.floor(2 * (player.int + player.dex + player.str) / 3),      // 最大元氣
   dirtiness: 0,
   favor: { SF: 20, SS: 10, DS: 0 },
   
