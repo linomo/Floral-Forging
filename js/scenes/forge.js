@@ -30,13 +30,12 @@ const ForgeScene = {
   
   // === 更新數值 ===
   updateValues() {
-    const ep = Math.floor(2 * (player.int + player.dex + player.str) / 3);
-    const epSpan.textContent = `${player.currentEP}/${player.maxEP}`;
+    const epSpan = document.querySelector('#scene-header span[style*="color: #4ecdc4"]');
     const dirtySpan = document.querySelector('#scene-header span[style*="color: #f5576c"]');
     
-    if (epSpan) epSpan.textContent = ep;
+    if (epSpan) epSpan.textContent = `${player.currentEP}/${player.maxEP}`;
     if (dirtySpan) dirtySpan.textContent = player.dirtiness;
-  },
+  }
   
   // === 渲染場景內容 ===
   async renderContent() {
