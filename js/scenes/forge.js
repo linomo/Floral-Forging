@@ -14,18 +14,32 @@ const ForgeScene = {
   },
   
   // === 渲染場景標題 ===
+// === 渲染場景標題 (修正 ID 與 數據源) ===
   renderHeader() {
-    const ep = Math.floor(2 * (player.int + player.dex + player.str) / 3);
-    
     return `
       <span style="font-weight: bold; font-size: 1.1em;">📍 鍛造室</span>
       <span style="margin-left: 15px; color: #888;">
-        ⚡元氣：<span>${player.currentEP}/${player.maxEP}</span>
+        ⚡元氣：<span id="header-ep" style="color: #4ecdc4; font-weight: bold;">${player.currentEP}</span> / ${player.maxEP}
       </span>
       <span style="margin-left: 15px; color: #888;">
-        💩髒髒值：<span style="color: #f5576c; font-weight: bold;">${player.dirtiness}</span>
+        💩髒髒值：<span id="header-dirtiness" style="color: #f5576c; font-weight: bold;">${player.dirtiness}</span>
       </span>
     `;
+  },
+  
+  // === 更新數值 (改用 ID 抓取，最穩定) ===
+  updateValues() {
+    const epSpan = document.getElementById('header-ep');
+    const dirtySpan = document.getElementById('header-dirtiness');
+    
+    if (epSpan) {
+      epSpan.textContent = player.currentEP;
+      // 這裡可以增加一個最大值顯示，確保完整性
+      epSpan.parentElement.innerHTML = `⚡元氣：<span id="header-ep" style="color: #4ecdc4; font-weight: bold;">${player.currentEP}</span> / ${player.maxEP}`;
+    }
+    if (dirtySpan) {
+      dirtySpan.textContent = player.dirtiness;
+    }
   },
   
   // === 更新數值 ===
