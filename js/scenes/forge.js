@@ -20,7 +20,7 @@ const ForgeScene = {
     return `
       <span style="font-weight: bold; font-size: 1.1em;">📍 鍛造室</span>
       <span style="margin-left: 15px; color: #888;">
-        ⚡元氣：<span style="color: #4ecdc4; font-weight: bold;">${ep}</span>
+        ⚡元氣：<span>${player.currentEP}/${player.maxEP}</span>
       </span>
       <span style="margin-left: 15px; color: #888;">
         💩髒髒值：<span style="color: #f5576c; font-weight: bold;">${player.dirtiness}</span>
@@ -31,7 +31,7 @@ const ForgeScene = {
   // === 更新數值 ===
   updateValues() {
     const ep = Math.floor(2 * (player.int + player.dex + player.str) / 3);
-    const epSpan = document.querySelector('#scene-header span[style*="color: #4ecdc4"]');
+    const epSpan.textContent = `${player.currentEP}/${player.maxEP}`;
     const dirtySpan = document.querySelector('#scene-header span[style*="color: #f5576c"]');
     
     if (epSpan) epSpan.textContent = ep;
@@ -162,8 +162,8 @@ const ForgeScene = {
     }
     
     const cleanAmount = 50;
-    player.dirtiness = Math.max(0, player.dirtiness - cleanAmount);
-    
+    player.dirtiness = Math.max(0, player.dirtiness - cleanAmount);   
+    player.currentEP -= epCost;// 打掃時（第 180 行附近）
     updateStatsDisplay();
     
     showToast(`✨ 打掃完成！汙穢值 -${cleanAmount}（消耗 ${epCost} EP）`);
@@ -202,7 +202,8 @@ const ForgeScene = {
   // === 繪製設計圖 ===
   drawDesign() {
     const epCost = CSVLoader.getModalEpCost('design_modal', '繪製');
-    
+    player.currentEP -= epCost;//繪圖時（第 206 行附近）
+    updateStatsDisplay();
     const design = DesignGenerator.draw(player);
     if (!design) {
       console.error('❌ 抽卡失敗！');
