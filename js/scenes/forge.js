@@ -13,14 +13,15 @@ const ForgeScene = {
     return digits[tens] + digits[ones];
   },
   
-  // === 渲染場景標題 ===
-// === 渲染場景標題 (修正 ID 與 數據源) ===
+// === 渲染場景標題 (確保數據與 ID 完整) ===
   renderHeader() {
+    // 渲染前重新計算一次
     player.maxEP = Math.floor(2 * (player.int + player.dex + player.str) / 3);
+    
     return `
       <span style="font-weight: bold; font-size: 1.1em;">📍 鍛造室</span>
       <span style="margin-left: 15px; color: #888;">
-        ⚡元氣：<span id="header-ep" style="color: #4ecdc4; font-weight: bold;">${player.currentEP}</span> / ${player.maxEP}
+        ⚡元氣：<span id="header-ep" style="color: #4ecdc4; font-weight: bold;">${player.currentEP}</span> / <span id="header-max-ep">${player.maxEP}</span>
       </span>
       <span style="margin-left: 15px; color: #888;">
         💩髒髒值：<span id="header-dirtiness" style="color: #f5576c; font-weight: bold;">${player.dirtiness}</span>
@@ -28,22 +29,24 @@ const ForgeScene = {
     `;
   },
 
-// === 更新數值 (精簡修正版) ===
+// === 更新數值 (安全檢查版) ===
   updateValues() {
-    const epSpan = document.getElementById('header-ep');
-    const maxEpSpan = document.getElementById('header-max-ep');
-    const dirtySpan = document.getElementById('header-dirtiness');
+    // 1. 抓取所有對應的 ID
+    const epElement = document.getElementById('header-ep');
+    const maxEpElement = document.getElementById('header-max-ep');
+    const dirtyElement = document.getElementById('header-dirtiness');
     
-    // 1. 只更新數字本身，不變動外層文字
-   // 更新當前值
-    if (epSpan) epSpan.textContent = player.currentEP;
+    // 2. 只有當標籤真的存在時才更新，防止 ReferenceError
+    if (epElement) {
+      epElement.textContent = player.currentEP;
+    }
     
-    // 更新最大值 (這樣就不會永遠卡在 60 了)
-    if (maxEpSpan) maxEpSpan.textContent = player.maxEP;
+    if (maxEpElement) {
+      maxEpElement.textContent = player.maxEP;
+    }
     
-    // 2. 更新髒髒值
-    if (dirtySpan) {
-      dirtySpan.textContent = player.dirtiness;
+    if (dirtyElement) {
+      dirtyElement.textContent = player.dirtiness;
     }
   },
   // === 渲染場景內容 ===
