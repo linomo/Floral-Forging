@@ -31,6 +31,7 @@ const ForgeScene = {
 // === 更新數值 (精簡修正版) ===
   updateValues() {
     const epSpan = document.getElementById('header-ep');
+    const maxEpSpan = document.getElementById('header-max-ep');
     const dirtySpan = document.getElementById('header-dirtiness');
     
     // 1. 只更新數字本身，不變動外層文字
