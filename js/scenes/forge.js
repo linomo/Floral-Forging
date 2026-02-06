@@ -87,10 +87,7 @@ const ForgeScene = {
     html += '</div>';
     return html;
   },
-    html += '</div>';
-    
-    return html;
-  },
+
   
   // === 完整渲染 ===
   async render() {
