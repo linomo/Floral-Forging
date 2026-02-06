@@ -283,7 +283,57 @@
     }
     .modal-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
     .modal-btn.primary { background: linear-gradient(90deg, #4ecdc4, #44a08d); border: none; color: #fff; }
+    /* 材料庫存彈窗 */
+    .inventory-modal {
+      background: linear-gradient(180deg, #252535 0%, #1a1a28 100%);
+      border-radius: 16px;
+      padding: 20px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
     
+    .inventory-content {
+      margin: 15px 0;
+    }
+    
+    .inventory-section {
+      margin-bottom: 20px;
+    }
+    
+    .inventory-title {
+      font-weight: bold;
+      color: #f5a623;
+      margin-bottom: 8px;
+      font-size: 1em;
+    }
+    
+    .inventory-items {
+      font-size: 0.85em;
+      color: #ccc;
+      line-height: 1.6;
+    }
+    
+    .inventory-list {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+.inventory-item {
+  padding: 8px;
+  margin-bottom: 5px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 5px;
+  font-size: 0.85em;
+}
+
+.inventory-empty {
+  color: #666;
+  font-size: 0.85em;
+  text-align: center;
+  padding: 20px;
+}
     /* === 評論框 === */
     .design-comments-box {
       width: 500px;
