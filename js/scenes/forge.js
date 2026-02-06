@@ -26,18 +26,18 @@ const ForgeScene = {
       </span>
     `;
   },
-  
-// === 更新數值 (唯一正確版：使用 ID 定位) ===
+
+// === 更新數值 (精簡修正版) ===
   updateValues() {
     const epSpan = document.getElementById('header-ep');
     const dirtySpan = document.getElementById('header-dirtiness');
     
+    // 1. 只更新數字本身，不變動外層文字
     if (epSpan) {
-      // 這裡直接更新整個內容，確保最大值也被正確顯示
       epSpan.textContent = player.currentEP;
-      // 如果你想連最大值一起顯示，可以這樣寫：
-      // epSpan.parentElement.innerHTML = `⚡元氣：<span id="header-ep" style="color: #4ecdc4; font-weight: bold;">${player.currentEP}</span> / ${player.maxEP}`;
     }
+    
+    // 2. 更新髒髒值
     if (dirtySpan) {
       dirtySpan.textContent = player.dirtiness;
     }
