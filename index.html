@@ -23,7 +23,59 @@
       color: #eee;
       display: flex;
     }
+    /* === 🔧 確認彈窗樣式 === */
+    .confirm-modal {
+      background: linear-gradient(180deg, #252535 0%, #1a1a28 100%);
+      border-radius: 16px;
+      padding: 30px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+    }
     
+    .confirm-message {
+      font-size: 1.1em;
+      color: #fff;
+      margin-bottom: 25px;
+      line-height: 1.6;
+    }
+    
+    .confirm-actions {
+      display: flex;
+      gap: 15px;
+    }
+    
+    .confirm-btn {
+      flex: 1;
+      padding: 12px;
+      font-size: 1em;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+      font-weight: bold;
+    }
+    
+    .confirm-btn.cancel {
+      background: rgba(255,255,255,0.1);
+      color: #aaa;
+    }
+    
+    .confirm-btn.cancel:hover {
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+    }
+    
+    .confirm-btn.confirm {
+      background: linear-gradient(90deg, #f5576c, #f093fb);
+      color: #fff;
+    }
+    
+    .confirm-btn.confirm:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(245, 87, 108, 0.4);
+    }
     /* === 左側面板 === */
     .left-panel {
       width: 180px;
@@ -331,7 +383,12 @@
   <!-- 右側主區 -->
   <div class="right-main">
     <div class="operation-area">
-      <div class="room-title">📍 鍛造室</div>
+      <div class="scene-header">
+        <span id="room-title">📍 鍛造室</span>
+        <span id="dirtiness-container" style="margin-left: 15px; color: #888;">
+          髒髒值：<span id="dirtiness-display" style="color: #f5576c; font-weight: bold;">0</span>
+        </span>
+      </div>
         <div class="room-grid">
           <div class="room-item" onclick="clickRoom('forge_shelf')"><span class="icon">📚</span><span class="label">書架</span></div>
           <div class="room-item" onclick="clickRoom('forge_desk')"><span class="icon">📝</span><span class="label">繪圖桌</span></div>
@@ -362,7 +419,7 @@
         </div>
         <div class="dialogue-content">
           <span class="dialogue-emoji" id="dialogue-emoji">🌺</span>
-          <span class="dialogue-text" id="dialogue-text">今天開始學鍛造，先去書桌畫設計圖吧。</span>
+          <span class="dialogue-text" id="dialogue-text">今天開始學，先去書桌畫設計圖吧。</span>
           <button class="continue-btn" onclick="nextDialogue()">▶</button>
         </div>
       </div>
@@ -384,7 +441,16 @@
     </div>
     <!-- 🔧 評論框會被 JS 動態插入這裡（在 modal-overlay 內部） -->
   </div>
-  
+    <!-- 🔧 確認彈窗 -->
+  <div class="modal-overlay" id="confirmModal">
+    <div class="confirm-modal">
+      <div class="confirm-message" id="confirmMessage">確定要離開室嗎？</div>
+      <div class="confirm-actions">
+        <button class="confirm-btn cancel" id="cancelBtn">取消</button>
+        <button class="confirm-btn confirm" id="confirmBtn">確定</button>
+      </div>
+    </div>
+  </div>
   <div class="effect-toast" id="toast"></div>
 
   <!-- 引入 JS 檔案 -->
