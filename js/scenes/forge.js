@@ -198,68 +198,80 @@ const ForgeScene = {
     DialogueSystem.hideDesignComments();
   },
   
-  // === 繪製設計圖 ===
 // === 繪製設計圖（修正版） ===
-drawDesign() {
-  // 1. 取得消耗數據
-  const epCost = CSVLoader.getModalEpCost('design_modal', '繪製') || 0;
-  const baseMoneyCost = 30;
-  
-  // 2. 驗證：檢查資源是否足夠
-  if (player.currentEP < epCost) {
-    showToast("⚡ 元氣不足，無法構思設計圖！");
-    return; // 直接中斷，不執行後續扣款
-  }
-  if (player.money < baseMoneyCost) {
-    showToast("💰 錢不夠買紙筆...");
-    return;
-  }
+  drawDesign() {
+    // 1. 取得消耗數據
+    const epCost = CSVLoader.getModalEpCost('design_modal', '繪製') || 0;
+    const baseMoneyCost = 30;
 
-  // 3. 數據運算（先算好變動量，不直接動 player）
-  const design = DesignGenerator.draw(player);
-  if (!design) {
-    console.error('❌ 抽卡失敗！');
-    return;
-  }
+    // 2. 驗證：檢查資源是否足夠
+    if (player.currentEP < epCost) {
+      showToast("⚡ 元氣不足，無法構思設計圖！");
+      return;
+    }
+    if (player.money < baseMoneyCost) {
+      showToast("💰 錢不夠買紙筆...");
+      return;
+    }
 
-  // 計算清潔費與髒髒值
-  const dirtinessIncrease = epCost / 2;
-  let extraCleaningFee = 0;
-  if (player.dirtiness >= 99) {
-    extraCleaningFee = dirtinessIncrease;
-  }
+    // 3. 數據運算
+    const design = DesignGenerator.draw(player);
+    if (!design) {
+      console.error('❌ 抽卡失敗！');
+      return;
+    }
 
-  // 4. 一次性執行扣款 (Atomic Update)
-  player.currentEP -= epCost;
-  player.money -= (baseMoneyCost + extraCleaningFee);
-  player.dirtiness = Math.min(100, player.dirtiness + dirtinessIncrease);
+    const dirtinessIncrease = epCost / 2;
+    let extraCleaningFee = 0;
+    if (player.dirtiness >= 99) {
+      extraCleaningFee = dirtinessIncrease;
+    }
 
-  // 5. 處理設計圖後續邏輯
-  const gradeData = CSVLoader.data.grades.find(g => g.grade === design.grade.replace('‽', ''));
-  const gradeMulti = gradeData ? parseFloat(gradeData.effect_value_.replace('*', '')) : 1;
-  design.blueprintPrice = Math.floor(30 * Math.pow(gradeMulti, 3));
-  
-  this.currentDesign = design;
+    // 4. 一次性執行扣款 (Atomic Update)
+    player.currentEP -= epCost;
+    player.money -= (baseMoneyCost + extraCleaningFee);
+    player.dirtiness = Math.min(100, player.dirtiness + dirtinessIncrease);
 
-  // 6. 最後僅更新一次 UI
-  this.renderDesignCard(design); // 建議將渲染卡片獨立成一個 function
-  updateStatsDisplay(); 
-  
-  if (extraCleaningFee > 0) {
-    DialogueSystem.showDialogue('PC', '被小師兄收取清潔費了嗚嗚。也是啦陳年汙垢好難處理。');
-  }
-},
+    // 5. 處理設計圖後續邏輯
+    const gradeData = CSVLoader.data.grades.find(g => g.grade === design.grade.replace('‽', ''));
+    const gradeMulti = gradeData ? parseFloat(gradeData.effect_value_.replace('*', '')) : 1;
+    design.blueprintPrice = Math.floor(30 * Math.pow(gradeMulti, 3));
+    
+    this.currentDesign = design;
 
-// 將渲染抽卡結果獨立出來，讓程式碼更乾淨
-renderDesignCard(design) {
-  const card = document.getElementById('designCard');
-  card.className = `card grade-${design.grade}`;
-  card.innerHTML = `
+    // 6. 最後僅更新一次 UI
+    this.renderDesignCard(design);
+    updateStatsDisplay(); 
+
+    if (extraCleaningFee > 0) {
+      DialogueSystem.showDialogue('PC', '被小師兄收取清潔費了嗚嗚。也是啦陳年汙垢好難處理。');
+    }
+  },
+
+  // 將渲染抽卡結果獨立出來，並補回原本被清空的 HTML 結構
+  renderDesignCard(design) {
+    const card = document.getElementById('designCard');
+    card.className = `card grade-${design.grade}`;
+    card.innerHTML = `
+      <div class="card-header">
+        <div class="card-grade grade-${design.grade}">${design.grade}！${design.physical}${design.mental}</div>
+        <div class="card-weapon">${design.weapon}</div>
+      </div>
+      <div class="card-info">
+        <div class="info-item"><span class="info-label">⚙️ 金</span><span class="info-value metal">${design.metalNeed}</span></div>
+        <div class="info-item"><span class="info-label">🥖 木</span><span class="info-value wood">${design.woodNeed}</span></div>
+        <div class="info-item"><span class="info-label">💰 圖紙</span><span class="info-value price">${design.blueprintPrice}</span></div>
+        <div class="info-item"><span class="info-label">⚡ EP</span><span class="info-value ep">${design.ep}</span></div>
+      </div>
+      <div class="card-effects">
+        <div class="effect-title">📝 讓我看看！</div>
+        <div class="effect-row">${design.effects.length > 0 ? design.effects.join('') : '&nbsp;'}</div>
+      </div>
     `;
-  DialogueSystem.showDesignComments(design.comments);
-  document.getElementById('saveBtn').style.display = 'block';
-}
-  
+    DialogueSystem.showDesignComments(design.comments);
+    document.getElementById('saveBtn').style.display = 'block';
+  },
+
   // === 儲存設計圖 ===
   saveDesign() {
     if (this.currentDesign) {
@@ -270,8 +282,8 @@ renderDesignCard(design) {
       showToast(`📜 獲得設計圖：${this.currentDesign.grade}！${this.currentDesign.weapon}`);
       this.closeDesignModal();
       DialogueSystem.showDialogue('PC', `完成了！${this.currentDesign.grade}！${this.currentDesign.physical}${this.currentDesign.mental}${this.currentDesign.weapon}！`);
+    }
   },
-  
   // === 材料庫存彈窗 ===
   openInventoryModal() {
     const modal = document.getElementById('inventoryModal');
