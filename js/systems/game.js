@@ -6,11 +6,7 @@
 // - 範圍：0-100
 // - 弄髒公式：消耗EP / 2
 // - 打掃效果：-50
-// - 例如：
-//   - 繪製設計圖（10 EP）→ 弄髒 5
-//   - 鍛造短劍（20 EP）→ 弄髒 10
-//   - 鍛造花劍（30 EP）→ 弄髒 15
-//   - 打掃（10 EP）→ 乾淨 50
+// - 髒髒值懲罰：≥99 時，弄髒行為會扣錢（扣除金額 = 弄髒值）
 
 // 🔧 場景系統
 let currentScene = 'forge'; // 當前場景：forge（鍛造室）、room（房間）、schedule（行程表）
@@ -25,7 +21,8 @@ const player = {
   luck: 50,
   mood: 50,
   stress: 25,
-  dirtiness: 0, // 🔧 汙穢值（0-100）
+  money: 100, // 🔧 新增：金錢
+  dirtiness: 0, // 汙穢值（0-100）
   favor: { SF: 20, SS: 10, DS: 0 },
   readBooks: ['book01'], // 預設讀完第一本書
   designs: [],
@@ -38,21 +35,15 @@ let currentDesign = null;
 const SCENES = {
   forge: {
     name: '鍛造室',
-    icon: '📍',
-    showDirtiness: true,  // 顯示汙穢值
-    showRoomGrid: true    // 顯示房間網格
+    icon: '📍'
   },
   room: {
     name: '小哈的房間',
-    icon: '🏠',
-    showDirtiness: false,
-    showRoomGrid: true
+    icon: '🏠'
   },
   schedule: {
     name: '行程表',
-    icon: '📅',
-    showDirtiness: false,
-    showRoomGrid: false  // 行程表不顯示房間網格
+    icon: '📅'
   }
 };
 
@@ -64,38 +55,81 @@ function switchScene(sceneId) {
   }
   
   currentScene = sceneId;
-  updateSceneDisplay();
+  renderScene();
 }
 
-// 更新場景顯示
-function updateSceneDisplay() {
-  const scene = SCENES[currentScene];
-  const titleElement = document.getElementById('room-title');
-  const dirtyElement = document.getElementById('dirtiness-container');
-  const roomGrid = document.querySelector('.room-grid');
+// 🔧 渲染場景（動態載入場景內容）
+async function renderScene() {
+  const sceneHeaderEl = document.getElementById('scene-header');
+  const sceneContentEl = document.getElementById('scene-content');
   
-  // 更新場景標題
-  if (titleElement) {
-    titleElement.innerHTML = `${scene.icon} ${scene.name}`;
+  if (!sceneHeaderEl || !sceneContentEl) {
+    console.error('場景容器不存在！請檢查 HTML');
+    return;
   }
   
-  // 控制汙穢值顯示/隱藏
-  if (dirtyElement) {
-    if (scene.showDirtiness) {
-      dirtyElement.style.display = 'inline';
-      // 更新汙穢值數字
-      const dirtyDisplay = document.getElementById('dirtiness-display');
-      if (dirtyDisplay) {
-        dirtyDisplay.textContent = player.dirtiness;
+  // 根據當前場景渲染
+  let sceneData = { header: '', content: '' };
+  
+  switch(currentScene) {
+    case 'forge':
+      // 鍛造室場景
+      if (typeof ForgeScene !== 'undefined') {
+        sceneData = await ForgeScene.render();
+      } else {
+        console.error('ForgeScene 未載入！');
+        sceneData = {
+          header: '📍 鍛造室',
+          content: '<div style="padding: 40px; text-align: center; color: #f5576c;">錯誤：forge.js 未載入</div>'
+        };
       }
-    } else {
-      dirtyElement.style.display = 'none';
-    }
+      break;
+      
+    case 'room':
+      // 房間場景（未實作）
+      sceneData = {
+        header: '<span style="font-weight: bold; font-size: 1.1em;">🏠 小哈的房間</span>',
+        content: '<div style="padding: 40px; text-align: center; color: #666;">房間場景開發中...</div>'
+      };
+      break;
+      
+    case 'schedule':
+      // 行程表（未實作）
+      sceneData = {
+        header: '<span style="font-weight: bold; font-size: 1.1em;">📅 行程表</span>',
+        content: '<div style="padding: 40px; text-align: center; color: #666;">行程表開發中...</div>'
+      };
+      break;
+      
+    default:
+      sceneData = {
+        header: '❓ 未知場景',
+        content: '<div style="padding: 40px; text-align: center; color: #f5576c;">場景不存在</div>'
+      };
   }
   
-  // 控制房間網格顯示/隱藏
-  if (roomGrid) {
-    roomGrid.style.display = scene.showRoomGrid ? 'grid' : 'none';
+  // 更新 DOM
+  sceneHeaderEl.innerHTML = sceneData.header;
+  sceneContentEl.innerHTML = sceneData.content;
+}
+
+// 🔧 更新場景內的數值（不重新渲染整個場景）
+function updateSceneValues() {
+  const scene = SCENES[currentScene];
+  
+  // 只在鍛造室更新元氣和汙穢值
+  if (currentScene === 'forge') {
+    const epDisplay = document.querySelector('#scene-header span[style*="color: #4ecdc4"]');
+    const dirtyDisplay = document.querySelector('#scene-header span[style*="color: #f5576c"]');
+    
+    if (epDisplay) {
+      const ep = Math.floor(2 * (player.int + player.dex + player.str) / 3);
+      epDisplay.textContent = ep;
+    }
+    
+    if (dirtyDisplay) {
+      dirtyDisplay.textContent = player.dirtiness;
+    }
   }
 }
 
@@ -123,7 +157,9 @@ async function initGame() {
   // 更新顯示
   updatePlayerDisplay();
   updateStatsDisplay();
-  updateSceneDisplay(); // 🔧 更新場景顯示
+  
+  // 🔧 渲染初始場景（鍛造室）
+  await renderScene();
   
   // 🔧 修正：從 CSV 讀取初始對話
   const sfChar = CharacterSystem.getCharacter('SF');
@@ -149,8 +185,14 @@ function updateStatsDisplay() {
   document.getElementById('mood-bar').style.width = player.mood + '%';
   document.getElementById('stress-bar').style.width = player.stress + '%';
   
-  // 🔧 更新場景顯示（包含汙穢值）
-  updateSceneDisplay();
+  // 🔧 更新金錢
+  const moneyDisplay = document.getElementById('money-display');
+  if (moneyDisplay) {
+    moneyDisplay.textContent = player.money;
+  }
+  
+  // 🔧 更新場景內的數值（元氣、汙穢值）
+  updateSceneValues();
 }
 
 // === 房間互動（從 CSV 讀取）===
@@ -296,8 +338,15 @@ function drawDesign() {
   }
   
   // 🔧 繪製設計圖增加汙穢值：EP / 2
-  const dirtiness = epCost / 2; // 10 / 2 = 5
-  player.dirtiness = Math.min(100, player.dirtiness + dirtiness);
+  const dirtinessIncrease = epCost / 2; // 10 / 2 = 5
+  
+  // 🔧 髒髒值懲罰：≥99 時扣錢
+  if (player.dirtiness >= 99) {
+    player.money = Math.max(0, player.money - dirtinessIncrease);
+    DialogueSystem.showDialogue('PC', '被小師兄收取清潔費了嗚嗚。也是啦陳年汙垢好難處理。');
+  }
+  
+  player.dirtiness = Math.min(100, player.dirtiness + dirtinessIncrease);
   updateStatsDisplay();
   
   currentDesign = design;
