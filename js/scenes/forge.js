@@ -270,7 +270,6 @@ renderDesignCard(design) {
       showToast(`📜 獲得設計圖：${this.currentDesign.grade}！${this.currentDesign.weapon}`);
       this.closeDesignModal();
       DialogueSystem.showDialogue('PC', `完成了！${this.currentDesign.grade}！${this.currentDesign.physical}${this.currentDesign.mental}${this.currentDesign.weapon}！`);
-    }
   },
   
   // === 材料庫存彈窗 ===
