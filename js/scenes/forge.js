@@ -155,14 +155,14 @@ const ForgeScene = {
   // === 處理打掃 ===
   handleCleanRoom(obj) {
     const epCost = parseInt(obj.ep_cost) || 0;
-    
+    player.currentEP -= epCost;
+    updateStatsDisplay();
     if (obj.comment) {
       DialogueSystem.showDialogue(obj.chara_id, obj.comment);
     }
     
     const cleanAmount = 50;
     player.dirtiness = Math.max(0, player.dirtiness - cleanAmount);   
-    player.currentEP -= epCost;// 打掃時（第 180 行附近）
     updateStatsDisplay();
     
     showToast(`✨ 打掃完成！汙穢值 -${cleanAmount}（消耗 ${epCost} EP）`);
@@ -202,6 +202,7 @@ const ForgeScene = {
   drawDesign() {
     const epCost = CSVLoader.getModalEpCost('design_modal', '繪製');
     player.currentEP -= epCost;//繪圖時（第 206 行附近）
+    player.money -=30;
     updateStatsDisplay();
     const design = DesignGenerator.draw(player);
     if (!design) {
