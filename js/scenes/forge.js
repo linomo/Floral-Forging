@@ -50,43 +50,43 @@ const ForgeScene = {
     }
   },
   // === 渲染場景內容 ===
+// === 僅將渲染內容改為從 CSV 讀取座標 ===
   async renderContent() {
-    const forgeMap = CSVLoader.data.forgeMap || [];
+    const forgeMap = CSVLoader.data.forgeMap || []; // 讀取你提供的 csv 資料
     
     if (forgeMap.length === 0) {
       return '<div style="padding: 40px; text-align: center; color: #666;">載入中...</div>';
     }
     
+    // 1. 動態計算網格的最大行列（確保畫布大小正確）
+    const maxRow = Math.max(...forgeMap.map(o => parseInt(o.row) || 0));
+    const maxCol = Math.max(...forgeMap.map(o => parseInt(o.col) || 0));
+
     let html = '<div class="room-grid">';
     
-    const gridLayout = [
-      ['forge_shelf', 'forge_desk', 'forge_decoration', 'forge_window'],
-      ['forge_anvil', 'forge_furnace', 'forge_water', 'empty'],
-      ['empty', 'forge_materials', 'forge_clean', 'empty'],
-      ['forge_door', 'empty', 'empty', 'empty']
-    ];
-    
-    gridLayout.forEach(row => {
-      row.forEach(objId => {
-        if (objId === 'empty') {
-          html += '<div class="room-item empty"></div>';
+    // 2. 使用雙層迴圈根據座標產出物件
+    for (let r = 1; r <= maxRow; r++) {
+      for (let c = 1; c <= maxCol; c++) {
+        // 在 CSV 中尋找符合目前 row 與 col 的物件
+        const obj = forgeMap.find(o => parseInt(o.row) === r && parseInt(o.col) === c);
+        
+        if (obj && obj.obj_id !== 'empty') {
+          html += `
+            <div class="room-item" onclick="ForgeScene.clickRoom('${obj.obj_id}')">
+              <span class="icon">${obj.icon}</span>
+              <span class="label">${obj.name}</span>
+            </div>
+          `;
         } else {
-          const obj = forgeMap.find(o => o.obj_id === objId);
-          
-          if (obj) {
-            html += `
-              <div class="room-item" onclick="ForgeScene.clickRoom('${obj.obj_id}')">
-                <span class="icon">${obj.icon}</span>
-                <span class="label">${obj.name}</span>
-              </div>
-            `;
-          } else {
-            html += '<div class="room-item empty"></div>';
-          }
+          // 若該座標沒有物件，則顯示空格
+          html += '<div class="room-item empty"></div>';
         }
-      });
-    });
+      }
+    }
     
+    html += '</div>';
+    return html;
+  },
     html += '</div>';
     
     return html;
