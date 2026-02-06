@@ -17,7 +17,7 @@ const ForgeScene = {
   renderHeader() {
     // 渲染前重新計算一次
     player.maxEP = Math.floor(2 * (player.int + player.dex + player.str) / 3);
-    
+    player.currentEP = player.maxEP;
     return `
       <span style="font-weight: bold; font-size: 1.1em;">📍 鍛造室</span>
       <span style="margin-left: 15px; color: #888;">
