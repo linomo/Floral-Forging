@@ -35,7 +35,7 @@ const ForgeScene = {
     
     if (epSpan) epSpan.textContent = `${player.currentEP}/${player.maxEP}`;
     if (dirtySpan) dirtySpan.textContent = player.dirtiness;
-  }
+  },
   
   // === 渲染場景內容 ===
   async renderContent() {
