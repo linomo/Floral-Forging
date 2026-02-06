@@ -2,6 +2,15 @@
 // 主遊戲邏輯
 // ===================================
 
+// 🔧 汙穢值系統規則：
+// - 範圍：0-100
+// - 弄髒公式：消耗EP / 2
+// - 打掃效果：-50
+// - 髒髒值懲罰：≥99 時，弄髒行為會扣錢（扣除金額 = 弄髒值）
+
+// 🔧 場景系統
+let currentScene = 'forge'; // 當前場景：forge（鍛造室）、room（房間）、schedule（行程表）
+
 // 玩家資料
 const player = {
   name: '小哈',
@@ -12,6 +21,8 @@ const player = {
   luck: 50,
   mood: 50,
   stress: 25,
+  money: 100, // 🔧 新增：金錢
+  dirtiness: 0, // 汙穢值（0-100）
   favor: { SF: 20, SS: 10, DS: 0 },
   readBooks: ['book01'], // 預設讀完第一本書
   designs: [],
@@ -19,6 +30,108 @@ const player = {
 };
 
 let currentDesign = null;
+
+// === 🔧 場景系統 ===
+const SCENES = {
+  forge: {
+    name: '鍛造室',
+    icon: '📍'
+  },
+  room: {
+    name: '小哈的房間',
+    icon: '🏠'
+  },
+  schedule: {
+    name: '行程表',
+    icon: '📅'
+  }
+};
+
+// 切換場景
+function switchScene(sceneId) {
+  if (!SCENES[sceneId]) {
+    console.error(`場景不存在: ${sceneId}`);
+    return;
+  }
+  
+  currentScene = sceneId;
+  renderScene();
+}
+
+// 🔧 渲染場景（動態載入場景內容）
+async function renderScene() {
+  const sceneHeaderEl = document.getElementById('scene-header');
+  const sceneContentEl = document.getElementById('scene-content');
+  
+  if (!sceneHeaderEl || !sceneContentEl) {
+    console.error('場景容器不存在！請檢查 HTML');
+    return;
+  }
+  
+  // 根據當前場景渲染
+  let sceneData = { header: '', content: '' };
+  
+  switch(currentScene) {
+    case 'forge':
+      // 鍛造室場景
+      if (typeof ForgeScene !== 'undefined') {
+        sceneData = await ForgeScene.render();
+      } else {
+        console.error('ForgeScene 未載入！');
+        sceneData = {
+          header: '📍 鍛造室',
+          content: '<div style="padding: 40px; text-align: center; color: #f5576c;">錯誤：forge.js 未載入</div>'
+        };
+      }
+      break;
+      
+    case 'room':
+      // 房間場景（未實作）
+      sceneData = {
+        header: '<span style="font-weight: bold; font-size: 1.1em;">🏠 小哈的房間</span>',
+        content: '<div style="padding: 40px; text-align: center; color: #666;">房間場景開發中...</div>'
+      };
+      break;
+      
+    case 'schedule':
+      // 行程表（未實作）
+      sceneData = {
+        header: '<span style="font-weight: bold; font-size: 1.1em;">📅 行程表</span>',
+        content: '<div style="padding: 40px; text-align: center; color: #666;">行程表開發中...</div>'
+      };
+      break;
+      
+    default:
+      sceneData = {
+        header: '❓ 未知場景',
+        content: '<div style="padding: 40px; text-align: center; color: #f5576c;">場景不存在</div>'
+      };
+  }
+  
+  // 更新 DOM
+  sceneHeaderEl.innerHTML = sceneData.header;
+  sceneContentEl.innerHTML = sceneData.content;
+}
+
+// 🔧 更新場景內的數值（不重新渲染整個場景）
+function updateSceneValues() {
+  const scene = SCENES[currentScene];
+  
+  // 只在鍛造室更新元氣和汙穢值
+  if (currentScene === 'forge') {
+    const epDisplay = document.querySelector('#scene-header span[style*="color: #4ecdc4"]');
+    const dirtyDisplay = document.querySelector('#scene-header span[style*="color: #f5576c"]');
+    
+    if (epDisplay) {
+      const ep = Math.floor(2 * (player.int + player.dex + player.str) / 3);
+      epDisplay.textContent = ep;
+    }
+    
+    if (dirtyDisplay) {
+      dirtyDisplay.textContent = player.dirtiness;
+    }
+  }
+}
 
 // === 初始化遊戲 ===
 async function initGame() {
@@ -45,6 +158,9 @@ async function initGame() {
   updatePlayerDisplay();
   updateStatsDisplay();
   
+  // 🔧 渲染初始場景（鍛造室）
+  await renderScene();
+  
   // 🔧 修正：從 CSV 讀取初始對話
   const sfChar = CharacterSystem.getCharacter('SF');
   if (sfChar) {
@@ -68,6 +184,15 @@ function updateStatsDisplay() {
   
   document.getElementById('mood-bar').style.width = player.mood + '%';
   document.getElementById('stress-bar').style.width = player.stress + '%';
+  
+  // 🔧 更新金錢
+  const moneyDisplay = document.getElementById('money-display');
+  if (moneyDisplay) {
+    moneyDisplay.textContent = player.money;
+  }
+  
+  // 🔧 更新場景內的數值（元氣、汙穢值）
+  updateSceneValues();
 }
 
 // === 房間互動（從 CSV 讀取）===
@@ -117,10 +242,12 @@ function handleOpenModal(obj) {
       break;
     case 'forge_modal':
       // 鍛造彈窗（尚未實作）
+      // TODO: 鍛造時計算汙穢值 = selectedDesign.ep / 2
       showToast('鍛造系統開發中...');
       break;
     case 'smelt_modal':
       // 冶煉彈窗（尚未實作）
+      // TODO: 冶煉時計算汙穢值 = EP消耗 / 2
       showToast('冶煉系統開發中...');
       break;
     case 'decoration_modal':
@@ -155,18 +282,32 @@ function handleCleanRoom(obj) {
     DialogueSystem.showDialogue(obj.chara_id, obj.comment);
   }
   
-  // TODO: 執行打掃效果
-  showToast(`✨ 打掃完成！（消耗 ${epCost} EP）`);
+  // 🔧 執行打掃效果：減少 50 點汙穢
+  const cleanAmount = 50;
+  player.dirtiness = Math.max(0, player.dirtiness - cleanAmount);
+  
+  // 更新顯示
+  updateStatsDisplay();
+  
+  showToast(`✨ 打掃完成！汙穢值 -${cleanAmount}（消耗 ${epCost} EP）`);
 }
 
 // === 處理確認離開 ===
 function handleConfirmExit(obj) {
-  // TODO: 實作確認對話框
+  // 🔧 使用遊戲內彈窗而不是 confirm()
   const confirmMsg = obj.confirm_message || '確定要離開嗎？';
-  if (confirm(confirmMsg)) {
-    showToast('離開鍛造室...');
-    // TODO: 實際的離開邏輯
-  }
+  const buttons = obj.confirm_buttons ? obj.confirm_buttons.split('│') : ['確定', '取消'];
+  
+  openConfirmModal(
+    confirmMsg,
+    buttons[0],
+    buttons[1],
+    () => {
+      // 確定離開
+      showToast('離開鍛造室...');
+      // TODO: 實際的離開邏輯
+    }
+  );
 }
 
 // === 設計圖彈窗 ===
@@ -195,6 +336,18 @@ function drawDesign() {
     console.error('❌ 抽卡失敗！');
     return;
   }
+  
+  // 🔧 繪製設計圖增加汙穢值：EP / 2
+  const dirtinessIncrease = epCost / 2; // 10 / 2 = 5
+  
+  // 🔧 髒髒值懲罰：≥99 時扣錢
+  if (player.dirtiness >= 99) {
+    player.money = Math.max(0, player.money - dirtinessIncrease);
+    DialogueSystem.showDialogue('PC', '被小師兄收取清潔費了嗚嗚。也是啦陳年汙垢好難處理。');
+  }
+  
+  player.dirtiness = Math.min(100, player.dirtiness + dirtinessIncrease);
+  updateStatsDisplay();
   
   currentDesign = design;
   
@@ -258,6 +411,46 @@ function showToast(message) {
 // === 對話繼續 ===
 function nextDialogue() {
   showToast('（繼續中...）');
+}
+
+// === 🔧 新增：確認彈窗 ===
+function openConfirmModal(message, confirmText, cancelText, onConfirm) {
+  const modal = document.getElementById('confirmModal');
+  const msgElement = document.getElementById('confirmMessage');
+  const confirmBtn = document.getElementById('confirmBtn');
+  const cancelBtn = document.getElementById('cancelBtn');
+  
+  if (!modal || !msgElement || !confirmBtn || !cancelBtn) {
+    console.error('確認彈窗元素不存在！');
+    return;
+  }
+  
+  msgElement.textContent = message;
+  confirmBtn.textContent = confirmText;
+  cancelBtn.textContent = cancelText;
+  
+  // 移除舊的事件監聽器（避免重複）
+  const newConfirmBtn = confirmBtn.cloneNode(true);
+  const newCancelBtn = cancelBtn.cloneNode(true);
+  confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+  cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+  
+  // 設定新的事件監聽器
+  newConfirmBtn.addEventListener('click', () => {
+    closeConfirmModal();
+    if (onConfirm) onConfirm();
+  });
+  
+  newCancelBtn.addEventListener('click', closeConfirmModal);
+  
+  modal.classList.add('show');
+}
+
+function closeConfirmModal() {
+  const modal = document.getElementById('confirmModal');
+  if (modal) {
+    modal.classList.remove('show');
+  }
 }
 
 // === 頁面載入後初始化 ===
