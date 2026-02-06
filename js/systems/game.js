@@ -365,7 +365,7 @@ function drawDesign() {
         <span class="info-value metal">${design.metalNeed}</span>
       </div>
       <div class="info-item">
-        <span class="info-label">🪵 木</span>
+        <span class="info-label">🥖 木</span>
         <span class="info-value wood">${design.woodNeed}</span>
       </div>
       <div class="info-item">
