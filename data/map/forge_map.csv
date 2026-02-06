@@ -8,7 +8,8 @@ forge,2,2,forge_furnace,爐,🔥,PC,爐火純青！燃燒吧！,open_modal,smelt
 forge,2,3,forge_water,水槽,💧,PC,淬火用的水槽，波波波。,dialogue,,,,,
 forge,3,2,forge_materials,材料,📦,PC,材料庫存⋯⋯,open_modal,inventory_modal,,,,inventory
 forge,3,3,forge_clean,掃具,🧹,PC,好髒喔掃一掃咻咻咻，洗一洗，變乾淨了！,clean_room,,10,,,
-forge,3,1,forge_door,門,🚪,PC,確定要出去了嗎？,confirm_exit,,,真的要離開鍛造室嗎？出去這旬就不能再進來囉！,讓我走！│不能逃避！,
+forge,3,4,forge_door,門,🚪,PC,確定要出去了嗎？,confirm_exit,,,真的要離開鍛造室嗎？出去這旬就不能再進來囉！,讓我走！│不能逃避！,
+
 
 
 
