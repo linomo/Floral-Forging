@@ -119,7 +119,13 @@ async function initGame() {
     alert('資料載入失敗，請重新整理頁面！');
     return;
   }
-  
+  // 讀取存檔
+  const savedGame = localStorage.getItem('floralForger_save');
+  if (savedGame) {
+    const saved = JSON.parse(savedGame);
+    Object.assign(player, saved);  // 覆蓋 player
+    console.log('📂 讀取存檔成功');
+  }
   // 檢查是否為新遊戲
   const newGameData = localStorage.getItem('floralForger_newGame');
   if (newGameData) {
@@ -164,7 +170,8 @@ function updateStatsDisplay() {
   if (moneyDisplay) {
     moneyDisplay.textContent = player.money;
   }
-  
+  // 自動存檔
+localStorage.setItem('floralForger_save', JSON.stringify(player));
   updateSceneValues();
 }
 
