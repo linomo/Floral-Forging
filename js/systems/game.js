@@ -134,6 +134,7 @@ async function initGame() {
     localStorage.removeItem('floralForger_save');  // ← 加這行
     const data = JSON.parse(newGameData);
     player.name = data.playerName;
+    player.currentEP = player.maxEP; // ✅ 只有新遊戲才補滿
     player.avatar = data.playerAvatar || '🔨';
     localStorage.removeItem('floralForger_newGame');
     console.log(`👋 歡迎，${player.name}！`);
