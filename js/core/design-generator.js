@@ -62,9 +62,9 @@ const DesignGenerator = {
         const physical = physicalPool.length > 0 ? this.pick(physicalPool) : this.pick(CSVLoader.data.physical);
         const mental = mentalPool.length > 0 ? this.pick(mentalPool) : this.pick(CSVLoader.data.mental);
 
-        // 3. 武器過濾：檢查 weapon.unlock_trigger 是否在 player.readBooks 中
+        // 3. 武器過濾：檢查 weapon.unlock_trigger 是否在 player.books 中
         const availableWeapons = CSVLoader.data.weapons.filter(w => 
-            !w.unlock_trigger || player.readBooks.includes(w.unlock_trigger)
+            !w.unlock_trigger || player.books.includes(w.unlock_trigger)
         );
         const weapon = availableWeapons.length > 0 ? this.pick(availableWeapons) : CSVLoader.data.weapons[0];
         
