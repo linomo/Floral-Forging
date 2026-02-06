@@ -22,7 +22,7 @@
       background: #0d0d14;
       min-height: 100vh;
       color: #eee;
-      display: flex;
+      : flex;
     }
     /* === 🔧 確認彈窗樣式 === */
     .confirm-modal {
@@ -42,7 +42,7 @@
     }
     
     .confirm-actions {
-      display: flex;
+      : flex;
       gap: 15px;
     }
     
@@ -83,7 +83,7 @@
       background: linear-gradient(180deg, #1a1a28 0%, #12121a 100%);
       border-right: 1px solid rgba(255,255,255,0.1);
       padding: 15px;
-      display: flex;
+      : flex;
       flex-direction: column;
       gap: 12px;
     }
@@ -98,7 +98,7 @@
       background: linear-gradient(135deg, #2a2a3d, #1a1a28);
       border: 2px solid #FCFAF2; border-radius: 12px;
       margin: 0 auto 8px;
-      display: flex; align-items: center; justify-content: center;
+      : flex; align-items: center; justify-content: center;
       font-size: 2.5em;
       cursor: pointer;
       transition: all 0.2s;
@@ -110,7 +110,7 @@
     .avatar-name { font-weight: bold; color: #FCFAF2; cursor: pointer; }
     
     .stats-section { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px; }
-    .stat-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.85em; }
+    .stat-row { : flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.85em; }
     .stat-row:last-child { margin-bottom: 0; }
     .stat-label { color: #888; }
     .stat-value { color: #fff; font-weight: bold; }
@@ -118,9 +118,9 @@
     .bar-section { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px; }
     .bar-item { margin-bottom: 10px; }
     .bar-item:last-child { margin-bottom: 0; }
-    .bar-header { display: flex; justify-content: space-between; font-size: 0.8em; margin-bottom: 5px; }
+    .bar-header { : flex; justify-content: space-between; font-size: 0.8em; margin-bottom: 5px; }
     .bar-label { color: #888; }
-    .bar-icons { display: flex; justify-content: space-between; font-size: 0.9em; }
+    .bar-icons { : flex; justify-content: space-between; font-size: 0.9em; }
     .bar-track { height: 8px; background: rgba(0,0,0,0.3); border-radius: 4px; overflow: hidden; }
     .bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s; background: linear-gradient(90deg, #7ed321, #f5a623, #f5576c); }
     
@@ -131,11 +131,11 @@
       border-radius: 6px; padding: 10px; cursor: pointer; text-align: center;
     }
     .equip-slot:hover { background: rgba(255,255,255,0.1); }
-    .equip-slot .equip-icon { font-size: 1.5em; display: block; margin-bottom: 4px; }
-    .equip-slot .equip-name { font-size: 0.8em; color: #ccc; display: block; }
-    .equip-slot .equip-effect { font-size: 0.75em; color: #7ed321; margin-top: 3px; display: block; }
+    .equip-slot .equip-icon { font-size: 1.5em; : block; margin-bottom: 4px; }
+    .equip-slot .equip-name { font-size: 0.8em; color: #ccc; : block; }
+    .equip-slot .equip-effect { font-size: 0.75em; color: #7ed321; margin-top: 3px; : block; }
     
-    .save-section { display: flex; gap: 8px; margin-top: auto; }
+    .save-section { : flex; gap: 8px; margin-top: auto; }
     .save-btn {
       flex: 1; padding: 8px;
       background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
@@ -144,7 +144,7 @@
     .save-btn:hover { background: rgba(255,255,255,0.1); color: #aaa; }
     
     /* === 右側主區 === */
-    .right-main { flex: 1; display: flex; flex-direction: column; }
+    .right-main { flex: 1; : flex; flex-direction: column; }
     
     .operation-area {
       flex: 6;
@@ -154,7 +154,7 @@
     }
     .room-title { position: absolute; top: 15px; left: 20px; color: #666; font-size: 0.85em; }
     .room-grid {
-      display: grid;
+      : grid;
       grid-template-columns: repeat(4, 80px);
       grid-template-rows: repeat(3, 60px);
       gap: 10px;
@@ -166,7 +166,7 @@
     .room-item {
       background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
       border-radius: 8px;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      : flex; flex-direction: column; align-items: center; justify-content: center;
       cursor: pointer; transition: all 0.2s;
     }
     .room-item:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
@@ -180,15 +180,15 @@
       background: linear-gradient(180deg, #151520 0%, #101018 100%);
       border-top: 1px solid rgba(255,255,255,0.1);
       padding: 15px 20px;
-      display: flex; flex-direction: column;
+      : flex; flex-direction: column;
     }
     .dialogue-box {
       background: rgba(30, 30, 45, 0.95); border-radius: 10px;
       border: 1px solid rgba(255,255,255,0.1);
-      flex: 1; display: flex; flex-direction: column; overflow: hidden;
+      flex: 1; : flex; flex-direction: column; overflow: hidden;
     }
     .dialogue-header {
-      display: flex; align-items: center;
+      : flex; align-items: center;
       padding: 10px 15px;
       border-bottom: 1px solid rgba(255,255,255,0.1);
       background: rgba(0,0,0,0.2);
@@ -197,7 +197,7 @@
     .speaker-name { font-weight: bold; font-size: 0.95em; }
     .dialogue-content {
       padding: 15px; font-size: 1em; line-height: 1.6;
-      display: flex; align-items: flex-start; gap: 10px;
+      : flex; align-items: flex-start; gap: 10px;
       flex: 1; position: relative;
     }
     .dialogue-emoji { font-size: 1.2em; }
@@ -214,7 +214,7 @@
     .modal-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.85);
-      display: none; 
+      : none; 
       align-items: center; 
       justify-content: center;
       z-index: 100;
@@ -222,7 +222,7 @@
       gap: 20px; /* 🔧 彈窗和評論框之間的間距 */
       padding: 20px; /* 🔧 留一些邊距 */
     }
-    .modal-overlay.show { display: flex; }
+    .modal-overlay.show { : flex; }
     
     .design-modal {
       background: linear-gradient(180deg, #252535 0%, #1a1a28 100%);
@@ -264,9 +264,9 @@
     
     .card-info {
       padding: 10px 12px; background: rgba(0,0,0,0.2);
-      display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 0.8em;
+      : grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 0.8em;
     }
-    .info-item { display: flex; justify-content: space-between; }
+    .info-item { : flex; justify-content: space-between; }
     .info-label { color: #666; }
     .info-value { color: #fff; }
     .info-value.metal { color: #f5a623; }
@@ -281,7 +281,7 @@
       font-size: 0.75em;
     }
     .effect-title { color: #666; margin-bottom: 4px; }
-    .effect-row { display: flex; flex-wrap: wrap; gap: 6px; min-height: 22px; }
+    .effect-row { : flex; flex-wrap: wrap; gap: 6px; min-height: 22px; }
     .effect-tag { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 8px; }
     .effect-tag.positive { color: #7ed321; }
     .effect-tag.negative { color: #f5576c; }
@@ -289,7 +289,7 @@
     
     .card-placeholder { padding: 40px 20px; text-align: center; color: #444; font-size: 0.9em; }
     
-    .modal-actions { display: flex; gap: 10px; margin-top: 15px; }
+    .modal-actions { : flex; gap: 10px; margin-top: 15px; }
     .modal-btn {
       flex: 1; padding: 10px; border-radius: 8px;
       border: 1px solid rgba(255,255,255,0.1);
@@ -307,11 +307,11 @@
       border: 1px solid rgba(255,255,255,0.1);
       border-radius: 12px;
       padding: 15px;
-      display: none;
+      : none;
       /* 移除了 position 相關設定，讓它在 flexbox 中自然排列 */
     }
     .design-comment-line {
-      display: flex;
+      : flex;
       align-items: flex-start;
       gap: 10px;
       margin-bottom: 10px;
@@ -334,7 +334,7 @@
       transform: translateX(-50%) translateY(-100px);
       background: rgba(126, 211, 33, 0.95);
       color: #fff; padding: 10px 20px;
-      border-radius: 25px; font-weight: bold; font-size: 0.9em;
+     : 25px; font-weight: bold; font-size: 0.9em;
       opacity: 0; transition: all 0.4s; z-index: 200;
     }
     .effect-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
@@ -358,6 +358,12 @@
       <div class="stat-row"><span class="stat-label">敏捷</span><span class="stat-value" id="dex-val">40</span></div>
       <div class="stat-row"><span class="stat-label">幸運</span><span class="stat-value" id="luck-val">50</span></div>
     </div>
+   <div class="money-section">
+      <div class="money-display">
+        <span class="money-icon">💰</span>
+        <span class="money-value" id="money-display">100</span>
+      </div>
+</div>
     <div class="bar-section">
       <div class="bar-item">
         <div class="bar-header"><span class="bar-label">心情</span></div>
@@ -387,10 +393,13 @@
   <!-- 右側主區 -->
   <div class="right-main">
     <div class="operation-area">
-      <div class="scene-header">
-        <span id="room-title">📍 鍛造室</span>
+       <div class="scene-header">
+        <span id="room-title" style="font-size: 1.1em; font-weight: bold;">📍 鍛造室</span>
+        <span id="ep-container" style="margin-left: 15px; color: #888;">
+          ⚡元氣：<span id="ep-display" style="color: #4ecdc4; font-weight: bold;">60</span>
+        </span>
         <span id="dirtiness-container" style="margin-left: 15px; color: #888;">
-          髒髒值：<span id="dirtiness-display" style="color: #f5576c; font-weight: bold;">0</span>
+          💩髒髒值：<span id="dirtiness-display" style="color: #f5576c; font-weight: bold;">0</span>
         </span>
       </div>
         <div class="room-grid">
@@ -440,7 +449,7 @@
       </div>
       <div class="modal-actions">
         <button class="modal-btn" onclick="closeDesignModal()">取消</button>
-        <button class="modal-btn primary" id="saveBtn" onclick="saveDesign()" style="display:none;">收下設計圖</button>
+        <button class="modal-btn primary" id="saveBtn" onclick="saveDesign()" style=":none;">收下設計圖</button>
       </div>
     </div>
     <!-- 🔧 評論框會被 JS 動態插入這裡（在 modal-overlay 內部） -->
