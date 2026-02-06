@@ -16,8 +16,8 @@ const player = {
   mood: 50,
   stress: 25,
   money: 100,
-  currentEP:,  // 當前元氣
-  maxEP:,      // 最大元氣
+  currentEP: 60,  // 當前元氣
+  maxEP: 60,      // 最大元氣
   dirtiness: 0,
   favor: { SF: 20, SS: 10, DS: 0 },
   
