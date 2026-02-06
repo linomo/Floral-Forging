@@ -20,6 +20,9 @@ const player = {
   get maxEP() {
     return Math.floor(2 * (this.str + this.int + this.dex) / 3);
   },
+  set maxEP(value) {
+    // 這裡留空，讓 Object.assign 賦值時不會報錯。數值依然會由上面的 get 計算產生
+  },
   currentEP: 0, // 先給 0，稍後初始化
   dirtiness: 0,
   favor: { SF: 20, SS: 10, DS: 0 },
@@ -154,9 +157,9 @@ async function initGame() {
   }
   
   console.log('✅ 遊戲初始化完成！', player);
-  
-  player.maxEP = Math.floor(2 * (player.int + player.dex + player.str) / 3);// 計算最大 EP
-  player.currentEP = player.maxEP;
+  if (player.currentEP === 0) {
+    player.currentEP = player.maxEP;
+  }
 }
 
 // === 更新玩家顯示 ===
