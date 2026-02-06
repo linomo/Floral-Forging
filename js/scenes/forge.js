@@ -34,9 +34,11 @@ const ForgeScene = {
     const dirtySpan = document.getElementById('header-dirtiness');
     
     // 1. 只更新數字本身，不變動外層文字
-    if (epSpan) {
-      epSpan.textContent = player.currentEP;
-    }
+   // 更新當前值
+    if (epSpan) epSpan.textContent = player.currentEP;
+    
+    // 更新最大值 (這樣就不會永遠卡在 60 了)
+    if (maxEpSpan) maxEpSpan.textContent = player.maxEP;
     
     // 2. 更新髒髒值
     if (dirtySpan) {
