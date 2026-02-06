@@ -119,21 +119,26 @@ async function initGame() {
     alert('資料載入失敗，請重新整理頁面！');
     return;
   }
-  // 讀取存檔
-  const savedGame = localStorage.getItem('floralForger_save');
-  if (savedGame) {
-    const saved = JSON.parse(savedGame);
-    Object.assign(player, saved);  // 覆蓋 player
-    console.log('📂 讀取存檔成功');
-  }
-  // 檢查是否為新遊戲
+  
+  // 🔧 改這裡：先檢查是否為新遊戲
   const newGameData = localStorage.getItem('floralForger_newGame');
+  
   if (newGameData) {
+    // === 新遊戲：清除舊存檔 ===
+    localStorage.removeItem('floralForger_save');  // ← 加這行
     const data = JSON.parse(newGameData);
     player.name = data.playerName;
     player.avatar = data.playerAvatar || '🔨';
     localStorage.removeItem('floralForger_newGame');
     console.log(`👋 歡迎，${player.name}！`);
+  } else {
+    // === 繼續遊戲：讀取存檔 ===
+    const savedGame = localStorage.getItem('floralForger_save');
+    if (savedGame) {
+      const saved = JSON.parse(savedGame);
+      Object.assign(player, saved);
+      console.log('📂 讀取存檔成功');
+    }
   }
   
   updatePlayerDisplay();
