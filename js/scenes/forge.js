@@ -27,30 +27,21 @@ const ForgeScene = {
     `;
   },
   
-  // === 更新數值 (改用 ID 抓取，最穩定) ===
+// === 更新數值 (唯一正確版：使用 ID 定位) ===
   updateValues() {
     const epSpan = document.getElementById('header-ep');
     const dirtySpan = document.getElementById('header-dirtiness');
     
     if (epSpan) {
+      // 這裡直接更新整個內容，確保最大值也被正確顯示
       epSpan.textContent = player.currentEP;
-      // 這裡可以增加一個最大值顯示，確保完整性
-      epSpan.parentElement.innerHTML = `⚡元氣：<span id="header-ep" style="color: #4ecdc4; font-weight: bold;">${player.currentEP}</span> / ${player.maxEP}`;
+      // 如果你想連最大值一起顯示，可以這樣寫：
+      // epSpan.parentElement.innerHTML = `⚡元氣：<span id="header-ep" style="color: #4ecdc4; font-weight: bold;">${player.currentEP}</span> / ${player.maxEP}`;
     }
     if (dirtySpan) {
       dirtySpan.textContent = player.dirtiness;
     }
   },
-  
-  // === 更新數值 ===
-  updateValues() {
-    const epSpan = document.querySelector('#scene-header span[style*="color: #4ecdc4"]');
-    const dirtySpan = document.querySelector('#scene-header span[style*="color: #f5576c"]');
-    
-    if (epSpan) epSpan.textContent = `${player.currentEP}/${player.maxEP}`;
-    if (dirtySpan) dirtySpan.textContent = player.dirtiness;
-  },
-  
   // === 渲染場景內容 ===
   async renderContent() {
     const forgeMap = CSVLoader.data.forgeMap || [];
@@ -166,22 +157,29 @@ const ForgeScene = {
     }
   },
   
-  // === 處理打掃 ===
+// === 處理打掃 (優化數據同步) ===
   handleCleanRoom(obj) {
     const epCost = parseInt(obj.ep_cost) || 0;
+    const cleanAmount = 50;
+
+    if (player.currentEP < epCost) {
+      showToast("⚡ 元氣不足，無法打掃！");
+      return;
+    }
+
+    // 數據變動
     player.currentEP -= epCost;
-    updateStatsDisplay();
+    player.dirtiness = Math.max(0, player.dirtiness - cleanAmount);
+    
+    // 渲染對話
     if (obj.comment) {
       DialogueSystem.showDialogue(obj.chara_id, obj.comment);
     }
     
-    const cleanAmount = 50;
-    player.dirtiness = Math.max(0, player.dirtiness - cleanAmount);   
-    updateStatsDisplay();
-    
+    // 統一更新 UI
+    updateStatsDisplay(); 
     showToast(`✨ 打掃完成！汙穢值 -${cleanAmount}（消耗 ${epCost} EP）`);
   },
-  
   // === 處理確認離開 ===
   handleConfirmExit(obj) {
     const confirmMsg = obj.confirm_message || '確定要離開嗎？';
