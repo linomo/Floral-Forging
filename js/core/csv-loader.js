@@ -12,7 +12,7 @@ const CSVLoader = {
 
     async loadCSV(path) {
         try {
-            const response = await fetch(path);
+            const response = await fetch(`${path}?t=${Date.now()}`); 
             if (!response.ok) throw new Error(`找不到檔案: ${path}`);
             const text = await response.text();
             const lines = text.trim().split('\n');
