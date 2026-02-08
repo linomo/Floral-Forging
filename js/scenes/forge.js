@@ -503,7 +503,7 @@ const ForgeScene = {
       
       .book-scroll-header {
         background: linear-gradient(180deg, #556b2f, #6b8e23);
-        padding: 40px 20px; /* 🔧 將上下 padding 從 20px 增加到 40px，這樣就會變高一倍 */
+        padding: 20px 20px; /* 🔧 將上下 padding 從 20px 增加到 40px，這樣就會變高一倍 */
         text-align: center;
         border-radius: 9px 9px 0 0;
         display: flex;      /* 🔧 加入這三行，確保標題文字在長高後依然垂直居中 */
