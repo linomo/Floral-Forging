@@ -60,13 +60,11 @@ const DesignGenerator = {
         const physicalPool = CSVLoader.data.physical.filter(p => p.grade === this.getGradeLabel(physVal));
         const mentalPool = CSVLoader.data.mental.filter(m => m.grade === this.getGradeLabel(mentVal));
         const physical = physicalPool.length > 0 ? this.pick(physicalPool) : this.pick(CSVLoader.data.physical);
-        const mental = mentalPool.length > 0 ? this.pick(mentalPool) : this.pick(CSVLoader.data.mental);       
-        // 🔧 新增：保存心理前綴完整資料（供後續套用效果）
-        const mentalPrefixData = mental;
+        const mental = mentalPool.length > 0 ? this.pick(mentalPool) : this.pick(CSVLoader.data.mental);
 
-        // 3. 武器過濾：檢查 weapon.unlock_trigger 是否在 player.books 中
+        // 3. 武器過濾：檢查 weapon.unlock_trigger 是否在 player.readBooks 中
         const availableWeapons = CSVLoader.data.weapons.filter(w => 
-            !w.unlock_trigger || player.books.includes(w.unlock_trigger)
+            !w.unlock_trigger || player.readBooks.includes(w.unlock_trigger)
         );
         const weapon = availableWeapons.length > 0 ? this.pick(availableWeapons) : CSVLoader.data.weapons[0];
         
@@ -112,7 +110,7 @@ const DesignGenerator = {
             price: Math.floor(30 * gMulti * pMulti), // 基礎售價 30
             ep: weapon.maker_point,
             effects,
-            mentalPrefixData,  // 🔧 新增
+            mentalPrefixData: mental,  // 🔧 保存心理前綴完整資料
             comments: CSVLoader.data.comments.filter(c => 
                 c.grade === displayGrade.replace('‽','') && 
                 (!c.unlock_trigger || c.unlock_trigger === physical.pp_id)
