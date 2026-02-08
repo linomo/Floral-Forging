@@ -148,7 +148,7 @@ const ForgeScene = {
   
   // === 處理純對話 ===
   handleDialogue(obj) {
-    if (obj.) {
+    if (obj.comment) {
       DialogueSystem.showDialogue(obj.chara_id, obj.comment);
     }
   },
