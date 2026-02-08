@@ -699,11 +699,12 @@ const ForgeScene = {
           ${book.description}
         </div>
         
-        <div class="book-scroll-footer">
+    <div class="book-scroll-footer">
           ${isRead ? 
             '<button class="book-read-btn" disabled>已讀過</button>' :
             `<button class="book-read-btn" onclick="ForgeScene.readBook('${bookId}')">閱讀</button>`
           }
+          <button class="book-read-btn" style="background: rgba(255,255,255,0.1); margin-top: 10px;" onclick="ForgeScene.closeBookScroll()">返回</button>
         </div>
       </div>
     `;
