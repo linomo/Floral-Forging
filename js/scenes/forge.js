@@ -494,7 +494,7 @@ const ForgeScene = {
       .book-scroll {
         background: linear-gradient(180deg, #3a3a4a 0%, #2a2a38 100%);
         border-radius: 12px;
-        padding: 0;
+        padding: 30;
         max-width: 400px;
         width: 90%;
         border: 3px solid #556b2f;  // // 深綠邊框
@@ -538,10 +538,10 @@ const ForgeScene = {
       .book-scroll-content {
         padding: 25px 30px;
         text-align: center;
-        line-height: 3;
+        line-height: 1.8;
         color: #ddd;
         font-size: 1em;
-        min-height: 300px;
+        min-height: 100px;
       }
       
       .book-scroll-footer {
