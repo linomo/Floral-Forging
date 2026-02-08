@@ -496,7 +496,7 @@ const ForgeScene = {
         border-radius: 12px;
         padding: 0;
         max-width: 400px;
-        width: 90%;
+        width: 95%;
         border: 3px solid #556b2f;  // // 深綠邊框
         box-shadow: 0 10px 40px rgba(0,0,0,0.5);
       }
