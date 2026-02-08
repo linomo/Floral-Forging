@@ -118,7 +118,7 @@ const ForgeScene = {
   // === 處理開啟彈窗 ===
   handleOpenModal(obj) {
     if (obj.) {
-      DialogueSystem.showDialogue(obj.chara_id, obj.);
+      DialogueSystem.showDialogue(obj.chara_id, obj.comment);
     }
     
     const modalId = obj.action_param;
@@ -149,7 +149,7 @@ const ForgeScene = {
   // === 處理純對話 ===
   handleDialogue(obj) {
     if (obj.) {
-      DialogueSystem.showDialogue(obj.chara_id, obj.);
+      DialogueSystem.showDialogue(obj.chara_id, obj.comment);
     }
   },
   
@@ -158,7 +158,7 @@ const ForgeScene = {
     const epCost = parseInt(obj.ep_cost) || 0;
     
     if (obj.) {
-      DialogueSystem.showDialogue(obj.chara_id, obj.);
+      DialogueSystem.showDialogue(obj.chara_id, obj.comment);
     }
     
     const cleanAmount = 50;
@@ -190,14 +190,14 @@ const ForgeScene = {
     this.currentDesign = null;
     document.getElementById('designCard').innerHTML = '<div class="card-placeholder">在腦中構思設計圖...</div>';
     document.getElementById('designCard').className = 'card';
-    DialogueSystem.showDesignComments(design.comments);
+   .showDesignComments(design.comments);
     // 🔧 移除收下按鈕（自動收下）
     // document.getElementById('saveBtn').style.display = 'block';
   },
   
   closeDesignModal() {
     document.getElementById('designModal').classList.remove('show');
-    DialogueSystem.hideDesigns();
+    DialogueSystem.hideDesignComments();
   },
   
 // === 繪製設計圖（修正版） ===
