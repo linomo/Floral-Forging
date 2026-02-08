@@ -497,7 +497,10 @@ const ForgeScene = {
         padding: 0;
         max-width: 600px;
         width: 90%;
-        border: 3px solid #8b7355;
+        border: 3px solid #d4af37;  // 金色邊框
+        background: linear-gradient(90deg, #d4af37, #f4e5b5);  // 金色漸層
+        border-top: 1px solid rgba(212,175,55,0.3);
+        border-bottom: 1px solid rgba(212,175,55,0.3);
         box-shadow: 0 10px 40px rgba(0,0,0,0.5);
       }
       
