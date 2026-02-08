@@ -117,8 +117,8 @@ const ForgeScene = {
   
   // === 處理開啟彈窗 ===
   handleOpenModal(obj) {
-    if (obj.comment) {
-      DialogueSystem.showDialogue(obj.chara_id, obj.comment);
+    if (obj.) {
+      DialogueSystem.showDialogue(obj.chara_id, obj.);
     }
     
     const modalId = obj.action_param;
@@ -148,8 +148,8 @@ const ForgeScene = {
   
   // === 處理純對話 ===
   handleDialogue(obj) {
-    if (obj.comment) {
-      DialogueSystem.showDialogue(obj.chara_id, obj.comment);
+    if (obj.) {
+      DialogueSystem.showDialogue(obj.chara_id, obj.);
     }
   },
   
@@ -157,8 +157,8 @@ const ForgeScene = {
   handleCleanRoom(obj) {
     const epCost = parseInt(obj.ep_cost) || 0;
     
-    if (obj.comment) {
-      DialogueSystem.showDialogue(obj.chara_id, obj.comment);
+    if (obj.) {
+      DialogueSystem.showDialogue(obj.chara_id, obj.);
     }
     
     const cleanAmount = 50;
@@ -190,79 +190,114 @@ const ForgeScene = {
     this.currentDesign = null;
     document.getElementById('designCard').innerHTML = '<div class="card-placeholder">在腦中構思設計圖...</div>';
     document.getElementById('designCard').className = 'card';
-    document.getElementById('saveBtn').style.display = 'none';
-    DialogueSystem.hideDesignComments();
+    DialogueSystem.showDesignComments(design.comments);
+    // 🔧 移除收下按鈕（自動收下）
+    // document.getElementById('saveBtn').style.display = 'block';
   },
   
   closeDesignModal() {
     document.getElementById('designModal').classList.remove('show');
-    DialogueSystem.hideDesignComments();
+    DialogueSystem.hideDesigns();
   },
   
-  // === 繪製設計圖 ===
+// === 繪製設計圖（修正版） ===
   drawDesign() {
-    const epCost = CSVLoader.getModalEpCost('design_modal', '繪製');
-    
+    // 1. 取得消耗數據
+    const epCost = CSVLoader.getModalEpCost('design_modal', '繪製') || 0;
+    const baseMoneyCost = 30;
+
+    // 2. 驗證：檢查資源是否足夠
+    if (player.currentEP < epCost) {
+      showToast("⚡ 元氣不足，無法構思設計圖！");
+      return;
+    }
+    if (player.money < baseMoneyCost) {
+      showToast("💰 錢不夠買紙筆...");
+      return;
+    }
+
+    // 3. 數據運算
     const design = DesignGenerator.draw(player);
     if (!design) {
       console.error('❌ 抽卡失敗！');
       return;
     }
-    
-    // 計算設計圖價格：30 × (品級倍率)³
+
+    const dirtinessIncrease = epCost / 2;
+    let extraCleaningFee = 0;
+    if (player.dirtiness >= 99) {
+      extraCleaningFee = dirtinessIncrease;
+    }
+
+    // 4. 一次性執行扣款 (Atomic Update)
+    player.currentEP -= epCost;
+    player.money -= (baseMoneyCost + extraCleaningFee);
+    player.dirtiness = Math.min(100, player.dirtiness + dirtinessIncrease);
+
+    // 5. 處理設計圖後續邏輯
     const gradeData = CSVLoader.data.grades.find(g => g.grade === design.grade.replace('‽', ''));
     const gradeMulti = gradeData ? parseFloat(gradeData.effect_value_.replace('*', '')) : 1;
     design.blueprintPrice = Math.floor(30 * Math.pow(gradeMulti, 3));
     
-    // 弄髒
-    const dirtinessIncrease = epCost / 2;
+    // 🔧 新增：套用心理前綴效果到角色身上
+    this.applyMentalEffects(design.mentalPrefixData);
     
-    if (player.dirtiness >= 99) {
-      player.money = Math.max(0, player.money - dirtinessIncrease);
+    // 🔧 新增：自動收下設計圖
+    design.id = player.designs.length + 1;
+    player.designs.push(design);
+    
+    this.currentDesign = design;
+
+    // 6. 最後僅更新一次 UI
+    this.renderDesignCard(design);
+    updateStatsDisplay(); 
+
+    if (extraCleaningFee > 0) {
       DialogueSystem.showDialogue('PC', '被小師兄收取清潔費了嗚嗚。也是啦陳年汙垢好難處理。');
     }
     
-    player.dirtiness = Math.min(100, player.dirtiness + dirtinessIncrease);
-    updateStatsDisplay();
-    
-    this.currentDesign = design;
-    
-    // 渲染卡片
-    const card = document.getElementById('designCard');
-    card.className = `card grade-${design.grade}`;
-    card.innerHTML = `
-      <div class="card-header">
-        <div class="card-grade grade-${design.grade}">${design.grade}！${design.physical}${design.mental}</div>
-        <div class="card-weapon">${design.weapon}</div>
-      </div>
-      <div class="card-info">
-        <div class="info-item">
-          <span class="info-label">⚙️ 金</span>
-          <span class="info-value metal">${design.metalNeed}</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">🥖 木</span>
-          <span class="info-value wood">${design.woodNeed}</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">💰 圖紙</span>
-          <span class="info-value price">${design.blueprintPrice}</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">⚡ EP</span>
-          <span class="info-value ep">${design.ep}</span>
-        </div>
-      </div>
-      <div class="card-effects">
-        <div class="effect-title">📝 讓我看看！</div>
-        <div class="effect-row">${design.effects.length > 0 ? design.effects.join('') : '&nbsp;'}</div>
-      </div>
-    `;
-    
-    DialogueSystem.showDesignComments(design.comments);
-    document.getElementById('saveBtn').style.display = 'block';
+    // 🔧 新增：自動收下提示
+    showToast(`📜 獲得設計圖：${design.grade}！${design.weapon}`);
+    DialogueSystem.showDialogue('PC', `完成了！${design.grade}！${design.physical}${design.mental}${design.weapon}！`);
   },
-  
+  // === 套用心理前綴效果 ===
+  applyMentalEffects(mentalData) {
+    if (!mentalData) return;
+    
+    // 掃描 effect_sta_1 ~ effect_sta_3
+    for (let i = 1; i <= 3; i++) {
+      const stat = mentalData[`effect_sta_${i}`];
+      const value = mentalData[`effect_value_${i}`];
+      
+      if (!stat || !value) continue;
+      
+      const numValue = parseInt(value) || 0;
+      
+      switch(stat) {
+        case 'STRESS':
+          player.stress = Math.max(0, Math.min(100, player.stress + numValue));
+          break;
+        case 'MOOD':
+          player.mood = Math.max(0, Math.min(100, player.mood + numValue));
+          break;
+        case 'INT':
+          player.int = Math.max(0, Math.min(100, player.int + numValue));
+          break;
+        case 'LUCK':
+          player.luck = Math.max(0, Math.min(100, player.luck + numValue));
+          break;
+        case 'SF_FAVOR':
+          player.favor.SF = Math.max(0, Math.min(100, (player.favor.SF || 0) + numValue));
+          break;
+        case 'SS_FAVOR':
+          player.favor.SS = Math.max(0, Math.min(100, (player.favor.SS || 0) + numValue));
+          break;
+        case 'DS_FAVOR':
+          player.favor.DS = Math.max(0, Math.min(100, (player.favor.DS || 0) + numValue));
+          break;
+      }
+    }
+  },
   // === 儲存設計圖 ===
   saveDesign() {
     if (this.currentDesign) {
