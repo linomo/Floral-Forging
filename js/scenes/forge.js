@@ -497,12 +497,12 @@ const ForgeScene = {
         padding: 0;
         max-width: 600px;
         width: 90%;
-        border: 3px solid #cd7f32;  // 青銅色邊框
+        border: 3px solid #556b2f;  // 青銅色邊框
         box-shadow: 0 10px 40px rgba(0,0,0,0.5);
       }
       
       .book-scroll-header {
-        background: linear-gradient(180deg, #cd7f32, #e09856);  // 青銅漸層
+        background: linear-gradient(180deg, #556b2f, #6b8e23);  // 青銅漸層
         padding: 20px;
         text-align: center;
         border-radius: 9px 9px 0 0;
@@ -520,8 +520,8 @@ const ForgeScene = {
         justify-content: space-around;
         padding: 15px 20px;
         background: rgba(0,0,0,0.2);
-        border-top: 1px solid rgba(205,127,50,0.3);
-        border-bottom: 1px solid rgba(205,127,50,0.3);
+        border-top: 1px solid rgba(85,107,47,0.3);
+        border-bottom: 1px solid rgba(85,107,47,0.3);
       }
       
       .book-scroll-meta-item {
