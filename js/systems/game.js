@@ -16,6 +16,16 @@ const player = {
   mood: 50,
   stress: 25,
   money: 100,
+  
+  // 最大元氣：動態計算公式
+  get maxEP() {
+    return Math.floor(2 * (this.str + this.int + this.dex) / 3);
+  },
+  set maxEP(value) {
+    // 留空，讓 Object.assign 賦值時不會報錯
+  },
+  currentEP: 0, // 當前元氣（初始化時會設定）
+  
   dirtiness: 0,
   favor: { SF: 20, SS: 10, DS: 0 },
   
@@ -120,14 +130,29 @@ async function initGame() {
     return;
   }
   
-  // 檢查是否為新遊戲
+  // 🔧 改這裡：先檢查是否為新遊戲
   const newGameData = localStorage.getItem('floralForger_newGame');
+  
   if (newGameData) {
+    // === 新遊戲：清除舊存檔 ===
+    localStorage.removeItem('floralForger_save');
     const data = JSON.parse(newGameData);
     player.name = data.playerName;
     player.avatar = data.playerAvatar || '🔨';
+    player.currentEP = player.maxEP; // ✅ 新遊戲補滿 EP
     localStorage.removeItem('floralForger_newGame');
     console.log(`👋 歡迎，${player.name}！`);
+  } else {
+    // === 繼續遊戲：讀取存檔 ===
+    const savedGame = localStorage.getItem('floralForger_save');
+    if (savedGame) {
+      const saved = JSON.parse(savedGame);
+      Object.assign(player, saved);
+      console.log('📂 讀取存檔成功');
+    } else {
+      // 沒有存檔，初始化 currentEP
+      player.currentEP = player.maxEP;
+    }
   }
   
   updatePlayerDisplay();
