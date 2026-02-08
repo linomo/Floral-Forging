@@ -13,76 +13,71 @@ const ForgeScene = {
     return digits[tens] + digits[ones];
   },
   
-// === 渲染場景標題 (確保數據與 ID 完整) ===
-renderHeader() {
-    // 只計算最大值，不要去動當前的 currentEP
-    player.maxEP = Math.floor(2 * (player.int + player.dex + player.str) / 3);
+  // === 渲染場景標題 ===
+  renderHeader() {
+    const ep = Math.floor(2 * (player.int + player.dex + player.str) / 3);
     
-    // ❌ 刪除這行：player.currentEP = player.maxEP; 
-
     return `
       <span style="font-weight: bold; font-size: 1.1em;">📍 鍛造室</span>
       <span style="margin-left: 15px; color: #888;">
-        ⚡元氣：<span id="header-ep" style="color: #4ecdc4; font-weight: bold;">${player.currentEP}</span> / <span id="header-max-ep">${player.maxEP}</span>
+        ⚡元氣：<span style="color: #4ecdc4; font-weight: bold;">${ep}</span>
       </span>
       <span style="margin-left: 15px; color: #888;">
-        💩髒髒值：<span id="header-dirtiness" style="color: #f5576c; font-weight: bold;">${player.dirtiness}</span>
+        💩髒髒值：<span style="color: #f5576c; font-weight: bold;">${player.dirtiness}</span>
       </span>
     `;
   },
-
-// === 更新數值 (安全檢查版) ===
+  
+  // === 更新數值 ===
   updateValues() {
-    // 1. 抓取所有對應的 ID
-    const epElement = document.getElementById('header-ep');
-    const maxEpElement = document.getElementById('header-max-ep');
-    const dirtyElement = document.getElementById('header-dirtiness');
+    const ep = Math.floor(2 * (player.int + player.dex + player.str) / 3);
+    const epSpan = document.querySelector('#scene-header span[style*="color: #4ecdc4"]');
+    const dirtySpan = document.querySelector('#scene-header span[style*="color: #f5576c"]');
     
-    // 2. 只有當標籤真的存在時才更新，防止 ReferenceError
-    if (epElement) {
-      epElement.textContent = player.currentEP;
-    }
-    
-    if (maxEpElement) {
-      maxEpElement.textContent = player.maxEP;
-    }
-    
-    if (dirtyElement) {
-      dirtyElement.textContent = player.dirtiness;
-    }
+    if (epSpan) epSpan.textContent = ep;
+    if (dirtySpan) dirtySpan.textContent = player.dirtiness;
   },
+  
   // === 渲染場景內容 ===
-async renderContent() {
+  async renderContent() {
     const forgeMap = CSVLoader.data.forgeMap || [];
     
     if (forgeMap.length === 0) {
       return '<div style="padding: 40px; text-align: center; color: #666;">載入中...</div>';
     }
     
-    const maxRow = Math.max(...forgeMap.map(o => parseInt(o.row) || 0));
-    const maxCol = Math.max(...forgeMap.map(o => parseInt(o.col) || 0));
-
-    // 🔧 修正：將 grid-template-columns 改為動態，根據 maxCol 決定
-    let html = `<div class="room-grid" style="grid-template-columns: repeat(${maxCol}, 80px);">`;
+    let html = '<div class="room-grid">';
     
-    for (let r = 1; r <= maxRow; r++) {
-      for (let c = 1; c <= maxCol; c++) {
-        const obj = forgeMap.find(o => parseInt(o.row) === r && parseInt(o.col) === c);
-        
-        if (obj && obj.obj_id !== 'empty') {
-          html += `
-            <div class="room-item" onclick="ForgeScene.clickRoom('${obj.obj_id}')">
-              <span class="icon">${obj.icon}</span>
-              <span class="label">${obj.name}</span>
-            </div>
-          `;
-        } else {
+    const gridLayout = [
+      ['forge_shelf', 'forge_desk', 'forge_decoration', 'forge_window'],
+      ['forge_anvil', 'forge_furnace', 'forge_water', 'empty'],
+      ['empty', 'forge_materials', 'forge_clean', 'empty'],
+      ['forge_door', 'empty', 'empty', 'empty']
+    ];
+    
+    gridLayout.forEach(row => {
+      row.forEach(objId => {
+        if (objId === 'empty') {
           html += '<div class="room-item empty"></div>';
+        } else {
+          const obj = forgeMap.find(o => o.obj_id === objId);
+          
+          if (obj) {
+            html += `
+              <div class="room-item" onclick="ForgeScene.clickRoom('${obj.obj_id}')">
+                <span class="icon">${obj.icon}</span>
+                <span class="label">${obj.name}</span>
+              </div>
+            `;
+          } else {
+            html += '<div class="room-item empty"></div>';
+          }
         }
-      }
-    }
+      });
+    });
     
     html += '</div>';
+    
     return html;
   },
   
@@ -135,7 +130,7 @@ async renderContent() {
         this.openInventoryModal();
         break;
       case 'book_modal':
-        showToast('書架系統開發中...');
+        this.openBookModal();
         break;
       case 'forge_modal':
         showToast('鍛造系統開發中...');
@@ -158,29 +153,22 @@ async renderContent() {
     }
   },
   
-// === 處理打掃 (優化數據同步) ===
+  // === 處理打掃 ===
   handleCleanRoom(obj) {
     const epCost = parseInt(obj.ep_cost) || 0;
-    const cleanAmount = 50;
-
-    if (player.currentEP < epCost) {
-      showToast("⚡ 元氣不足，無法打掃！");
-      return;
-    }
-
-    // 數據變動
-    player.currentEP -= epCost;
-    player.dirtiness = Math.max(0, player.dirtiness - cleanAmount);
     
-    // 渲染對話
     if (obj.comment) {
       DialogueSystem.showDialogue(obj.chara_id, obj.comment);
     }
     
-    // 統一更新 UI
-    updateStatsDisplay(); 
+    const cleanAmount = 50;
+    player.dirtiness = Math.max(0, player.dirtiness - cleanAmount);
+    
+    updateStatsDisplay();
+    
     showToast(`✨ 打掃完成！汙穢值 -${cleanAmount}（消耗 ${epCost} EP）`);
   },
+  
   // === 處理確認離開 ===
   handleConfirmExit(obj) {
     const confirmMsg = obj.confirm_message || '確定要離開嗎？';
@@ -211,58 +199,35 @@ async renderContent() {
     DialogueSystem.hideDesignComments();
   },
   
-// === 繪製設計圖（修正版） ===
+  // === 繪製設計圖 ===
   drawDesign() {
-    // 1. 取得消耗數據
-    const epCost = CSVLoader.getModalEpCost('design_modal', '繪製') || 0;
-    const baseMoneyCost = 30;
-
-    // 2. 驗證：檢查資源是否足夠
-    if (player.currentEP < epCost) {
-      showToast("⚡ 元氣不足，無法構思設計圖！");
-      return;
-    }
-    if (player.money < baseMoneyCost) {
-      showToast("💰 錢不夠買紙筆...");
-      return;
-    }
-
-    // 3. 數據運算
+    const epCost = CSVLoader.getModalEpCost('design_modal', '繪製');
+    
     const design = DesignGenerator.draw(player);
     if (!design) {
       console.error('❌ 抽卡失敗！');
       return;
     }
-
-    const dirtinessIncrease = epCost / 2;
-    let extraCleaningFee = 0;
-    if (player.dirtiness >= 99) {
-      extraCleaningFee = dirtinessIncrease;
-    }
-
-    // 4. 一次性執行扣款 (Atomic Update)
-    player.currentEP -= epCost;
-    player.money -= (baseMoneyCost + extraCleaningFee);
-    player.dirtiness = Math.min(100, player.dirtiness + dirtinessIncrease);
-
-    // 5. 處理設計圖後續邏輯
+    
+    // 計算設計圖價格：30 × (品級倍率)³
     const gradeData = CSVLoader.data.grades.find(g => g.grade === design.grade.replace('‽', ''));
     const gradeMulti = gradeData ? parseFloat(gradeData.effect_value_.replace('*', '')) : 1;
     design.blueprintPrice = Math.floor(30 * Math.pow(gradeMulti, 3));
     
-    this.currentDesign = design;
-
-    // 6. 最後僅更新一次 UI
-    this.renderDesignCard(design);
-    updateStatsDisplay(); 
-
-    if (extraCleaningFee > 0) {
+    // 弄髒
+    const dirtinessIncrease = epCost / 2;
+    
+    if (player.dirtiness >= 99) {
+      player.money = Math.max(0, player.money - dirtinessIncrease);
       DialogueSystem.showDialogue('PC', '被小師兄收取清潔費了嗚嗚。也是啦陳年汙垢好難處理。');
     }
-  },
-
-  // 將渲染抽卡結果獨立出來，並補回原本被清空的 HTML 結構
-  renderDesignCard(design) {
+    
+    player.dirtiness = Math.min(100, player.dirtiness + dirtinessIncrease);
+    updateStatsDisplay();
+    
+    this.currentDesign = design;
+    
+    // 渲染卡片
     const card = document.getElementById('designCard');
     card.className = `card grade-${design.grade}`;
     card.innerHTML = `
@@ -271,20 +236,33 @@ async renderContent() {
         <div class="card-weapon">${design.weapon}</div>
       </div>
       <div class="card-info">
-        <div class="info-item"><span class="info-label">⚙️ 金</span><span class="info-value metal">${design.metalNeed}</span></div>
-        <div class="info-item"><span class="info-label">🥖 木</span><span class="info-value wood">${design.woodNeed}</span></div>
-        <div class="info-item"><span class="info-label">💰 圖紙</span><span class="info-value price">${design.blueprintPrice}</span></div>
-        <div class="info-item"><span class="info-label">⚡ EP</span><span class="info-value ep">${design.ep}</span></div>
+        <div class="info-item">
+          <span class="info-label">⚙️ 金</span>
+          <span class="info-value metal">${design.metalNeed}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">🥖 木</span>
+          <span class="info-value wood">${design.woodNeed}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">💰 圖紙</span>
+          <span class="info-value price">${design.blueprintPrice}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">⚡ EP</span>
+          <span class="info-value ep">${design.ep}</span>
+        </div>
       </div>
       <div class="card-effects">
         <div class="effect-title">📝 讓我看看！</div>
         <div class="effect-row">${design.effects.length > 0 ? design.effects.join('') : '&nbsp;'}</div>
       </div>
     `;
+    
     DialogueSystem.showDesignComments(design.comments);
     document.getElementById('saveBtn').style.display = 'block';
   },
-
+  
   // === 儲存設計圖 ===
   saveDesign() {
     if (this.currentDesign) {
@@ -297,6 +275,7 @@ async renderContent() {
       DialogueSystem.showDialogue('PC', `完成了！${this.currentDesign.grade}！${this.currentDesign.physical}${this.currentDesign.mental}${this.currentDesign.weapon}！`);
     }
   },
+  
   // === 材料庫存彈窗 ===
   openInventoryModal() {
     const modal = document.getElementById('inventoryModal');
@@ -422,6 +401,338 @@ async renderContent() {
     if (modal) {
       modal.classList.remove('show');
     }
+  },
+  
+  // === 書籍系統 ===
+  
+  // 初始化書籍 CSS（只執行一次）
+  initBookStyles() {
+    if (document.getElementById('book-system-styles')) return;
+    
+    const style = document.createElement('style');
+    style.id = 'book-system-styles';
+    style.textContent = `
+      /* 書櫃彈窗 */
+      .book-modal {
+        background: linear-gradient(180deg, #252535 0%, #1a1a28 100%);
+        border-radius: 16px;
+        padding: 20px;
+        max-width: 400px;
+        width: 90%;
+        max-height: 70vh;
+        overflow-y: auto;
+      }
+      
+      .book-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin: 15px 0;
+      }
+      
+      .book-item {
+        padding: 15px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: center;
+      }
+      
+      .book-item:hover {
+        background: rgba(255,255,255,0.1);
+        border-color: rgba(255,255,255,0.3);
+        transform: translateY(-2px);
+      }
+      
+      .book-item-name {
+        font-size: 1.1em;
+        font-weight: bold;
+        color: #f5a623;
+      }
+      
+      /* 書卷軸 */
+      .book-scroll {
+        background: linear-gradient(180deg, #3a3a4a 0%, #2a2a38 100%);
+        border-radius: 12px;
+        padding: 0;
+        max-width: 600px;
+        width: 90%;
+        border: 3px solid #8b7355;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      }
+      
+      .book-scroll-header {
+        background: linear-gradient(90deg, #8b7355, #a0826d);
+        padding: 20px;
+        text-align: center;
+        border-radius: 9px 9px 0 0;
+      }
+      
+      .book-scroll-title {
+        font-size: 1.5em;
+        font-weight: bold;
+        color: #fff;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      }
+      
+      .book-scroll-meta {
+        display: flex;
+        justify-content: space-around;
+        padding: 15px 20px;
+        background: rgba(0,0,0,0.2);
+        border-top: 1px solid rgba(139,115,85,0.3);
+        border-bottom: 1px solid rgba(139,115,85,0.3);
+      }
+      
+      .book-scroll-meta-item {
+        text-align: center;
+        color: #ccc;
+        font-size: 0.95em;
+      }
+      
+      .book-scroll-meta-label {
+        color: #888;
+        margin-right: 5px;
+      }
+      
+      .book-scroll-content {
+        padding: 25px 30px;
+        text-align: center;
+        line-height: 1.8;
+        color: #ddd;
+        font-size: 1em;
+        min-height: 100px;
+      }
+      
+      .book-scroll-footer {
+        padding: 20px;
+        text-align: center;
+        background: rgba(0,0,0,0.1);
+        border-radius: 0 0 9px 9px;
+      }
+      
+      .book-read-btn {
+        padding: 12px 40px;
+        font-size: 1.1em;
+        background: linear-gradient(90deg, #f5a623, #f5576c);
+        border: none;
+        border-radius: 10px;
+        color: #fff;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.2s;
+      }
+      
+      .book-read-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(245,166,35,0.4);
+      }
+      
+      .book-read-btn:disabled {
+        background: rgba(255,255,255,0.1);
+        color: #666;
+        cursor: not-allowed;
+      }
+      
+      .book-read-btn:disabled:hover {
+        transform: none;
+        box-shadow: none;
+      }
+      
+      .book-status-read {
+        color: #7ed321;
+        font-weight: bold;
+      }
+      
+      .book-status-unread {
+        color: #f5576c;
+        font-weight: bold;
+      }
+    `;
+    document.head.appendChild(style);
+  },
+  
+  // 打開書櫃彈窗（書名列表）
+  openBookModal() {
+    this.initBookStyles();
+    
+    // 檢查是否已存在彈窗
+    let modal = document.getElementById('bookModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'bookModal';
+      modal.className = 'modal-overlay';
+      document.body.appendChild(modal);
+    }
+    
+    // 生成書籍列表
+    const playerBooks = player.books || [];
+    
+    if (playerBooks.length === 0) {
+      modal.innerHTML = `
+        <div class="book-modal">
+          <div class="modal-title">📚 書架</div>
+          <div style="padding: 40px; text-align: center; color: #666;">
+            還沒有任何書籍...
+          </div>
+          <div class="modal-actions">
+            <button class="modal-btn primary" onclick="ForgeScene.closeBookModal()">關閉</button>
+          </div>
+        </div>
+      `;
+    } else {
+      let booksHtml = '<div class="book-list">';
+      
+      playerBooks.forEach(bookId => {
+        const book = CSVLoader.data.books.find(b => b.book_id === bookId);
+        if (book) {
+          booksHtml += `
+            <div class="book-item" onclick="ForgeScene.openBookScroll('${bookId}')">
+              <div class="book-item-name">📖 ${book.name}</div>
+            </div>
+          `;
+        }
+      });
+      
+      booksHtml += '</div>';
+      
+      modal.innerHTML = `
+        <div class="book-modal">
+          <div class="modal-title">📚 書架</div>
+          ${booksHtml}
+          <div class="modal-actions">
+            <button class="modal-btn primary" onclick="ForgeScene.closeBookModal()">關閉</button>
+          </div>
+        </div>
+      `;
+    }
+    
+    modal.classList.add('show');
+  },
+  
+  // 關閉書櫃彈窗
+  closeBookModal() {
+    const modal = document.getElementById('bookModal');
+    if (modal) {
+      modal.classList.remove('show');
+    }
+  },
+  
+  // 打開書卷軸（單本書詳細）
+  openBookScroll(bookId) {
+    this.initBookStyles();
+    
+    const book = CSVLoader.data.books.find(b => b.book_id === bookId);
+    if (!book) {
+      console.error(`找不到書籍: ${bookId}`);
+      return;
+    }
+    
+    const isRead = player.readBooks.includes(bookId);
+    const epCost = parseInt(book.read_ep) || 0;
+    
+    // 檢查是否已存在書卷軸彈窗
+    let scrollModal = document.getElementById('bookScrollModal');
+    if (!scrollModal) {
+      scrollModal = document.createElement('div');
+      scrollModal.id = 'bookScrollModal';
+      scrollModal.className = 'modal-overlay';
+      document.body.appendChild(scrollModal);
+    }
+    
+    scrollModal.innerHTML = `
+      <div class="book-scroll">
+        <div class="book-scroll-header">
+          <div class="book-scroll-title">${book.name}</div>
+        </div>
+        
+        <div class="book-scroll-meta">
+          <div class="book-scroll-meta-item">
+            <span class="book-scroll-meta-label">⚡ EP：</span>
+            <span>${epCost}</span>
+          </div>
+          <div class="book-scroll-meta-item">
+            <span class="${isRead ? 'book-status-read' : 'book-status-unread'}">
+              ${isRead ? '已閱讀' : '未閱讀'}
+            </span>
+          </div>
+        </div>
+        
+        <div class="book-scroll-content">
+          ${book.description}
+        </div>
+        
+        <div class="book-scroll-footer">
+          ${isRead ? 
+            '<button class="book-read-btn" disabled>已讀過</button>' :
+            `<button class="book-read-btn" onclick="ForgeScene.readBook('${bookId}')">閱讀</button>`
+          }
+        </div>
+      </div>
+    `;
+    
+    // 關閉書櫃，顯示書卷軸
+    this.closeBookModal();
+    scrollModal.classList.add('show');
+  },
+  
+  // 關閉書卷軸
+  closeBookScroll() {
+    const scrollModal = document.getElementById('bookScrollModal');
+    if (scrollModal) {
+      scrollModal.classList.remove('show');
+    }
+  },
+  
+  // 閱讀書籍
+  readBook(bookId) {
+    const book = CSVLoader.data.books.find(b => b.book_id === bookId);
+    if (!book) {
+      console.error(`找不到書籍: ${bookId}`);
+      return;
+    }
+    
+    const epCost = parseInt(book.read_ep) || 0;
+    
+    // 檢查 EP 是否足夠
+    if (player.currentEP < epCost) {
+      showToast('⚡ 元氣不足，無法閱讀！');
+      return;
+    }
+    
+    // 扣除 EP
+    player.currentEP -= epCost;
+    
+    // 加入已讀列表
+    if (!player.readBooks.includes(bookId)) {
+      player.readBooks.push(bookId);
+    }
+    
+    // 解鎖武器
+    const unlockedWeapons = CSVLoader.data.weapons.filter(w => w.unlock_trigger === bookId);
+    unlockedWeapons.forEach(w => {
+      if (!player.unlockedWeapons.includes(w.wea_id)) {
+        player.unlockedWeapons.push(w.wea_id);
+      }
+    });
+    
+    // 更新 UI
+    updateStatsDisplay();
+    
+    // 顯示解鎖訊息
+    if (unlockedWeapons.length > 0) {
+      const weaponNames = unlockedWeapons.map(w => w.name).join('、');
+      showToast(`📖 讀完《${book.name}》！解鎖武器：${weaponNames}`);
+      DialogueSystem.showDialogue('PC', `太好了！學會了 ${weaponNames} 的製作方法！`);
+    } else {
+      showToast(`📖 讀完《${book.name}》！`);
+      DialogueSystem.showDialogue('PC', `嗯...雖然沒學到新武器，但還是有收穫的！`);
+    }
+    
+    // 關閉書卷軸
+    this.closeBookScroll();
   }
 };
 
