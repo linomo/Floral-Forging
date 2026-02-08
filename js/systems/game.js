@@ -16,15 +16,8 @@ const player = {
   mood: 50,
   stress: 25,
   money: 100,
-  
-  // 最大元氣：動態計算公式
-  get maxEP() {
-    return Math.floor(2 * (this.str + this.int + this.dex) / 3);
-  },
-  set maxEP(value) {
-    // 留空，讓 Object.assign 賦值時不會報錯
-  },
-  currentEP: 0, // 當前元氣（初始化時會設定）
+  currentEP: 0,  // 當前元氣
+  dirtiness: 0,
   
   dirtiness: 0,
   favor: { SF: 20, SS: 10, DS: 0 },
