@@ -1,5 +1,5 @@
 // ===================================
-// 遊戲核心邏輯（重構版 v2.5）
+// 遊戲核心邏輯（重構版 v2.8 - 修正存檔）
 // ===================================
 
 // 場景系統
@@ -18,8 +18,6 @@ const player = {
   money: 100,
   currentEP: 0,  // 當前元氣
   dirtiness: 0,
-  
-  dirtiness: 0,
   favor: { SF: 20, SS: 10, DS: 0 },
   
   // 材料庫存
@@ -33,8 +31,8 @@ const player = {
   products: [],     // 成品劍（完整物件）
   equipment: ['equip01'],  // 裝備 ID
   books: ['book01'],       // 擁有的書籍 ID
-  readBooks: [],           // 已讀過的書籍 ID
-  unlockedWeapons: [],  // 已解鎖的武器 ID
+  readBooks: [],           // 已讀過的書籍 ID（初始為空）
+  unlockedWeapons: [],     // 已解鎖的武器 ID（初始為空）
   unlockedAvatars: ['avatars01']
 };
 
@@ -123,35 +121,37 @@ async function initGame() {
     return;
   }
   
-  // 🔧 改這裡：先檢查是否為新遊戲
+  // 檢查是否為新遊戲
   const newGameData = localStorage.getItem('floralForger_newGame');
   
- if (newGameData) {
-  // 新遊戲
-  localStorage.removeItem('floralForger_save');
-  const data = JSON.parse(newGameData);
-  player.name = data.playerName;
-  player.avatar = data.playerAvatar || '🔨';
-  
-  // 🔧 計算並設定初始 EP
-  const maxEP = Math.floor(2 * (player.str + player.int + player.dex) / 3);
-  player.currentEP = maxEP;
-  
-  localStorage.removeItem('floralForger_newGame');
-  console.log(`👋 歡迎，${player.name}！`);
-} else {
-  // 讀取存檔
-  const savedGame = localStorage.getItem('floralForger_save');
-  if (savedGame) {
-    const saved = JSON.parse(savedGame);
-    Object.assign(player, saved);
-    console.log('📂 讀取存檔成功', player);  // 🔧 加上 player 看看內容
-  } else {
-    // 沒有存檔，初始化
+  if (newGameData) {
+    // === 新遊戲 ===
+    console.log('🆕 開始新遊戲');
+    localStorage.removeItem('floralForger_save');
+    const data = JSON.parse(newGameData);
+    player.name = data.playerName;
+    player.avatar = data.playerAvatar || '🔨';
+    
+    // 計算並設定初始 EP
     const maxEP = Math.floor(2 * (player.str + player.int + player.dex) / 3);
     player.currentEP = maxEP;
+    
+    localStorage.removeItem('floralForger_newGame');
+    console.log(`👋 歡迎，${player.name}！初始 EP: ${player.currentEP}`);
+  } else {
+    // === 讀取存檔 ===
+    const savedGame = localStorage.getItem('floralForger_save');
+    if (savedGame) {
+      const saved = JSON.parse(savedGame);
+      Object.assign(player, saved);
+      console.log('📂 讀取存檔成功', player);
+    } else {
+      // 沒有存檔，初始化
+      const maxEP = Math.floor(2 * (player.str + player.int + player.dex) / 3);
+      player.currentEP = maxEP;
+      console.log('📝 初次遊玩，初始化數值');
+    }
   }
-}
   
   updatePlayerDisplay();
   updateStatsDisplay();
@@ -186,6 +186,9 @@ function updateStatsDisplay() {
   }
   
   updateSceneValues();
+  
+  // 🔧 自動存檔
+  localStorage.setItem('floralForger_save', JSON.stringify(player));
 }
 
 // === 通用工具函數 ===
