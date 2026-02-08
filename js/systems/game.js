@@ -133,27 +133,32 @@ async function initGame() {
   // 🔧 改這裡：先檢查是否為新遊戲
   const newGameData = localStorage.getItem('floralForger_newGame');
   
-  if (newGameData) {
-    // === 新遊戲：清除舊存檔 ===
-    localStorage.removeItem('floralForger_save');
-    const data = JSON.parse(newGameData);
-    player.name = data.playerName;
-    player.avatar = data.playerAvatar || '🔨';
-    player.currentEP = player.maxEP; // ✅ 新遊戲補滿 EP
-    localStorage.removeItem('floralForger_newGame');
-    console.log(`👋 歡迎，${player.name}！`);
+ if (newGameData) {
+  // 新遊戲
+  localStorage.removeItem('floralForger_save');
+  const data = JSON.parse(newGameData);
+  player.name = data.playerName;
+  player.avatar = data.playerAvatar || '🔨';
+  
+  // 🔧 計算並設定初始 EP
+  const maxEP = Math.floor(2 * (player.str + player.int + player.dex) / 3);
+  player.currentEP = maxEP;
+  
+  localStorage.removeItem('floralForger_newGame');
+  console.log(`👋 歡迎，${player.name}！`);
+} else {
+  // 讀取存檔
+  const savedGame = localStorage.getItem('floralForger_save');
+  if (savedGame) {
+    const saved = JSON.parse(savedGame);
+    Object.assign(player, saved);
+    console.log('📂 讀取存檔成功', player);  // 🔧 加上 player 看看內容
   } else {
-    // === 繼續遊戲：讀取存檔 ===
-    const savedGame = localStorage.getItem('floralForger_save');
-    if (savedGame) {
-      const saved = JSON.parse(savedGame);
-      Object.assign(player, saved);
-      console.log('📂 讀取存檔成功');
-    } else {
-      // 沒有存檔，初始化 currentEP
-      player.currentEP = player.maxEP;
-    }
+    // 沒有存檔，初始化
+    const maxEP = Math.floor(2 * (player.str + player.int + player.dex) / 3);
+    player.currentEP = maxEP;
   }
+}
   
   updatePlayerDisplay();
   updateStatsDisplay();
