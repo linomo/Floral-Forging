@@ -62,11 +62,17 @@ const DesignGenerator = {
         const physical = physicalPool.length > 0 ? this.pick(physicalPool) : this.pick(CSVLoader.data.physical);
         const mental = mentalPool.length > 0 ? this.pick(mentalPool) : this.pick(CSVLoader.data.mental);
 
-        // 3. 武器過濾：檢查 weapon.unlock_trigger 是否在 player.readBooks 中
+        // 3. 武器過濾：只選擇已解鎖的武器
         const availableWeapons = CSVLoader.data.weapons.filter(w => 
-            !w.unlock_trigger || player.readBooks.includes(w.unlock_trigger)
+            w.unlock_trigger && player.readBooks.includes(w.unlock_trigger)
         );
-        const weapon = availableWeapons.length > 0 ? this.pick(availableWeapons) : CSVLoader.data.weapons[0];
+        
+        // 如果沒有解鎖的武器，返回 null
+        if (availableWeapons.length === 0) {
+            return null;
+        }
+        
+        const weapon = this.pick(availableWeapons);
         
         // 奇‽ 特殊觸發 (心情爛但骰出奇)
         const displayGrade = (this.getGradeLabel(mentVal) === '爛' && overallGrade === '奇' && Math.random() < 0.1) ? '奇‽' : overallGrade;
