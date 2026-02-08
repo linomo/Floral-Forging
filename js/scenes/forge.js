@@ -17,7 +17,6 @@ const ForgeScene = {
   renderHeader() {
     // 計算最大 EP
     const maxEP = Math.floor(2 * (player.int + player.dex + player.str) / 3);
-    const currentEP = player.currentEP || 0;
     
     return `
   
