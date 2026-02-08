@@ -1,5 +1,5 @@
 // ===================================
-// 鍛造室場景（重構版 v2.5）
+// 鍛造室場景（重構版 v2.6）
 // ===================================
 
 const ForgeScene = {
@@ -15,27 +15,31 @@ const ForgeScene = {
   
   // === 渲染場景標題 ===
   renderHeader() {
-    const ep = Math.floor(2 * (player.int + player.dex + player.str) / 3);
+    // 計算最大 EP
+    const maxEP = Math.floor(2 * (player.int + player.dex + player.str) / 3);
+    const currentEP = player.currentEP || 0;
     
     return `
       <span style="font-weight: bold; font-size: 1.1em;">📍 鍛造室</span>
       <span style="margin-left: 15px; color: #888;">
-        ⚡元氣：<span style="color: #4ecdc4; font-weight: bold;">${ep}</span>
+        ⚡元氣：<span id="header-ep" style="color: #4ecdc4; font-weight: bold;">${currentEP}</span> / <span id="header-max-ep">${maxEP}</span>
       </span>
       <span style="margin-left: 15px; color: #888;">
-        💩髒髒值：<span style="color: #f5576c; font-weight: bold;">${player.dirtiness}</span>
+        💩髒髒值：<span id="header-dirtiness" style="color: #f5576c; font-weight: bold;">${player.dirtiness}</span>
       </span>
     `;
   },
   
   // === 更新數值 ===
   updateValues() {
-    const ep = Math.floor(2 * (player.int + player.dex + player.str) / 3);
-    const epSpan = document.querySelector('#scene-header span[style*="color: #4ecdc4"]');
-    const dirtySpan = document.querySelector('#scene-header span[style*="color: #f5576c"]');
+    const maxEP = Math.floor(2 * (player.int + player.dex + player.str) / 3);
+    const epElement = document.getElementById('header-ep');
+    const maxEpElement = document.getElementById('header-max-ep');
+    const dirtyElement = document.getElementById('header-dirtiness');
     
-    if (epSpan) epSpan.textContent = ep;
-    if (dirtySpan) dirtySpan.textContent = player.dirtiness;
+    if (epElement) epElement.textContent = player.currentEP || 0;
+    if (maxEpElement) maxEpElement.textContent = maxEP;
+    if (dirtyElement) dirtyElement.textContent = player.dirtiness;
   },
   
   // === 渲染場景內容 ===
@@ -46,38 +50,29 @@ const ForgeScene = {
       return '<div style="padding: 40px; text-align: center; color: #666;">載入中...</div>';
     }
     
-    let html = '<div class="room-grid">';
+    const maxRow = Math.max(...forgeMap.map(o => parseInt(o.row) || 0));
+    const maxCol = Math.max(...forgeMap.map(o => parseInt(o.col) || 0));
+
+    let html = `<div class="room-grid" style="grid-template-columns: repeat(${maxCol}, 80px);">`;
     
-    const gridLayout = [
-      ['forge_shelf', 'forge_desk', 'forge_decoration', 'forge_window'],
-      ['forge_anvil', 'forge_furnace', 'forge_water', 'empty'],
-      ['empty', 'forge_materials', 'forge_clean', 'empty'],
-      ['forge_door', 'empty', 'empty', 'empty']
-    ];
-    
-    gridLayout.forEach(row => {
-      row.forEach(objId => {
-        if (objId === 'empty') {
-          html += '<div class="room-item empty"></div>';
+    for (let r = 1; r <= maxRow; r++) {
+      for (let c = 1; c <= maxCol; c++) {
+        const obj = forgeMap.find(o => parseInt(o.row) === r && parseInt(o.col) === c);
+        
+        if (obj && obj.obj_id !== 'empty') {
+          html += `
+            <div class="room-item" onclick="ForgeScene.clickRoom('${obj.obj_id}')">
+              <span class="icon">${obj.icon}</span>
+              <span class="label">${obj.name}</span>
+            </div>
+          `;
         } else {
-          const obj = forgeMap.find(o => o.obj_id === objId);
-          
-          if (obj) {
-            html += `
-              <div class="room-item" onclick="ForgeScene.clickRoom('${obj.obj_id}')">
-                <span class="icon">${obj.icon}</span>
-                <span class="label">${obj.name}</span>
-              </div>
-            `;
-          } else {
-            html += '<div class="room-item empty"></div>';
-          }
+          html += '<div class="room-item empty"></div>';
         }
-      });
-    });
+      }
+    }
     
     html += '</div>';
-    
     return html;
   },
   
@@ -157,11 +152,17 @@ const ForgeScene = {
   handleCleanRoom(obj) {
     const epCost = parseInt(obj.ep_cost) || 0;
     
+    if (player.currentEP < epCost) {
+      showToast("⚡ 元氣不足，無法打掃！");
+      return;
+    }
+    
     if (obj.comment) {
       DialogueSystem.showDialogue(obj.chara_id, obj.comment);
     }
     
     const cleanAmount = 50;
+    player.currentEP -= epCost;
     player.dirtiness = Math.max(0, player.dirtiness - cleanAmount);
     
     updateStatsDisplay();
@@ -190,8 +191,7 @@ const ForgeScene = {
     this.currentDesign = null;
     document.getElementById('designCard').innerHTML = '<div class="card-placeholder">在腦中構思設計圖...</div>';
     document.getElementById('designCard').className = 'card';
-    // 🔧 移除收下按鈕（自動收下）
-    // document.getElementById('saveBtn').style.display = 'block';
+    DialogueSystem.hideDesignComments();
   },
   
   closeDesignModal() {
@@ -199,13 +199,11 @@ const ForgeScene = {
     DialogueSystem.hideDesignComments();
   },
   
-// === 繪製設計圖（修正版） ===
+  // === 繪製設計圖 ===
   drawDesign() {
-    // 1. 取得消耗數據
     const epCost = CSVLoader.getModalEpCost('design_modal', '繪製') || 0;
     const baseMoneyCost = 30;
 
-    // 2. 驗證：檢查資源是否足夠
     if (player.currentEP < epCost) {
       showToast("⚡ 元氣不足，無法構思設計圖！");
       return;
@@ -215,7 +213,6 @@ const ForgeScene = {
       return;
     }
 
-    // 3. 數據運算
     const design = DesignGenerator.draw(player);
     if (!design) {
       console.error('❌ 抽卡失敗！');
@@ -228,26 +225,26 @@ const ForgeScene = {
       extraCleaningFee = dirtinessIncrease;
     }
 
-    // 4. 一次性執行扣款 (Atomic Update)
+    // 扣除資源
     player.currentEP -= epCost;
     player.money -= (baseMoneyCost + extraCleaningFee);
     player.dirtiness = Math.min(100, player.dirtiness + dirtinessIncrease);
 
-    // 5. 處理設計圖後續邏輯
+    // 計算設計圖價格
     const gradeData = CSVLoader.data.grades.find(g => g.grade === design.grade.replace('‽', ''));
     const gradeMulti = gradeData ? parseFloat(gradeData.effect_value_.replace('*', '')) : 1;
     design.blueprintPrice = Math.floor(30 * Math.pow(gradeMulti, 3));
     
-    // 🔧 新增：套用心理前綴效果到角色身上
+    // 套用心理前綴效果
     this.applyMentalEffects(design.mentalPrefixData);
     
-    // 🔧 新增：自動收下設計圖
+    // 自動收下設計圖
     design.id = player.designs.length + 1;
     player.designs.push(design);
     
     this.currentDesign = design;
 
-    // 6. 最後僅更新一次 UI
+    // 渲染卡片
     this.renderDesignCard(design);
     updateStatsDisplay(); 
 
@@ -255,15 +252,14 @@ const ForgeScene = {
       DialogueSystem.showDialogue('PC', '被小師兄收取清潔費了嗚嗚。也是啦陳年汙垢好難處理。');
     }
     
-    // 🔧 新增：自動收下提示
     showToast(`📜 獲得設計圖：${design.grade}！${design.weapon}`);
     DialogueSystem.showDialogue('PC', `完成了！${design.grade}！${design.physical}${design.mental}${design.weapon}！`);
   },
+  
   // === 套用心理前綴效果 ===
   applyMentalEffects(mentalData) {
     if (!mentalData) return;
     
-    // 掃描 effect_sta_1 ~ effect_sta_3
     for (let i = 1; i <= 3; i++) {
       const stat = mentalData[`effect_sta_${i}`];
       const value = mentalData[`effect_value_${i}`];
@@ -297,17 +293,28 @@ const ForgeScene = {
       }
     }
   },
-  // === 儲存設計圖 ===
-  saveDesign() {
-    if (this.currentDesign) {
-      // 加入 ID
-      this.currentDesign.id = player.designs.length + 1;
-      player.designs.push(this.currentDesign);
-      
-      showToast(`📜 獲得設計圖：${this.currentDesign.grade}！${this.currentDesign.weapon}`);
-      this.closeDesignModal();
-      DialogueSystem.showDialogue('PC', `完成了！${this.currentDesign.grade}！${this.currentDesign.physical}${this.currentDesign.mental}${this.currentDesign.weapon}！`);
-    }
+  
+  // === 渲染設計圖卡片 ===
+  renderDesignCard(design) {
+    const card = document.getElementById('designCard');
+    card.className = `card grade-${design.grade}`;
+    card.innerHTML = `
+      <div class="card-header">
+        <div class="card-grade grade-${design.grade}">${design.grade}！${design.physical}${design.mental}</div>
+        <div class="card-weapon">${design.weapon}</div>
+      </div>
+      <div class="card-info">
+        <div class="info-item"><span class="info-label">⚙️ 金</span><span class="info-value metal">${design.metalNeed}</span></div>
+        <div class="info-item"><span class="info-label">🥖 木</span><span class="info-value wood">${design.woodNeed}</span></div>
+        <div class="info-item"><span class="info-label">💰 圖紙</span><span class="info-value price">${design.blueprintPrice}</span></div>
+        <div class="info-item"><span class="info-label">⚡ EP</span><span class="info-value ep">${design.ep}</span></div>
+      </div>
+      <div class="card-effects">
+        <div class="effect-title">📝 讓我看看！</div>
+        <div class="effect-row">${design.effects.length > 0 ? design.effects.join('') : '&nbsp;'}</div>
+      </div>
+    `;
+    DialogueSystem.showDesignComments(design.comments);
   },
   
   // === 材料庫存彈窗 ===
@@ -318,7 +325,6 @@ const ForgeScene = {
       return;
     }
     
-    // 生成材料庫存 HTML
     let html = '<div class="inventory-content">';
     
     // 金屬材料
@@ -439,14 +445,12 @@ const ForgeScene = {
   
   // === 書籍系統 ===
   
-  // 初始化書籍 CSS（只執行一次）
   initBookStyles() {
     if (document.getElementById('book-system-styles')) return;
     
     const style = document.createElement('style');
     style.id = 'book-system-styles';
     style.textContent = `
-      /* 書櫃彈窗 */
       .book-modal {
         background: linear-gradient(180deg, #252535 0%, #1a1a28 100%);
         border-radius: 16px;
@@ -486,7 +490,6 @@ const ForgeScene = {
         color: #f5a623;
       }
       
-      /* 書卷軸 */
       .book-scroll {
         background: linear-gradient(180deg, #3a3a4a 0%, #2a2a38 100%);
         border-radius: 12px;
@@ -588,11 +591,9 @@ const ForgeScene = {
     document.head.appendChild(style);
   },
   
-  // 打開書櫃彈窗（書名列表）
   openBookModal() {
     this.initBookStyles();
     
-    // 檢查是否已存在彈窗
     let modal = document.getElementById('bookModal');
     if (!modal) {
       modal = document.createElement('div');
@@ -601,7 +602,6 @@ const ForgeScene = {
       document.body.appendChild(modal);
     }
     
-    // 生成書籍列表
     const playerBooks = player.books || [];
     
     if (playerBooks.length === 0) {
@@ -646,7 +646,6 @@ const ForgeScene = {
     modal.classList.add('show');
   },
   
-  // 關閉書櫃彈窗
   closeBookModal() {
     const modal = document.getElementById('bookModal');
     if (modal) {
@@ -654,7 +653,6 @@ const ForgeScene = {
     }
   },
   
-  // 打開書卷軸（單本書詳細）
   openBookScroll(bookId) {
     this.initBookStyles();
     
@@ -667,7 +665,6 @@ const ForgeScene = {
     const isRead = player.readBooks.includes(bookId);
     const epCost = parseInt(book.read_ep) || 0;
     
-    // 檢查是否已存在書卷軸彈窗
     let scrollModal = document.getElementById('bookScrollModal');
     if (!scrollModal) {
       scrollModal = document.createElement('div');
@@ -698,7 +695,7 @@ const ForgeScene = {
           ${book.description}
         </div>
         
-    <div class="book-scroll-footer">
+        <div class="book-scroll-footer">
           ${isRead ? 
             '<button class="book-read-btn" disabled>已讀過</button>' :
             `<button class="book-read-btn" onclick="ForgeScene.readBook('${bookId}')">閱讀</button>`
@@ -708,12 +705,10 @@ const ForgeScene = {
       </div>
     `;
     
-    // 關閉書櫃，顯示書卷軸
     this.closeBookModal();
     scrollModal.classList.add('show');
   },
   
-  // 關閉書卷軸
   closeBookScroll() {
     const scrollModal = document.getElementById('bookScrollModal');
     if (scrollModal) {
@@ -721,7 +716,6 @@ const ForgeScene = {
     }
   },
   
-  // 閱讀書籍
   readBook(bookId) {
     const book = CSVLoader.data.books.find(b => b.book_id === bookId);
     if (!book) {
@@ -731,7 +725,6 @@ const ForgeScene = {
     
     const epCost = parseInt(book.read_ep) || 0;
     
-    // 檢查 EP 是否足夠
     if (player.currentEP < epCost) {
       showToast('⚡ 元氣不足，無法閱讀！');
       return;
@@ -778,10 +771,6 @@ function clickRoom(objId) {
 
 function drawDesign() {
   ForgeScene.drawDesign();
-}
-
-function saveDesign() {
-  ForgeScene.saveDesign();
 }
 
 function closeDesignModal() {
