@@ -503,7 +503,7 @@ const ForgeScene = {
       
       .book-scroll-header {
         background: linear-gradient(180deg, #556b2f, #6b8e23);  // // 深綠漸層
-        padding: 20px;
+        padding: 40px;
         text-align: center;
         border-radius: 9px 9px 0 0;
       }
