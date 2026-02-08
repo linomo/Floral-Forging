@@ -538,10 +538,10 @@ const ForgeScene = {
       .book-scroll-content {
         padding: 25px 30px;
         text-align: center;
-        line-height: 1.8;
+        line-height: 3;
         color: #ddd;
         font-size: 1em;
-        min-height: 100px;
+        min-height: 300px;
       }
       
       .book-scroll-footer {
