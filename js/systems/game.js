@@ -16,14 +16,6 @@ const player = {
   mood: 50,
   stress: 25,
   money: 100,
-// 最大元氣：動態計算公式
-  get maxEP() {
-    return Math.floor(2 * (this.str + this.int + this.dex) / 3);
-  },
-  set maxEP(value) {
-    // 這裡留空，讓 Object.assign 賦值時不會報錯。數值依然會由上面的 get 計算產生
-  },
-  currentEP: 0, // 先給 0，稍後初始化
   dirtiness: 0,
   favor: { SF: 20, SS: 10, DS: 0 },
   
@@ -37,7 +29,9 @@ const player = {
   designs: [],      // 設計圖（完整物件）
   products: [],     // 成品劍（完整物件）
   equipment: ['equip01'],  // 裝備 ID
-  books: ['book01'],       // 書籍 ID
+  books: ['book01'],       // 擁有的書籍 ID
+  readBooks: [],           // 已讀過的書籍 ID
+  unlockedWeapons: ['wea01', 'wea02', 'wea03', 'wea04'],  // 已解鎖的武器 ID
   unlockedAvatars: ['avatars01']
 };
 
@@ -126,26 +120,14 @@ async function initGame() {
     return;
   }
   
-  // 🔧 改這裡：先檢查是否為新遊戲
+  // 檢查是否為新遊戲
   const newGameData = localStorage.getItem('floralForger_newGame');
-  
   if (newGameData) {
-    // === 新遊戲：清除舊存檔 ===
-    localStorage.removeItem('floralForger_save');  // ← 加這行
     const data = JSON.parse(newGameData);
     player.name = data.playerName;
-    player.currentEP = player.maxEP; // ✅ 只有新遊戲才補滿
     player.avatar = data.playerAvatar || '🔨';
     localStorage.removeItem('floralForger_newGame');
     console.log(`👋 歡迎，${player.name}！`);
-  } else {
-    // === 繼續遊戲：讀取存檔 ===
-    const savedGame = localStorage.getItem('floralForger_save');
-    if (savedGame) {
-      const saved = JSON.parse(savedGame);
-      Object.assign(player, saved);
-      console.log('📂 讀取存檔成功');
-    }
   }
   
   updatePlayerDisplay();
@@ -158,9 +140,6 @@ async function initGame() {
   }
   
   console.log('✅ 遊戲初始化完成！', player);
-  if (player.currentEP === 0) {
-    player.currentEP = player.maxEP;
-  }
 }
 
 // === 更新玩家顯示 ===
@@ -182,8 +161,7 @@ function updateStatsDisplay() {
   if (moneyDisplay) {
     moneyDisplay.textContent = player.money;
   }
-  // 自動存檔
-localStorage.setItem('floralForger_save', JSON.stringify(player));
+  
   updateSceneValues();
 }
 
