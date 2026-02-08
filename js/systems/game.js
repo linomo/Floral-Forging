@@ -41,7 +41,7 @@ const player = {
   equipment: ['equip01'],  // 裝備 ID
   books: ['book01'],       // 擁有的書籍 ID
   readBooks: [],           // 已讀過的書籍 ID
-  unlockedWeapons: ['wea01', 'wea02', 'wea03', 'wea04'],  // 已解鎖的武器 ID
+  unlockedWeapons: [],  // 已解鎖的武器 ID
   unlockedAvatars: ['avatars01']
 };
 
