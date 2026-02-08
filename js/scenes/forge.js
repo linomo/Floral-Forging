@@ -117,7 +117,7 @@ const ForgeScene = {
   
   // === 處理開啟彈窗 ===
   handleOpenModal(obj) {
-    if (obj.) {
+    if (obj.comment) {
       DialogueSystem.showDialogue(obj.chara_id, obj.comment);
     }
     
@@ -157,7 +157,7 @@ const ForgeScene = {
   handleCleanRoom(obj) {
     const epCost = parseInt(obj.ep_cost) || 0;
     
-    if (obj.) {
+    if (obj.comment) {
       DialogueSystem.showDialogue(obj.chara_id, obj.comment);
     }
     
@@ -190,7 +190,6 @@ const ForgeScene = {
     this.currentDesign = null;
     document.getElementById('designCard').innerHTML = '<div class="card-placeholder">在腦中構思設計圖...</div>';
     document.getElementById('designCard').className = 'card';
-   .showDesignComments(design.comments);
     // 🔧 移除收下按鈕（自動收下）
     // document.getElementById('saveBtn').style.display = 'block';
   },
