@@ -215,7 +215,8 @@ const ForgeScene = {
 
     const design = DesignGenerator.draw(player);
     if (!design) {
-      console.error('❌ 抽卡失敗！');
+      showToast('❌ 你還沒學會任何武器的製作方法！請先去書架閱讀書籍。');
+      DialogueSystem.showDialogue('PC', '欸？我根本不知道要畫什麼劍...還是先去看看書吧。');
       return;
     }
 
