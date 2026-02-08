@@ -518,7 +518,7 @@ const ForgeScene = {
       .book-scroll-meta {
         display: flex;
         justify-content: space-around;
-        padding: 33px 20px;
+        padding: 15px 20px;
         background: rgba(0,0,0,0.2);
         border-top: 1px solid rgba(85,107,47,0.3);
         border-bottom: 1px solid rgba(85,107,47,0.3);
