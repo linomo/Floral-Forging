@@ -128,7 +128,7 @@ const ForgeScene = {
         this.openBookModal();
         break;
       case 'forge_modal':
-        showToast('鍛造系統開發中...');
+        ForgeCrafting.openModal();
         break;
       case 'smelt_modal'://開啟冶煉
         case 'smelt_modal':
