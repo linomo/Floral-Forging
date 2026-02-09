@@ -201,7 +201,7 @@ const ForgeCrafting = {
           </select>
         </div>
         
-        <div class="forge-section" id="forgeMaterialSection" style="display:none;">
+        <div class="forge-section" id="forgeMaterialSection">
           <div class="forge-material-row">
             <div class="forge-material-label">⚙️ 金<span id="forgeMetalNeed">0</span></div>
             <div class="forge-grade-buttons" id="forgeMetalGrades"></div>
@@ -256,7 +256,6 @@ const ForgeCrafting = {
       const index = parseInt(e.target.value);
       if (isNaN(index)) {
         this.selectedDesign = null;
-        document.getElementById('forgeMaterialSection').style.display = 'none';
         document.getElementById('forgePreview').style.display = 'none';
         return;
       }
@@ -276,9 +275,7 @@ const ForgeCrafting = {
   
   // === 更新材料選項 ===
   updateMaterialOptions() {
-    if (!this.selectedDesign) return;
-    
-    document.getElementById('forgeMaterialSection').style.display = 'block';
+    if (!this.selectedDesign) return;  
     document.getElementById('forgePreview').style.display = 'flex';
     
     // 顯示需求數量
