@@ -130,8 +130,9 @@ const ForgeScene = {
       case 'forge_modal':
         showToast('鍛造系統開發中...');
         break;
-      case 'smelt_modal':
-        showToast('冶煉系統開發中...');
+      case 'smelt_modal'://開啟冶煉
+        case 'smelt_modal':
+        this.openSmeltModal();
         break;
       case 'decoration_modal':
         showToast('裝飾系統開發中...');
