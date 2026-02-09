@@ -771,7 +771,7 @@ const ForgeScene = {
     
     // 關閉書卷軸
     this.closeBookScroll();
-  }
+  },
   // ✨ 新增這段 ✨
 // === 冶煉系統 ===
 
