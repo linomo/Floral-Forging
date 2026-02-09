@@ -163,7 +163,7 @@ const ForgeScene = {
       // ✨ 乾淨檢查～ ✨
   if (player.dirtiness === 0) {
     showToast("✨ 很乾淨了！");
-    DialogueSystem.showDialogue('PC', '很乾淨了！再清下去，小師兄會覺得我們再搞破壞！');
+    DialogueSystem.showDialogue('PC', '很乾淨了！再清下去，小師兄會覺得我們搞破壞！');
     return;
   }
  
