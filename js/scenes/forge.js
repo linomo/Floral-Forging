@@ -160,7 +160,13 @@ const ForgeScene = {
     if (obj.comment) {
       DialogueSystem.showDialogue(obj.chara_id, obj.comment);
     }
-    
+      // ✨ 乾淨檢查～ ✨
+  if (player.dirtiness === 0) {
+    showToast("✨ 很乾淨了！");
+    DialogueSystem.showDialogue('PC', '很乾淨了！再清下去，小師兄會覺得我們再搞破壞！');
+    return;
+  }
+ 
     const cleanAmount = 50;
     player.currentEP -= epCost;
     player.dirtiness = Math.max(0, player.dirtiness - cleanAmount);
