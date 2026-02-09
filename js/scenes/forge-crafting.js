@@ -37,19 +37,33 @@ const ForgeCrafting = {
         width: 100%;
         padding: 12px;
         font-size: 1em;
-        background: rgba(0,0,0,0.3);
-        border: 1px solid rgba(255,255,255,0.2);
+        background: rgba(0,0,0,0.3); /*← 這裡是背景色 */
+        border: 1px solid rgba(255,255,255,0.2);/* ← 這裡是邊框色 */
         border-radius: 8px;
-        color: #fff;
+        color: #fff; /* ← 這裡是文字顏色 */
         font-family: inherit;
         text-align: center;
       }
       
       .forge-design-select:focus {
         outline: none;
-        border-color: #f5a623;
+        border-color: #f5a623;  /* ← 這裡是選中時的邊框色 */
+      }
+      // ✨ 新增這段 ✨
+      .forge-design-select option {
+        background: rgba(166,159,21,0.3);  /* ← 選項背景色（灰色在這） */
+        color: #fff;                   /* ← 選項文字顏色 */
+        padding: 10px;                 /* ← 選項內距 */
       }
       
+      .forge-design-select option:hover {
+        background: rgba(255,255,255,0.2);  /* ← 滑鼠移過去的背景色 */
+      }
+      
+      .forge-design-select option:checked {
+        background: linear-gradient(90deg, #f5a623, #f5576c);  /* ← 被選中的背景色 */
+        color: #fff;
+      }
       .forge-material-row {
         display: flex;
         align-items: center;
@@ -213,7 +227,7 @@ const ForgeCrafting = {
           </div>
         </div>
         
-        <div class="forge-preview" id="forgePreview" style="display:none;">
+        <div class="forge-preview" id="forgePreview">
           <span class="forge-preview-item">⚡ <span class="forge-preview-value" id="forgeEP">0</span></span>
           <span class="forge-preview-item">💰 <span class="forge-preview-value">10元</span></span>
           <span class="forge-preview-item">💩 +<span class="forge-preview-value" id="forgeDirt">0</span></span>
@@ -256,7 +270,6 @@ const ForgeCrafting = {
       const index = parseInt(e.target.value);
       if (isNaN(index)) {
         this.selectedDesign = null;
-        document.getElementById('forgePreview').style.display = 'none';
         return;
       }
       
@@ -275,9 +288,7 @@ const ForgeCrafting = {
   
   // === 更新材料選項 ===
   updateMaterialOptions() {
-    if (!this.selectedDesign) return;  
-    document.getElementById('forgePreview').style.display = 'flex';
-    
+    if (!this.selectedDesign) return;      
     // 顯示需求數量
     document.getElementById('forgeMetalNeed').textContent = this.selectedDesign.metalNeed;
     document.getElementById('forgeWoodNeed').textContent = this.selectedDesign.woodNeed;
