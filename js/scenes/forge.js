@@ -986,9 +986,9 @@ const ForgeScene = {
         </div>
         
         <!-- 結果顯示 -->
-        <div class="smelt-result" id="smeltResult">
+        <div class="smelt-result show" id="smeltResult">
           <div class="smelt-result-title">☄️ 降落！☄️</div>
-          <div class="smelt-result-content" id="smeltResultContent"></div>
+          <div class="smelt-result-content" id="smeltResultContent">等待冶煉...</div>
         </div>
         
         <div class="modal-actions">
