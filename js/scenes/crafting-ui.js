@@ -58,7 +58,7 @@ const CraftingUI = {
             <div class="forge-modal">
                 <div class="modal-title">⚒️ 鍛造</div>
                 <div class="forge-section">
-                    <div class="forge-section-title">【要來創造哪個傳奇？】</div>
+                    <div class="forge-section-title">要來創造哪個傳奇？</div>
                     <select class="forge-design-select" id="forgeDesignSelect">
                         <option value="">請選擇設計圖</option>
                         ${this._generateDesignOptions()}
