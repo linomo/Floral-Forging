@@ -13,6 +13,23 @@ const ForgeScene = {
         return d[Math.floor(num / 10)] + d[num % 10];
     },
 
+    // === 確認彈窗樣式 ===
+    _initConfirmStyles() {
+        if (document.getElementById('forge-confirm-styles')) return;
+        const style = document.createElement('style');
+        style.id = 'forge-confirm-styles';
+        style.textContent = `
+            /* === 確認彈窗 === */
+            .confirm-modal {
+                background: linear-gradient(180deg, #252535 0%, #1a1a28 100%);
+                border-radius: 16px; padding: 30px 25px;
+                max-width: 300px; width: 90%; text-align: center;
+            }
+            .confirm-message { font-size: 1.1em; color: #eee; margin-bottom: 20px; line-height: 1.5; }
+        `;
+        document.head.appendChild(style);
+    },
+
     // === 場景標題（含 EP / 髒髒值）===
     renderHeader() {
         const maxEP     = Math.floor(2 * (player.str + player.int + player.dex) / 3);
@@ -127,27 +144,32 @@ const ForgeScene = {
     // === 確認彈窗
     // =========================================
     openConfirmModal(message, confirmText, cancelText, onConfirm) {
-        const modal    = document.getElementById('confirmModal');
-        const msgEl    = document.getElementById('confirmMessage');
-        let confBtn    = document.getElementById('confirmBtn');
-        let cancBtn    = document.getElementById('cancelBtn');
+        this._initConfirmStyles();
 
-        if (!modal || !msgEl || !confBtn || !cancBtn) {
-            console.error('確認彈窗元素不存在！'); return;
+        let modal = document.getElementById('confirmModal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'confirmModal';
+            modal.className = 'modal-overlay';
+            document.body.appendChild(modal);
         }
 
-        msgEl.textContent   = message;
-        confBtn.textContent = confirmText;
-        cancBtn.textContent = cancelText;
+        modal.innerHTML = `
+            <div class="confirm-modal">
+                <div class="confirm-message">${message}</div>
+                <div class="modal-actions">
+                    <button class="modal-btn" id="cancelBtn">${cancelText}</button>
+                    <button class="modal-btn primary" id="confirmBtn">${confirmText}</button>
+                </div>
+            </div>`;
 
-        // 清除舊的 listener
-        const newConf = confBtn.cloneNode(true);
-        const newCanc = cancBtn.cloneNode(true);
-        confBtn.parentNode.replaceChild(newConf, confBtn);
-        cancBtn.parentNode.replaceChild(newCanc, cancBtn);
-
-        newConf.addEventListener('click', () => { this.closeConfirmModal(); if (onConfirm) onConfirm(); });
-        newCanc.addEventListener('click', () => this.closeConfirmModal());
+        document.getElementById('confirmBtn').addEventListener('click', () => {
+            this.closeConfirmModal();
+            if (onConfirm) onConfirm();
+        });
+        document.getElementById('cancelBtn').addEventListener('click', () => {
+            this.closeConfirmModal();
+        });
 
         modal.classList.add('show');
     },
