@@ -66,7 +66,7 @@ const CraftingUI = {
                 </div>
                 <div class="forge-section" id="forgeMaterialSection">
                     <div class="forge-material-row">
-                        <div class="forge-material-label">⚙️ 金<span id="forgeMetalNeed">?</span></div>
+                        <div class="forge-material-label">⚙️ 金<span id="forgeMetalNeed">？</span></div>
                         <div class="forge-grade-buttons" id="forgeMetalGrades">
                             <button class="forge-grade-btn" disabled>爛</button>
                             <button class="forge-grade-btn" disabled>普</button>
@@ -75,7 +75,7 @@ const CraftingUI = {
                         </div>
                     </div>
                     <div class="forge-material-row">
-                        <div class="forge-material-label">🥖 木<span id="forgeWoodNeed">?</span></div>
+                        <div class="forge-material-label">🥖 木<span id="forgeWoodNeed">？</span></div>
                         <div class="forge-grade-buttons" id="forgeWoodGrades">
                             <button class="forge-grade-btn" disabled>爛</button>
                             <button class="forge-grade-btn" disabled>普</button>
