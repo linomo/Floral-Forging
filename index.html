@@ -161,27 +161,7 @@
     .modal-btn.primary { background: linear-gradient(90deg, #4ecdc4, #44a08d); border: none; color: #fff; }
 
 
-    /* === 確認彈窗 === */
-    .confirm-modal {
-      background: linear-gradient(180deg, #252535 0%, #1a1a28 100%);
-      border-radius: 16px; padding: 30px 25px;
-      max-width: 300px; width: 90%; text-align: center;
-    }
-    .confirm-message { font-size: 1.1em; color: #eee; margin-bottom: 20px; line-height: 1.5; }
 
-    /* === 庫存 Modal === */
-    .inventory-modal {
-      background: linear-gradient(180deg, #252535 0%, #1a1a28 100%);
-      border-radius: 16px; padding: 20px;
-      max-width: 440px; width: 90%; max-height: 80vh; overflow-y: auto;
-    }
-    .inventory-content { display: flex; flex-direction: column; gap: 15px; }
-    .inventory-section { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 12px; }
-    .inventory-title { font-size: 0.85em; color: #f5a623; margin-bottom: 8px; }
-    .inventory-items { font-size: 0.85em; color: #bbb; line-height: 1.8; }
-    .inventory-list { display: flex; flex-direction: column; gap: 5px; }
-    .inventory-item { font-size: 0.82em; color: #ccc; padding: 5px 8px; background: rgba(0,0,0,0.2); border-radius: 5px; }
-    .inventory-empty { font-size: 0.82em; color: #555; padding: 10px 0; text-align: center; }
 
     /* === Toast === */
     .effect-toast {
@@ -267,29 +247,6 @@
         </div>
 
  
-  <!-- ====== 確認 Modal ====== -->
-  <div class="modal-overlay" id="confirmModal">
-    <div class="confirm-modal">
-      <div class="confirm-message" id="confirmMessage">確定嗎？</div>
-      <div class="modal-actions">
-        <button class="modal-btn" id="cancelBtn">取消</button>
-        <button class="modal-btn primary" id="confirmBtn">確定</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ====== 庫存 Modal ====== -->
-  <div class="modal-overlay" id="inventoryModal" onclick="this.classList.remove('show')">
-    <div class="inventory-modal" onclick="event.stopPropagation()">
-      <div class="modal-title">📦 材料庫存</div>
-      <div class="inventory-modal-content">
-        <!-- 由 ForgeUtils.openInventoryModal() 填入 -->
-      </div>
-      <div class="modal-actions">
-        <button class="modal-btn primary" onclick="closeDesignModal()">關閉</button>
-      </div>
-    </div>
-  </div>
 
   <!-- ====== Toast ====== -->
   <div class="effect-toast" id="toast"></div>
