@@ -4,6 +4,29 @@
  */
 const ForgeUtils = {
 
+    // === 庫存彈窗樣式 ===
+    _initInventoryStyles() {
+        if (document.getElementById('forge-inventory-styles')) return;
+        const style = document.createElement('style');
+        style.id = 'forge-inventory-styles';
+        style.textContent = `
+            /* === 庫存 Modal === */
+            .inventory-modal {
+                background: linear-gradient(180deg, #252535 0%, #1a1a28 100%);
+                border-radius: 16px; padding: 20px;
+                max-width: 440px; width: 90%; max-height: 80vh; overflow-y: auto;
+            }
+            .inventory-content  { display: flex; flex-direction: column; gap: 15px; }
+            .inventory-section  { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 12px; }
+            .inventory-title    { font-size: 0.85em; color: #f5a623; margin-bottom: 8px; }
+            .inventory-items    { font-size: 0.85em; color: #bbb; line-height: 1.8; }
+            .inventory-list     { display: flex; flex-direction: column; gap: 5px; }
+            .inventory-item     { font-size: 0.82em; color: #ccc; padding: 5px 8px; background: rgba(0,0,0,0.2); border-radius: 5px; }
+            .inventory-empty    { font-size: 0.82em; color: #555; padding: 10px 0; text-align: center; }
+        `;
+        document.head.appendChild(style);
+    },
+
     // === 打掃 ===
     cleanRoom(epCost) {
         if (player.dirtiness === 0) {
@@ -26,51 +49,84 @@ const ForgeUtils = {
     // === 材料庫存彈窗
     // =========================================
     openInventory() {
-        const modal = document.getElementById('inventoryModal');
-        if (!modal) { console.error('inventoryModal 不存在！'); return; }
+        this._initInventoryStyles();
 
-        let html = '<div class="inventory-content">';
+        let modal = document.getElementById('inventoryModal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'inventoryModal';
+            modal.className = 'modal-overlay';
+            document.body.appendChild(modal);
+        }
+
+        // 建立內容 HTML
+        let contentHtml = '<div class="inventory-content">';
 
         // 金屬材料
-        html += '<div class="inventory-section"><div class="inventory-title">【金屬】</div><div class="inventory-items">';
-        const metalItems = [];
-        Object.keys(player.materials.metal).forEach(id => {
+        const metalItems = Object.keys(player.materials.metal).map(id => {
             const amount = player.materials.metal[id];
-            const mat = CSVLoader.data.metal.find(m => m.m_id === id);
-            if (mat) metalItems.push(`${mat.name}×${amount}`);
-        });
-        html += metalItems.join(' | ') + '</div></div>';
+            const mat    = CSVLoader.data.metal.find(m => m.m_id === id);
+            return mat ? `${mat.name}×${amount}` : null;
+        }).filter(Boolean);
+        contentHtml += `
+            <div class="inventory-section">
+                <div class="inventory-title">【金屬】</div>
+                <div class="inventory-items">${metalItems.join(' | ')}</div>
+            </div>`;
 
         // 木材
-        html += '<div class="inventory-section"><div class="inventory-title">【木材】</div><div class="inventory-items">';
-        const woodItems = [];
-        Object.keys(player.materials.wood).forEach(id => {
+        const woodItems = Object.keys(player.materials.wood).map(id => {
             const amount = player.materials.wood[id];
-            const mat = CSVLoader.data.wood.find(w => w.w_id === id);
-            if (mat) woodItems.push(`${mat.name}×${amount}`);
-        });
-        html += woodItems.join(' | ') + '</div></div>';
+            const mat    = CSVLoader.data.wood.find(w => w.w_id === id);
+            return mat ? `${mat.name}×${amount}` : null;
+        }).filter(Boolean);
+        contentHtml += `
+            <div class="inventory-section">
+                <div class="inventory-title">【木材】</div>
+                <div class="inventory-items">${woodItems.join(' | ')}</div>
+            </div>`;
 
         // 設計圖
-        html += `<div class="inventory-section"><div class="inventory-title">【設計圖】${player.designs.length} 張</div><div class="inventory-list">`;
-        player.designs.forEach(d => {
-            const chNum = ForgeScene.toChineseNumber(d.id);
-            html += `<div class="inventory-item">${chNum} ${d.grade}！${d.physical}${d.mental}${d.weapon} 💰${d.blueprintPrice}元</div>`;
-        });
-        if (player.designs.length === 0) html += '<div class="inventory-empty">還沒有設計圖</div>';
-        html += '</div></div>';
+        let designsHtml = player.designs.length > 0
+            ? player.designs.map(d => {
+                const chNum = ForgeScene.toChineseNumber(d.id);
+                return `<div class="inventory-item">${chNum} ${d.grade}！${d.physical}${d.mental}${d.weapon} 💰${d.blueprintPrice}元</div>`;
+              }).join('')
+            : '<div class="inventory-empty">還沒有設計圖</div>';
+        contentHtml += `
+            <div class="inventory-section">
+                <div class="inventory-title">【設計圖】${player.designs.length} 張</div>
+                <div class="inventory-list">${designsHtml}</div>
+            </div>`;
 
         // 成品劍
-        html += `<div class="inventory-section"><div class="inventory-title">【成品】${player.products.length} 把</div><div class="inventory-list">`;
-        player.products.forEach(p => {
-            const chNum = ForgeScene.toChineseNumber(p.id);
-            html += `<div class="inventory-item">${chNum} ${p.grade}！${p.physical}${p.mental}${p.weapon} 💰${p.sellPrice || '?'}元</div>`;
-        });
-        if (player.products.length === 0) html += '<div class="inventory-empty">還沒有成品劍</div>';
-        html += '</div></div></div>';
+        let productsHtml = player.products.length > 0
+            ? player.products.map(p => {
+                const chNum = ForgeScene.toChineseNumber(p.id);
+                return `<div class="inventory-item">${chNum} ${p.grade}！${p.physical}${p.mental}${p.weapon} 💰${p.sellPrice || '?'}元</div>`;
+              }).join('')
+            : '<div class="inventory-empty">還沒有成品劍</div>';
+        contentHtml += `
+            <div class="inventory-section">
+                <div class="inventory-title">【成品】${player.products.length} 把</div>
+                <div class="inventory-list">${productsHtml}</div>
+            </div>`;
 
-        const modalContent = modal.querySelector('.inventory-modal-content') || modal;
-        modalContent.innerHTML = html;
+        contentHtml += '</div>';
+
+        modal.innerHTML = `
+            <div class="inventory-modal">
+                <div class="modal-title">📦 材料庫存</div>
+                <div class="inventory-modal-content">${contentHtml}</div>
+                <div class="modal-actions">
+                    <button class="modal-btn primary" onclick="closeInventoryModal()">關閉</button>
+                </div>
+            </div>`;
+
+        // 點擊背景關閉
+        modal.onclick = () => this.closeInventory();
+        modal.querySelector('.inventory-modal').onclick = e => e.stopPropagation();
+
         modal.classList.add('show');
     },
 
