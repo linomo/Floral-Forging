@@ -38,7 +38,7 @@ const DesignUI = {
             return;
         }
 
-        const dirtinessIncrease = epCost / 2;
+        const dirtinessIncrease = Math.ceil(epCost / 2);
         let extraCleaningFee = 0;
         if (player.dirtiness >= 99) extraCleaningFee = dirtinessIncrease;
 
