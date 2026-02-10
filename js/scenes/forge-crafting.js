@@ -56,11 +56,11 @@ const ForgeCrafting = {
       }
       
       .forge-design-select option:hover {
-        background: rgba(255,255,255,0.2);  /* ← 滑鼠移過去的背景色 */
+        background: rgba(25,25,25,0.2);  /* ← 滑鼠移過去的背景色 */
       }
       
       .forge-design-select option:checked {
-        background: linear-gradient(90deg, #f5a623, #f5576c);  /* ← 被選中的背景色 */
+        background: rgba(25,25,25,0.2);   /* ← 被選中的背景色 */
         color: #fff;
       }
       .forge-material-row {
