@@ -221,7 +221,7 @@ const ForgeCrafting = {
               <button class="forge-grade-btn" disabled>奇</button>
             </div>
           </div>
-          modal.innerHTML = `材料顯示
+      
           <div class="forge-material-row">
             <div class="forge-material-label">🥖 木<span id="forgeWoodNeed">?</span></div>
             <div class="forge-grade-buttons" id="forgeWoodGrades">
