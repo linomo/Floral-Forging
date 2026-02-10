@@ -108,8 +108,8 @@ async function initGame() {
     updatePlayerDisplay();
     updateStatsDisplay();
     await renderScene();
-    DialogueSystem.showDialogue('SF', '今天開始學鍛造，先去書桌畫設計圖吧。');
-    console.log('✅ 遊戲初始化完成！', player);
+    DialogueSystem.showDialogue('PC', '是時候展現真正的技術了！');
+    console.log('✅ 鍛造室初始化完成！', player);
 }
 
 // === 顯示更新 ===
