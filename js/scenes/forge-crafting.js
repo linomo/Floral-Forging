@@ -231,7 +231,7 @@ const ForgeCrafting = {
               <button class="forge-grade-btn" disabled>奇</button>
             </div>
           </div>
-        </div>  /* 到這裡*/
+        </div>  /* 材料顯示到這裡*/
      
         
         <div class="forge-preview" id="forgePreview">
