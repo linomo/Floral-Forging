@@ -17,7 +17,7 @@ const SmeltUI = {
             .smelt-select { width: 100%; padding: 10px; font-size: 1em; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; margin-bottom: 15px; font-family: inherit; text-align: center; }
             .smelt-select:focus { outline: none; border-color: #f5a623; }
             .smelt-amount-control { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; }
-            .smelt-arrow { width: 40px; height: 40px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; font-size: 1.2em; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+            .smelt-arrow { width: 40px; height: 40px; background: #f5576c; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; font-size: 1.2em; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
             .smelt-arrow:hover:not(:disabled) { background: rgba(255,255,255,0.2); transform: scale(1.1); }
             .smelt-arrow:disabled { opacity: 0.3; cursor: not-allowed; }
             .smelt-amount-display { font-size: 1.5em; font-weight: bold; color: #fff; min-width: 60px; }
