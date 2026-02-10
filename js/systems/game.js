@@ -108,6 +108,7 @@ async function initGame() {
     updatePlayerDisplay();
     updateStatsDisplay();
     await renderScene();
+    document.getElementById('speaker-name').textContent = player.name;//初始讀取名字
     DialogueSystem.showDialogue('PC', '是時候展現真正的技術了！');
     console.log('✅ 鍛造室初始化完成！', player);
 }
