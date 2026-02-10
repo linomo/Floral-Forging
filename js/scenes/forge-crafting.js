@@ -50,8 +50,8 @@ const ForgeCrafting = {
         border-color: #f5a623;  /* ← 這裡是選中時的邊框色 */
       }
       .forge-design-select option {
-        background: #2a2a3d;     /* 深紫灰色 */
-        color: #f5a623;          /* 金黃色文字 */
+        background: #64A600;     /* 下拉選項底色 */
+        color: #fff;          /* 文字 */
         padding: 10px;
       }
       
