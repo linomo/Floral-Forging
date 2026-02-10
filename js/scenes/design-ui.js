@@ -105,7 +105,7 @@ const DesignUI = {
 
         modal.innerHTML = `
             <div class="design-modal">
-                <div class="modal-title">📜 繪製設計圖</div>
+                <div class="modal-title">📝 繪製設計圖</div>
                 <button class="draw-btn" onclick="drawDesign()">🎴 開始繪製！</button>
                 <div class="card" id="designCard">
                     <div class="card-placeholder">在腦中構思設計圖...</div>
