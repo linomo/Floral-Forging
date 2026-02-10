@@ -219,8 +219,8 @@ const CraftingUI = {
             weapon:    this.selectedDesign.weapon,
             sellPrice,
             metalGrade: this.selectedMetalGrade,
-            woodGrade:  this.selectedWoodGrade
-            decorated: false,
+            woodGrade:  this.selectedWoodGrade,
+            decorated: false
         };
         player.products.push(product);
 
