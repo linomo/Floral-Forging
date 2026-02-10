@@ -4,14 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FLORAL FORGER</title>
-  
-  <!-- 自動跳轉到開始畫面 -->
-  <script>
-    if (!document.referrer.includes('start.html')) {
-      window.location.href = 'start.html';
-    }
-  </script>
-  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -21,7 +13,7 @@
       color: #eee;
       display: flex;
     }
-    
+
     /* === 左側面板 === */
     .left-panel {
       width: 180px;
@@ -32,60 +24,28 @@
       flex-direction: column;
       gap: 12px;
     }
-    
     .date-section { text-align: center; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); }
     .date-year { font-size: 1.1em; color: #f5a623; font-weight: bold; }
     .date-month { font-size: 0.95em; color: #ccc; margin: 3px 0; }
     .date-day { font-size: 0.85em; color: #888; }
-    
+
     .avatar-section { text-align: center; }
     .avatar-box {
       width: 80px; height: 80px;
       background: linear-gradient(135deg, #2a2a3d, #1a1a28);
-      border: 2px solid #FCFAF2; border-radius: 12px;
+      border: 2px solid #4a90d9; border-radius: 12px;
       margin: 0 auto 8px;
       display: flex; align-items: center; justify-content: center;
       font-size: 2.5em;
-      cursor: pointer;
-      transition: all 0.2s;
     }
-    .avatar-box:hover {
-      transform: scale(1.05);
-      box-shadow: 0 5px 15px rgba(252, 250, 242, 0.3);
-    }
-    .avatar-name { font-weight: bold; color: #FCFAF2; cursor: pointer; }
-    
+    .avatar-name { font-weight: bold; color: #4a90d9; }
+
     .stats-section { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px; }
     .stat-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.85em; }
     .stat-row:last-child { margin-bottom: 0; }
     .stat-label { color: #888; }
     .stat-value { color: #fff; font-weight: bold; }
-    
-    /* === 金錢框框 === */
-    .money-section {
-      background: rgba(0,0,0,0.2);
-      border-radius: 8px;
-      padding: 10px;
-      text-align: center;
-    }
-    
-    .money-display {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-    
-    .money-icon {
-      font-size: 1.5em;
-    }
-    
-    .money-value {
-      font-size: 1.2em;
-      font-weight: bold;
-      color: #f5a623;
-    }
-    
+
     .bar-section { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px; }
     .bar-item { margin-bottom: 10px; }
     .bar-item:last-child { margin-bottom: 0; }
@@ -94,7 +54,7 @@
     .bar-icons { display: flex; justify-content: space-between; font-size: 0.9em; }
     .bar-track { height: 8px; background: rgba(0,0,0,0.3); border-radius: 4px; overflow: hidden; }
     .bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s; background: linear-gradient(90deg, #7ed321, #f5a623, #f5576c); }
-    
+
     .equip-section { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px; }
     .equip-label { font-size: 0.8em; color: #888; margin-bottom: 6px; }
     .equip-slot {
@@ -105,7 +65,7 @@
     .equip-slot .equip-icon { font-size: 1.5em; display: block; margin-bottom: 4px; }
     .equip-slot .equip-name { font-size: 0.8em; color: #ccc; display: block; }
     .equip-slot .equip-effect { font-size: 0.75em; color: #7ed321; margin-top: 3px; display: block; }
-    
+
     .save-section { display: flex; gap: 8px; margin-top: auto; }
     .save-btn {
       flex: 1; padding: 8px;
@@ -113,42 +73,33 @@
       border-radius: 6px; color: #666; cursor: pointer; font-size: 0.8em;
     }
     .save-btn:hover { background: rgba(255,255,255,0.1); color: #aaa; }
-    
+
     /* === 右側主區 === */
     .right-main { flex: 1; display: flex; flex-direction: column; }
-    
+
     .operation-area {
       flex: 6;
       background: linear-gradient(180deg, #1a1a28 0%, #151520 100%);
       padding: 20px;
+      display: flex; flex-direction: column; align-items: center;
       position: relative;
     }
-    
-    /* === 場景標題和內容 === */
-    #scene-header {
-      position: absolute;
-      top: 15px;
-      left: 20px;
-      color: #888;
-      font-size: 0.95em;
+    .room-header {
+      width: 100%; display: flex; align-items: center;
+      padding-bottom: 12px; margin-bottom: 15px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      font-size: 0.9em;
     }
-    
-    #scene-content {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    #room-content {
+      display: flex; align-items: center; justify-content: center;
+      flex: 1; width: 100%;
     }
-    
     .room-grid {
       display: grid;
-      grid-template-columns: repeat(4, 80px);
-      grid-template-rows: repeat(3, 60px);
       gap: 10px;
     }
-    
     .room-item {
+      width: 80px; height: 60px;
       background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
       border-radius: 8px;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -159,7 +110,7 @@
     .room-item .label { font-size: 0.75em; color: #666; margin-top: 4px; }
     .room-item.empty { background: transparent; border-color: transparent; cursor: default; }
     .room-item.empty:hover { transform: none; background: transparent; }
-    
+
     .dialogue-area {
       flex: 4;
       background: linear-gradient(180deg, #151520 0%, #101018 100%);
@@ -180,6 +131,7 @@
     }
     .color-block { width: 16px; height: 16px; border-radius: 3px; margin-right: 10px; }
     .speaker-name { font-weight: bold; font-size: 0.95em; }
+
     .dialogue-content {
       padding: 15px; font-size: 1em; line-height: 1.6;
       display: flex; align-items: flex-start; gap: 10px;
@@ -187,44 +139,53 @@
     }
     .dialogue-emoji { font-size: 1.2em; }
     .dialogue-text { flex: 1; }
-    .continue-btn {
-      position: absolute; bottom: 10px; right: 10px;
-      background: rgba(255,255,255,0.1); border: none;
-      color: #888; padding: 5px 12px; border-radius: 5px;
-      cursor: pointer; font-size: 0.8em;
+
+    /* 設計圖評論區塊 */
+    #design-comments {
+      display: none;
+      padding: 10px 15px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      background: rgba(0,0,0,0.15);
     }
-    .continue-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
-    
-    /* === 設計圖彈窗 === */
+    .comment-line { display: flex; gap: 6px; margin-bottom: 5px; font-size: 0.8em; line-height: 1.4; }
+    .comment-line:last-child { margin-bottom: 0; }
+    .comment-text { color: #bbb; }
+
+    /* === 共用 Modal 樣式 === */
     .modal-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.85);
-      display: none;
-      align-items: center;
-      justify-content: center;
+      display: none; align-items: center; justify-content: center;
       z-index: 100;
-      flex-direction: column;
-      gap: 20px;
-      padding: 20px;
     }
     .modal-overlay.show { display: flex; }
-    
+    .modal-title { text-align: center; color: #f5a623; margin-bottom: 15px; font-size: 1.1em; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 15px; }
+    .modal-btn {
+      flex: 1; padding: 10px; border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.05); color: #aaa;
+      cursor: pointer; font-size: 0.9em; font-family: inherit;
+    }
+    .modal-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .modal-btn.primary { background: linear-gradient(90deg, #4ecdc4, #44a08d); border: none; color: #fff; }
+
+    /* === 設計圖 Modal === */
     .design-modal {
       background: linear-gradient(180deg, #252535 0%, #1a1a28 100%);
       border-radius: 16px; padding: 20px;
       max-width: 320px; width: 90%;
     }
-    .modal-title { text-align: center; color: #f5a623; margin-bottom: 15px; font-size: 1.1em; }
-    
     .draw-btn {
       width: 100%; padding: 12px; font-size: 1em;
       background: linear-gradient(90deg, #f093fb, #f5576c);
       border: none; border-radius: 10px;
       color: #fff; cursor: pointer; font-weight: bold;
-      margin-bottom: 15px;
+      margin-bottom: 15px; font-family: inherit;
     }
     .draw-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245, 87, 108, 0.3); }
-    
+
+    /* === 設計圖卡片 === */
     .card {
       background: rgba(0,0,0,0.3); border-radius: 12px;
       overflow: hidden; border: 2px solid #333;
@@ -238,7 +199,6 @@
       0%, 100% { box-shadow: 0 5px 20px rgba(255,107,107,0.3); }
       50% { box-shadow: 0 5px 30px rgba(255,107,107,0.6); }
     }
-    
     .card-header { padding: 12px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
     .card-grade { font-size: 0.8em; margin-bottom: 3px; }
     .grade-爛 { color: #888; }
@@ -246,7 +206,6 @@
     .grade-好 { color: #ffe66d; }
     .grade-奇, .grade-奇‽ { color: #ff6b6b; }
     .card-weapon { font-size: 1.2em; font-weight: bold; color: #fff; }
-    
     .card-info {
       padding: 10px 12px; background: rgba(0,0,0,0.2);
       display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 0.8em;
@@ -258,11 +217,9 @@
     .info-value.wood { color: #7ed321; }
     .info-value.price { color: #f5576c; }
     .info-value.ep { color: #4ecdc4; }
-    
     .card-effects {
       padding: 8px 12px;
       border-top: 1px solid rgba(255,255,255,0.05);
-      border-bottom: 1px solid rgba(255,255,255,0.05);
       font-size: 0.75em;
     }
     .effect-title { color: #666; margin-bottom: 4px; }
@@ -271,152 +228,31 @@
     .effect-tag.positive { color: #7ed321; }
     .effect-tag.negative { color: #f5576c; }
     .effect-tag.special { color: #f5a623; background: rgba(245,166,35,0.2); }
-    
     .card-placeholder { padding: 40px 20px; text-align: center; color: #444; font-size: 0.9em; }
-    
-    .modal-actions { display: flex; gap: 10px; margin-top: 15px; }
-    .modal-btn {
-      flex: 1; padding: 10px; border-radius: 8px;
-      border: 1px solid rgba(255,255,255,0.1);
-      background: rgba(255,255,255,0.05); color: #aaa;
-      cursor: pointer; font-size: 0.9em;
-    }
-    .modal-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
-    .modal-btn.primary { background: linear-gradient(90deg, #4ecdc4, #44a08d); border: none; color: #fff; }
-    /* 材料庫存彈窗 */
-    .inventory-modal {
-      background: linear-gradient(180deg, #252535 0%, #1a1a28 100%);
-      border-radius: 16px;
-      padding: 20px;
-      max-width: 500px;
-      width: 90%;
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-    
-    .inventory-content {
-      margin: 15px 0;
-    }
-    
-    .inventory-section {
-      margin-bottom: 20px;
-    }
-    
-    .inventory-title {
-      font-weight: bold;
-      color: #f5a623;
-      margin-bottom: 8px;
-      font-size: 1em;
-    }
-    
-    .inventory-items {
-      font-size: 0.85em;
-      color: #ccc;
-      line-height: 1.6;
-    }
-    
-    .inventory-list {
-      max-height: 200px;
-      overflow-y: auto;
-    }
 
-.inventory-item {
-  padding: 8px;
-  margin-bottom: 5px;
-  background: rgba(255,255,255,0.05);
-  border-radius: 5px;
-  font-size: 0.85em;
-}
-
-.inventory-empty {
-  color: #666;
-  font-size: 0.85em;
-  text-align: center;
-  padding: 20px;
-}
-    /* === 評論框 === */
-    .design-comments-box {
-      width: 500px;
-      max-width: 90%;
-      background: rgba(30, 30, 45, 0.95);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 12px;
-      padding: 15px;
-      display: none;
-    }
-    .design-comment-line {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      margin-bottom: 10px;
-      line-height: 1.5;
-    }
-    .design-comment-line:last-child {
-      margin-bottom: 0;
-    }
-    .design-comment-icon {
-      font-size: 1.2em;
-      flex-shrink: 0;
-    }
-    .design-comment-text {
-      flex: 1;
-      font-size: 0.9em;
-    }
-    
     /* === 確認彈窗 === */
     .confirm-modal {
       background: linear-gradient(180deg, #252535 0%, #1a1a28 100%);
-      border-radius: 16px;
-      padding: 30px;
-      max-width: 400px;
-      width: 90%;
-      text-align: center;
+      border-radius: 16px; padding: 30px 25px;
+      max-width: 300px; width: 90%; text-align: center;
     }
-    
-    .confirm-message {
-      font-size: 1.1em;
-      color: #fff;
-      margin-bottom: 25px;
-      line-height: 1.6;
+    .confirm-message { font-size: 1.1em; color: #eee; margin-bottom: 20px; line-height: 1.5; }
+
+    /* === 庫存 Modal === */
+    .inventory-modal {
+      background: linear-gradient(180deg, #252535 0%, #1a1a28 100%);
+      border-radius: 16px; padding: 20px;
+      max-width: 440px; width: 90%; max-height: 80vh; overflow-y: auto;
     }
-    
-    .confirm-actions {
-      display: flex;
-      gap: 15px;
-    }
-    
-    .confirm-btn {
-      flex: 1;
-      padding: 12px;
-      font-size: 1em;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      font-family: inherit;
-      transition: all 0.2s;
-      font-weight: bold;
-    }
-    
-    .confirm-btn.cancel {
-      background: rgba(255,255,255,0.1);
-      color: #aaa;
-    }
-    
-    .confirm-btn.cancel:hover {
-      background: rgba(255,255,255,0.2);
-      color: #fff;
-    }
-    
-    .confirm-btn.confirm {
-      background: linear-gradient(90deg, #f5576c, #f093fb);
-      color: #fff;
-    }
-    
-    .confirm-btn.confirm:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 20px rgba(245, 87, 108, 0.4);
-    }
-    
+    .inventory-content { display: flex; flex-direction: column; gap: 15px; }
+    .inventory-section { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 12px; }
+    .inventory-title { font-size: 0.85em; color: #f5a623; margin-bottom: 8px; }
+    .inventory-items { font-size: 0.85em; color: #bbb; line-height: 1.8; }
+    .inventory-list { display: flex; flex-direction: column; gap: 5px; }
+    .inventory-item { font-size: 0.82em; color: #ccc; padding: 5px 8px; background: rgba(0,0,0,0.2); border-radius: 5px; }
+    .inventory-empty { font-size: 0.82em; color: #555; padding: 10px 0; text-align: center; }
+
+    /* === Toast === */
     .effect-toast {
       position: fixed; top: 20px; left: 50%;
       transform: translateX(-50%) translateY(-100px);
@@ -424,44 +260,41 @@
       color: #fff; padding: 10px 20px;
       border-radius: 25px; font-weight: bold; font-size: 0.9em;
       opacity: 0; transition: all 0.4s; z-index: 200;
+      pointer-events: none;
     }
     .effect-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
   </style>
 </head>
 <body>
-  <!-- 左側面板 -->
+
+  <!-- ====== 左側面板 ====== -->
   <div class="left-panel">
     <div class="date-section">
-      <div class="date-year">元年</div>
-      <div class="date-month">一月 上旬</div>
-      <div class="date-day">第三天</div>
+      <div class="date-year" id="date-year">元年</div>
+      <div class="date-month" id="date-month">一月 上旬</div>
+      <div class="date-day" id="date-day">第一天</div>
     </div>
     <div class="avatar-section">
-      <div class="avatar-box">🔨</div>
-      <div class="avatar-name">小哈</div>
+      <div class="avatar-box" id="avatar-box">🔨</div>
+      <div class="avatar-name" id="avatar-name">小哈</div>
     </div>
     <div class="stats-section">
       <div class="stat-row"><span class="stat-label">力量</span><span class="stat-value" id="str-val">0</span></div>
       <div class="stat-row"><span class="stat-label">智力</span><span class="stat-value" id="int-val">0</span></div>
       <div class="stat-row"><span class="stat-label">敏捷</span><span class="stat-value" id="dex-val">0</span></div>
       <div class="stat-row"><span class="stat-label">幸運</span><span class="stat-value" id="luck-val">0</span></div>
-    </div>
-    <div class="money-section">
-      <div class="money-display">
-        <span class="money-icon">💰</span>
-        <span class="money-value" id="money-display">0</span>
-      </div>
+      <div class="stat-row"><span class="stat-label">💰 金錢</span><span class="stat-value" id="money-val">0</span></div>
     </div>
     <div class="bar-section">
       <div class="bar-item">
         <div class="bar-header"><span class="bar-label">心情</span></div>
-        <div class="bar-icons"><span>🌋</span><span>🌸</span></div>  <!-- ← 對調！ -->
-        <div class="bar-track"><div class="bar-fill" id="mood-bar" style="width: 0%"></div></div>
+        <div class="bar-icons"><span>🌸</span><span>🌋</span></div>
+        <div class="bar-track"><div class="bar-fill" id="mood-bar" style="width: 50%"></div></div>
       </div>
       <div class="bar-item">
         <div class="bar-header"><span class="bar-label">壓力</span></div>
         <div class="bar-icons"><span>☀️</span><span>🌪️</span></div>
-        <div class="bar-track"><div class="bar-fill" id="stress-bar" style="width: 0%"></div></div>
+        <div class="bar-track"><div class="bar-fill" id="stress-bar" style="width: 25%"></div></div>
       </div>
     </div>
     <div class="equip-section">
@@ -473,33 +306,42 @@
       </div>
     </div>
     <div class="save-section">
-      <button class="save-btn">💾 儲存</button>
-      <button class="save-btn">📂 讀取</button>
+      <button class="save-btn" onclick="GameSystem.save()">💾 儲存</button>
+      <button class="save-btn" onclick="GameSystem.load()">📂 讀取</button>
     </div>
   </div>
-  
-  <!-- 右側主區 -->
+
+  <!-- ====== 右側主區 ====== -->
   <div class="right-main">
+    <!-- 操作區 -->
     <div class="operation-area">
-      <div id="scene-header"></div>
-      <div id="scene-content"></div>
+      <div class="room-header" id="room-header">
+        <!-- 由 ForgeScene.renderHeader() 填入 -->
+      </div>
+      <div id="room-content">
+        <!-- 由 ForgeScene.renderContent() 填入 -->
+        <div style="color: #444; font-size: 0.9em;">載入中...</div>
+      </div>
     </div>
+
+    <!-- 對話區 -->
     <div class="dialogue-area">
       <div class="dialogue-box">
         <div class="dialogue-header">
-          <div class="color-block" id="speaker-color" style="background: #B5CAA0"></div>
-          <div class="speaker-name" id="speaker-name" style="color: #B5CAA0">載入中</div>
+          <div class="color-block" id="speaker-color" style="background: #f5a623"></div>
+          <div class="speaker-name" id="speaker-name" style="color: #f5a623">師父</div>
         </div>
         <div class="dialogue-content">
-          <span class="dialogue-emoji" id="dialogue-emoji">⏳</span>
-          <span class="dialogue-text" id="dialogue-text">遊戲載入中...</span>
-          <button class="continue-btn" onclick="nextDialogue()">▶</button>
+          <span class="dialogue-emoji" id="dialogue-emoji">🧔</span>
+          <span class="dialogue-text" id="dialogue-text">準備好就去書桌畫設計圖吧。</span>
         </div>
+        <!-- 設計圖評論 -->
+        <div id="design-comments"></div>
       </div>
     </div>
   </div>
-  
-  <!-- 設計圖彈窗 -->
+
+  <!-- ====== 設計圖 Modal ====== -->
   <div class="modal-overlay" id="designModal">
     <div class="design-modal">
       <div class="modal-title">📜 繪製設計圖</div>
@@ -508,41 +350,63 @@
         <div class="card-placeholder">在腦中構思設計圖...</div>
       </div>
       <div class="modal-actions">
-        <button class="modal-btn" onclick="closeDesignModal()">取消</button>
-        <button class="modal-btn primary" id="saveBtn" onclick="saveDesign()" style="display:none;">收下設計圖</button>
+        <button class="modal-btn" onclick="closeDesignModal()">關閉</button>
       </div>
     </div>
   </div>
-  <!-- 材料庫存彈窗 -->
-<div class="modal-overlay" id="inventoryModal">
-  <div class="inventory-modal">
-    <div class="modal-title">📦 材料庫存</div>
-    <div class="inventory-modal-content"></div>
-    <div class="modal-actions">
-      <button class="modal-btn primary" onclick="closeInventoryModal()">關閉</button>
-    </div>
-  </div>
-</div>
-  <!-- 確認彈窗 -->
+
+  <!-- ====== 確認 Modal ====== -->
   <div class="modal-overlay" id="confirmModal">
     <div class="confirm-modal">
-      <div class="confirm-message" id="confirmMessage">確定要離開嗎？</div>
-      <div class="confirm-actions">
-        <button class="confirm-btn cancel" id="cancelBtn">取消</button>
-        <button class="confirm-btn confirm" id="confirmBtn">確定</button>
+      <div class="confirm-message" id="confirmMessage">確定嗎？</div>
+      <div class="modal-actions">
+        <button class="modal-btn" id="cancelBtn">取消</button>
+        <button class="modal-btn primary" id="confirmBtn">確定</button>
       </div>
     </div>
   </div>
-  
+
+  <!-- ====== 庫存 Modal ====== -->
+  <div class="modal-overlay" id="inventoryModal" onclick="this.classList.remove('show')">
+    <div class="inventory-modal" onclick="event.stopPropagation()">
+      <div class="modal-title">📦 材料庫存</div>
+      <div class="inventory-modal-content">
+        <!-- 由 ForgeUtils.openInventoryModal() 填入 -->
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn primary" onclick="closeInventoryModal()">關閉</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== Toast ====== -->
   <div class="effect-toast" id="toast"></div>
 
-  <!-- 引入 JS 檔案 -->
+  <!-- ======================================================
+       Script 載入順序（依賴關係由上往下）
+       ====================================================== -->
+
+  <!-- 1. 核心：CSV 資料載入（其他一切的基礎）-->
   <script src="js/core/csv-loader.js"></script>
+
+  <!-- 2. 系統：角色 / 對話 / 遊戲狀態 -->
   <script src="js/systems/character.js"></script>
   <script src="js/systems/dialogue.js"></script>
-  <script src="js/core/design-generator.js"></script>
-  <script src="js/scenes/forge.js"></script>
-  <script src="js/scenes/forge-crafting.js"></script>
   <script src="js/systems/game.js"></script>
+
+  <!-- 3. 核心：各系統計算邏輯 -->
+  <script src="js/core/design.js"></script>
+  <script src="js/core/crafting.js"></script>
+  <script src="js/core/smelt.js"></script>
+  <script src="js/core/decoration.js"></script>
+
+  <!-- 4. 場景：各 UI 彈窗 -->
+  <script src="js/scenes/forge.js"></script>
+  <script src="js/scenes/design-ui.js"></script>
+  <script src="js/scenes/crafting-ui.js"></script>
+  <script src="js/scenes/smelt-ui.js"></script>
+  <script src="js/scenes/decoration-ui.js"></script>
+  <script src="js/scenes/forge-utils.js"></script>
+
 </body>
 </html>
