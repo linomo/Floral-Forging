@@ -56,7 +56,7 @@ const CraftingUI = {
 
         modal.innerHTML = `
             <div class="forge-modal">
-                <div class="modal-title">🔨 鍛造</div>
+                <div class="modal-title">⚒️ 鍛造</div>
                 <div class="forge-section">
                     <div class="forge-section-title">【要來創造哪個傳奇？】</div>
                     <select class="forge-design-select" id="forgeDesignSelect">
