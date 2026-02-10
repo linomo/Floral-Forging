@@ -15,7 +15,7 @@ const DialogueSystem = {
         const textEl  = document.getElementById('dialogue-text');
 
         if (colorEl) colorEl.style.background = char.color;
-        if (nameEl)  { nameEl.textContent = char.name; nameEl.style.color = char.color; }
+        if (nameEl) { nameEl.textContent = (charaId === 'PC' ? player.name : char.name); nameEl.style.color = char.color; }
         if (emojiEl) emojiEl.textContent = char.icon;
         if (textEl)  textEl.textContent  = text;
     },
