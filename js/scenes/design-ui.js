@@ -5,16 +5,124 @@
 const DesignUI = {
     currentDesign: null,
 
+    _initStyles() {
+        if (document.getElementById('design-system-styles')) return;
+        const style = document.createElement('style');
+        style.id = 'design-system-styles';
+        style.textContent = `
+            /* === 設計圖 Modal === */
+            .design-modal {
+                background: linear-gradient(180deg, #252535 0%, #1a1a28 100%);
+                border-radius: 16px; padding: 20px;
+                max-width: 320px; width: 90%;
+            }
+            .draw-btn {
+                width: 100%; padding: 12px; font-size: 1em;
+                background: linear-gradient(90deg, #f093fb, #f5576c);
+                border: none; border-radius: 10px;
+                color: #fff; cursor: pointer; font-weight: bold;
+                margin-bottom: 15px; font-family: inherit;
+            }
+            .draw-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245, 87, 108, 0.3); }
+
+            /* === 設計圖卡片 === */
+            .card {
+                background: rgba(0,0,0,0.3); border-radius: 12px;
+                overflow: hidden; border: 2px solid #333;
+            }
+            .card.grade-爛 { border-color: #555; }
+            .card.grade-普 { border-color: #4ecdc4; }
+            .card.grade-好 { border-color: #ffe66d; }
+            .card.grade-奇 { border-color: #ff6b6b; box-shadow: 0 5px 20px rgba(255,107,107,0.3); }
+            .card.grade-奇‽ { border-color: #ff6b6b; animation: glow 1.5s infinite; }
+            @keyframes glow {
+                0%, 100% { box-shadow: 0 5px 20px rgba(255,107,107,0.3); }
+                50%       { box-shadow: 0 5px 30px rgba(255,107,107,0.6); }
+            }
+            .card-header { padding: 12px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+            .card-grade { font-size: 0.8em; margin-bottom: 3px; }
+            .grade-爛  { color: #888; }
+            .grade-普  { color: #4ecdc4; }
+            .grade-好  { color: #ffe66d; }
+            .grade-奇, .grade-奇‽ { color: #ff6b6b; }
+            .card-weapon { font-size: 1.2em; font-weight: bold; color: #fff; }
+            .card-info {
+                padding: 10px 12px; background: rgba(0,0,0,0.2);
+                display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 0.8em;
+            }
+            .info-item  { display: flex; justify-content: space-between; }
+            .info-label { color: #666; }
+            .info-value { color: #fff; }
+            .info-value.metal { color: #f5a623; }
+            .info-value.wood  { color: #7ed321; }
+            .info-value.price { color: #f5576c; }
+            .info-value.ep    { color: #4ecdc4; }
+            .card-effects {
+                padding: 8px 12px;
+                border-top: 1px solid rgba(255,255,255,0.05);
+                font-size: 0.75em;
+            }
+            .effect-title { color: #666; margin-bottom: 4px; }
+            .effect-row   { display: flex; flex-wrap: wrap; gap: 6px; min-height: 22px; }
+            .effect-tag   { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 8px; }
+            .effect-tag.positive { color: #7ed321; }
+            .effect-tag.negative { color: #f5576c; }
+            .effect-tag.special  { color: #f5a623; background: rgba(245,166,35,0.2); }
+            .card-placeholder { padding: 40px 20px; text-align: center; color: #444; font-size: 0.9em; }
+
+            /* === 設計圖評論區塊 === */
+            #design-comments {
+                display: none;
+                padding: 10px 15px;
+                border-top: 1px solid rgba(255,255,255,0.05);
+                background: rgba(0,0,0,0.15);
+            }
+            .comment-line { display: flex; gap: 6px; margin-bottom: 5px; font-size: 0.8em; line-height: 1.4; }
+            .comment-line:last-child { margin-bottom: 0; }
+            .comment-text { color: #bbb; }
+        `;
+        document.head.appendChild(style);
+
+        // 建立 #design-comments 元素（若不存在），掛到 .dialogue-box 尾端
+        if (!document.getElementById('design-comments')) {
+            const commentsEl = document.createElement('div');
+            commentsEl.id = 'design-comments';
+            const dialogueBox = document.querySelector('.dialogue-box');
+            if (dialogueBox) dialogueBox.appendChild(commentsEl);
+        }
+    },
+
     open() {
-        document.getElementById('designModal').classList.add('show');
+        this._initStyles();
+
+        let modal = document.getElementById('designModal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'designModal';
+            modal.className = 'modal-overlay';
+            document.body.appendChild(modal);
+        }
+
+        modal.innerHTML = `
+            <div class="design-modal">
+                <div class="modal-title">📜 繪製設計圖</div>
+                <button class="draw-btn" onclick="drawDesign()">🎴 開始繪製！</button>
+                <div class="card" id="designCard">
+                    <div class="card-placeholder">在腦中構思設計圖...</div>
+                </div>
+                <div class="modal-actions">
+                    <button class="modal-btn primary" onclick="closeDesignModal()">關閉</button>
+                </div>
+            </div>`;
+
         this.currentDesign = null;
-        document.getElementById('designCard').innerHTML = '<div class="card-placeholder">在腦中構思設計圖...</div>';
-        document.getElementById('designCard').className = 'card';
         DialogueSystem.hideDesignComments();
+        modal.classList.add('show');
     },
 
     close() {
-        document.getElementById('designModal').classList.remove('show');
+        const modal = document.getElementById('designModal');
+        if (modal) modal.classList.remove('show');
         DialogueSystem.hideDesignComments();
     },
 
