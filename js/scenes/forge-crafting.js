@@ -49,7 +49,6 @@ const ForgeCrafting = {
         outline: none;
         border-color: #f5a623;  /* ← 這裡是選中時的邊框色 */
       }
-      // ✨ 新增這段 ✨
       .forge-design-select option {
         background: rgba(166,159,21,0.3);  /* ← 選項背景色（灰色在這） */
         color: #fff;                   /* ← 選項文字顏色 */
@@ -215,17 +214,29 @@ const ForgeCrafting = {
           </select>
         </div>
         
+        // ✨ 材料顯示 ✨
         <div class="forge-section" id="forgeMaterialSection">
           <div class="forge-material-row">
-            <div class="forge-material-label">⚙️ 金<span id="forgeMetalNeed">0</span></div>
-            <div class="forge-grade-buttons" id="forgeMetalGrades"></div>
+            <div class="forge-material-label">⚙️ 金<span id="forgeMetalNeed">?</span></div>
+            <div class="forge-grade-buttons" id="forgeMetalGrades">
+              <button class="forge-grade-btn" disabled>爛</button>
+              <button class="forge-grade-btn" disabled>普</button>
+              <button class="forge-grade-btn" disabled>好</button>
+              <button class="forge-grade-btn" disabled>奇</button>
+            </div>
           </div>
           
           <div class="forge-material-row">
-            <div class="forge-material-label">🥖 木<span id="forgeWoodNeed">0</span></div>
-            <div class="forge-grade-buttons" id="forgeWoodGrades"></div>
+            <div class="forge-material-label">🥖 木<span id="forgeWoodNeed">?</span></div>
+            <div class="forge-grade-buttons" id="forgeWoodGrades">
+              <button class="forge-grade-btn" disabled>爛</button>
+              <button class="forge-grade-btn" disabled>普</button>
+              <button class="forge-grade-btn" disabled>好</button>
+              <button class="forge-grade-btn" disabled>奇</button>
+            </div>
           </div>
         </div>
+        // ✨ 到這裡 ✨
         
         <div class="forge-preview" id="forgePreview">
           <span class="forge-preview-item">⚡ <span class="forge-preview-value" id="forgeEP">0</span></span>
