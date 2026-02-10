@@ -6,6 +6,7 @@ const CraftingUI = {
     selectedDesign:     null,
     selectedMetalGrade: '',
     selectedWoodGrade:  '',
+    _reopenTimer:       null,
 
     _initStyles() {
         if (document.getElementById('forge-crafting-styles')) return;
@@ -15,7 +16,7 @@ const CraftingUI = {
             .forge-modal { background: linear-gradient(180deg, #252535 0%, #1a1a28 100%); border-radius: 16px; padding: 20px; max-width: 500px; width: 90%; }
             .forge-section { margin-bottom: 20px; }
             .forge-section-title { font-size: 1em; color: #f5a623; margin-bottom: 10px; text-align: center; }
-            .forge-design-select { width: 100%; padding: 12px; font-size: 1em; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; font-family: inherit; text-align: center; }
+            .forge-design-select { width: 100%; padding: 12px; font-size: 1em; background: #B0D068; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; font-family: inherit; text-align: center; }
             .forge-design-select:focus { outline: none; border-color: #f5a623; }
             .forge-design-select option { background: #B0D068; color: #fff; padding: 10px; }
             .forge-material-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px; }
@@ -102,8 +103,10 @@ const CraftingUI = {
         modal.classList.add('show');
     },
 
-    // === 關閉彈窗 ===
+    // === 關閉彈窗（清除計時器，防止自動重開）===
     close() {
+        clearTimeout(this._reopenTimer);
+        this._reopenTimer = null;
         const modal = document.getElementById('forgeModal');
         if (modal) modal.classList.remove('show');
     },
@@ -194,10 +197,10 @@ const CraftingUI = {
         const weaponData = CSVLoader.data.weapons.find(w => w.name === this.selectedDesign.weapon);
         const physData   = CSVLoader.data.physical.find(p => p.name === this.selectedDesign.physical);
 
-        const metalPrice   = parseInt(metalData?.price)  || 0;
-        const woodPrice    = parseInt(woodData?.price)   || 0;
-        const weaponMulti  = weaponData ? parseFloat(weaponData.price_multiplier.replace('*', '')) : 1;
-        const physicalMulti = physData  ? parseFloat(physData.effect_value_2.replace('*', '')) : 1;
+        const metalPrice    = parseInt(metalData?.price)  || 0;
+        const woodPrice     = parseInt(woodData?.price)   || 0;
+        const weaponMulti   = weaponData ? parseFloat(weaponData.price_multiplier.replace('*', '')) : 1;
+        const physicalMulti = physData   ? parseFloat(physData.effect_value_2.replace('*', '')) : 1;
 
         const sellPrice = Math.floor(
             (this.selectedDesign.metalNeed * metalPrice + this.selectedDesign.woodNeed * woodPrice)
@@ -212,15 +215,15 @@ const CraftingUI = {
         player.dirtiness  = Math.min(100, player.dirtiness + Math.ceil(epCost / 2));
 
         const product = {
-            id: player.products.length + 1,
-            grade:     this.selectedDesign.grade,
-            physical:  this.selectedDesign.physical,
-            mental:    this.selectedDesign.mental,
-            weapon:    this.selectedDesign.weapon,
+            id:         player.products.length + 1,
+            grade:      this.selectedDesign.grade,
+            physical:   this.selectedDesign.physical,
+            mental:     this.selectedDesign.mental,
+            weapon:     this.selectedDesign.weapon,
             sellPrice,
             metalGrade: this.selectedMetalGrade,
             woodGrade:  this.selectedWoodGrade,
-            decorated: false
+            decorated:  false
         };
         player.products.push(product);
 
@@ -233,7 +236,15 @@ const CraftingUI = {
         showToast(`✨ 鍛造成功！獲得 ${product.weapon}！`);
         DialogueSystem.showDialogue('PC', `匡匡匡！完成了！${product.grade}！${product.weapon}！`);
 
-        setTimeout(() => { this.close(); this.open(); }, 2000);
+        // 只在 Modal 還是開著的情況下才重開
+        this._reopenTimer = setTimeout(() => {
+            this._reopenTimer = null;
+            const modal = document.getElementById('forgeModal');
+            if (modal && modal.classList.contains('show')) {
+                this.close();
+                this.open();
+            }
+        }, 2000);
     }
 };
 
