@@ -3,6 +3,7 @@
  * js/scenes/smelt-ui.js
  */
 const SmeltUI = {
+    _reopenTimer: null,
 
     // === 樣式初始化 ===
     _initStyles() {
@@ -92,8 +93,10 @@ const SmeltUI = {
         modal.classList.add('show');
     },
 
-    // === 關閉彈窗 ===
+    // === 關閉彈窗（清除計時器，防止自動重開）===
     close() {
+        clearTimeout(this._reopenTimer);
+        this._reopenTimer = null;
         const modal = document.getElementById('smeltModal');
         if (modal) modal.classList.remove('show');
     },
@@ -200,7 +203,14 @@ const SmeltUI = {
         showToast(`✨ 處理完成！獲得 ${outputMat.name} × ${outputAmount}`);
         DialogueSystem.showDialogue('PC', `煉出來了！${grade}品質的材料！`);
 
-        setTimeout(() => { this.close(); this.open(); }, 2000);
+        this._reopenTimer = setTimeout(() => {
+            this._reopenTimer = null;
+            const modal = document.getElementById('smeltModal');
+            if (modal && modal.classList.contains('show')) {
+                this.close();
+                this.open();
+            }
+        }, 2000);
     },
 
     _executeDecompose(state) {
@@ -215,7 +225,7 @@ const SmeltUI = {
         const targetId   = downMap[currentId];
         if (!targetId) { showToast('❌ 無法分解！'); return; }
 
-        const ratioMap  = { '04': 2, '03': 1.5, '02': 1.33 };
+        const ratioMap     = { '04': 2, '03': 1.5, '02': 1.33 };
         const outputAmount = Math.floor(state.amount * (ratioMap[currentId] || 1));
         mats[state.type] -= state.amount;
 
@@ -235,7 +245,14 @@ const SmeltUI = {
         showToast(`✨ 分解完成！獲得 ${outputMat.name} × ${outputAmount}`);
         DialogueSystem.showDialogue('PC', `分解成功！變成更多低級材料了！`);
 
-        setTimeout(() => { this.close(); this.open(); }, 2000);
+        this._reopenTimer = setTimeout(() => {
+            this._reopenTimer = null;
+            const modal = document.getElementById('smeltModal');
+            if (modal && modal.classList.contains('show')) {
+                this.close();
+                this.open();
+            }
+        }, 2000);
     },
 
     _gradeByValue(value) {
