@@ -52,6 +52,16 @@ const DecorationUI = {
             .deco-result-content { font-size: 1.1em; color: #fff; }
             .deco-result-price   { font-size: 1em; color: #7ed321; margin-top: 8px; }
             .deco-result-note    { font-size: 0.85em; color: #aaa; margin-top: 8px; }
+            .deco-result-stats   {
+                display: flex; justify-content: center; flex-wrap: wrap; gap: 6px;
+                margin-top: 10px; min-height: 24px;
+            }
+            .deco-stat-tag {
+                padding: 2px 8px; border-radius: 8px; font-size: 0.82em; font-weight: bold;
+                background: rgba(255,255,255,0.08);
+            }
+            .deco-stat-tag.positive { color: #7ed321; }
+            .deco-stat-tag.negative { color: #f5576c; }
         `;
         document.head.appendChild(style);
     },
@@ -103,6 +113,7 @@ const DecorationUI = {
                     <div class="deco-result-content" id="decoResultContent">等待裝飾...</div>
                     <div class="deco-result-price"   id="decoResultPrice"></div>
                     <div class="deco-result-note"    id="decoResultNote"></div>
+                    <div class="deco-result-stats"   id="decoResultStats"></div>
                 </div>
 
                 <div class="modal-actions">
@@ -155,6 +166,13 @@ const DecorationUI = {
         btn.disabled = !ready;
     },
 
+    // 格式化數值變動標籤
+    _statTag(label, value) {
+        const sign = value > 0 ? '+' : '';
+        const cls  = value > 0 ? 'positive' : 'negative';
+        return `<span class="deco-stat-tag ${cls}">${label} ${sign}${value}</span>`;
+    },
+
     execute() {
         if (this.selectedProductIndex === null || this.selectedCost === null) return;
 
@@ -170,28 +188,51 @@ const DecorationUI = {
         player.money     -= this.selectedCost;
         player.dirtiness  = Math.min(100, player.dirtiness + Math.ceil(epCost / 2));
 
-        // 計算結果
+        // 套用花費固定效果
+        const statChanges = [];
+        const costEffect = DecorationCore.getCostEffect(this.selectedCost);
+        if (costEffect) {
+            if (costEffect.stat === 'mood') {
+                player.mood   = Math.max(0, Math.min(100, player.mood   + costEffect.value));
+                statChanges.push(this._statTag('MOOD', costEffect.value));
+            } else if (costEffect.stat === 'stress') {
+                player.stress = Math.max(0, Math.min(100, player.stress + costEffect.value));
+                statChanges.push(this._statTag('STRESS', costEffect.value));
+            }
+        }
+
+        // 計算裝飾結果
         const randomNum  = DecorationCore.rollRandom(player.int);
         const multiplier = DecorationCore.getMultiplier(randomNum, this.selectedCost);
         const newPrice   = Math.round(product.sellPrice * multiplier);
 
-        // 套用並標記已裝飾（下次開啟時從清單消失）
+        // 套用結果效果
+        let prefix, note;
+        if (multiplier > 1) {
+            prefix = '🎀'; note = '變好看了！跟我一樣！';
+            player.mood   = Math.max(0, Math.min(100, player.mood + 10));
+            statChanges.push(this._statTag('MOOD', +10));
+        } else if (multiplier < 1) {
+            prefix = '💥'; note = '大爆走了啊啊啊！';
+            player.stress = Math.max(0, Math.min(100, player.stress + 10));
+            statChanges.push(this._statTag('STRESS', +10));
+        } else {
+            prefix = '〰️'; note = '沒有反應只是一個成品。';
+        }
+
+        // 套用並鎖定
         product.sellPrice = newPrice;
         product.decorated = true;
 
-        // 決定前綴與訊息
-        let prefix, note;
-        if (multiplier > 1)      { prefix = '🎀'; note = '變好看了！跟我一樣！'; }
-        else if (multiplier < 1) { prefix = '💥'; note = '大爆走了啊啊啊！'; }
-        else                     { prefix = '〰️'; note = '沒有反應只是一個成品。'; }
-
+        // 顯示結果
         const chNum = ForgeScene.toChineseNumber(product.id);
         document.getElementById('decoResultContent').textContent =
             `${prefix} ${chNum} ${product.grade}！${product.physical}${product.mental}${product.weapon}`;
         document.getElementById('decoResultPrice').textContent = `💰 售價 ${newPrice}元`;
         document.getElementById('decoResultNote').textContent  = note;
+        document.getElementById('decoResultStats').innerHTML   = statChanges.join('');
 
-        // 鎖住操作區（不自動關閉，讓玩家自己關）
+        // 鎖住操作區
         document.getElementById('decoBtn').disabled = true;
         document.getElementById('decoProductSelect').disabled = true;
         [10, 30, 100].forEach(c => {
