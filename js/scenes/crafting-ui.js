@@ -220,6 +220,7 @@ const CraftingUI = {
             sellPrice,
             metalGrade: this.selectedMetalGrade,
             woodGrade:  this.selectedWoodGrade
+            decorated: false,
         };
         player.products.push(product);
 
