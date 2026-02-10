@@ -210,7 +210,7 @@ const ForgeCrafting = {
           </select>
         </div>
         
-        \${/* 材料顯示區域 */}
+    
         <div class="forge-section" id="forgeMaterialSection"> 
           <div class="forge-material-row">
             <div class="forge-material-label">⚙️ 金<span id="forgeMetalNeed">?</span></div>
@@ -221,7 +221,7 @@ const ForgeCrafting = {
               <button class="forge-grade-btn" disabled>奇</button>
             </div>
           </div>
-          
+          modal.innerHTML = `材料顯示
           <div class="forge-material-row">
             <div class="forge-material-label">🥖 木<span id="forgeWoodNeed">?</span></div>
             <div class="forge-grade-buttons" id="forgeWoodGrades">
