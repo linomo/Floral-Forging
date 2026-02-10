@@ -223,6 +223,7 @@ const DecorationUI = {
         // 套用並鎖定
         product.sellPrice = newPrice;
         product.decorated = true;
+        product.decorationPrefix = prefix;
 
         // 顯示結果
         const chNum = ForgeScene.toChineseNumber(product.id);
