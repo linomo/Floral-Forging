@@ -1,9 +1,6 @@
 /**
  * DecorationCore - 裝飾計算邏輯
  * js/core/decoration.js
- *
- * 隨機數 = Math.floor(Random(0~8)) + INT/50
- * 對照倍率表計算成品新售價
  */
 const DecorationCore = {
 
@@ -15,6 +12,13 @@ const DecorationCore = {
         { max: 9,        rates: { 10: 1.2, 30: 1.8,  100: 2.0 } },
         { max: Infinity, rates: { 10: 1.5, 30: 2.0,  100: 3.0 } },
     ],
+
+    // 花費固定效果（裝飾時立即套用，與結果無關）
+    _costEffects: {
+        10:  null,
+        30:  { stat: 'mood',   value: -10 },
+        100: { stat: 'stress', value: +10 },
+    },
 
     /** EP消耗 = Math.round(15 - MOOD/100)，最低 0 */
     calcEP(mood) {
@@ -32,6 +36,11 @@ const DecorationCore = {
             if (randomNum < row.max) return row.rates[cost] ?? 1;
         }
         return 1;
+    },
+
+    /** 取花費固定效果，無效果時回傳 null */
+    getCostEffect(cost) {
+        return this._costEffects[cost] ?? null;
     }
 };
 
