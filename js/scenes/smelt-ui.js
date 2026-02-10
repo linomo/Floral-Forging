@@ -172,7 +172,7 @@ const SmeltUI = {
         const outputAmount = Math.floor(state.amount * player.int / 100);
         if (outputAmount === 0) {
             showToast('❌ 智力太低，無法產出任何材料！');
-            DialogueSystem.showDialogue('PC', '嗚...我太笨了，什麼都煉不出來...');
+            DialogueSystem.showDialogue('PC', '嗚...這個爐子太笨了，什麼都煉不出來...');
             return;
         }
 
