@@ -14,7 +14,7 @@ const SmeltUI = {
             .smelt-container { display: flex; gap: 20px; margin: 20px 0; }
             .smelt-column { flex: 1; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 15px; text-align: center; }
             .smelt-column-title { font-size: 1.1em; font-weight: bold; margin-bottom: 15px; color: #f5a623; }
-            .smelt-select { width: 100%; padding: 10px; font-size: 1em; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; margin-bottom: 15px; font-family: inherit; text-align: center; }
+            .smelt-select { width: 100%; padding: 10px; font-size: 1em; background: #B0D068; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; margin-bottom: 15px; font-family: inherit; text-align: center; }
             .smelt-select:focus { outline: none; border-color: #f5a623; }
             .smelt-amount-control { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; }
             .smelt-arrow { width: 40px; height: 40px; background: #f5576c; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; font-size: 1.2em; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
