@@ -210,8 +210,8 @@ const ForgeCrafting = {
           </select>
         </div>
         
-         /* 材料顯示*/
-        <div class="forge-section" id="forgeMaterialSection">
+      
+        <div class="forge-section" id="forgeMaterialSection">   /* 材料顯示*/
           <div class="forge-material-row">
             <div class="forge-material-label">⚙️ 金<span id="forgeMetalNeed">?</span></div>
             <div class="forge-grade-buttons" id="forgeMetalGrades">
@@ -231,8 +231,8 @@ const ForgeCrafting = {
               <button class="forge-grade-btn" disabled>奇</button>
             </div>
           </div>
-        </div>
-       /* 到這裡*/
+        </div>  /* 到這裡*/
+     
         
         <div class="forge-preview" id="forgePreview">
           <span class="forge-preview-item">⚡ <span class="forge-preview-value" id="forgeEP">0</span></span>
