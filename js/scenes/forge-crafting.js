@@ -37,7 +37,7 @@ const ForgeCrafting = {
         width: 100%;
         padding: 12px;
         font-size: 1em;
-        background: rgba(25,25,25,0.3); /*← 這裡是背景色 */
+        background: rgba(0,0,0,0.3); /*← 這裡是背景色 */
         border: 1px solid rgba(255,255,255,0.2);/* ← 這裡是邊框色 */
         border-radius: 8px;
         color: #fff; /* ← 這裡是文字顏色 */
@@ -56,11 +56,11 @@ const ForgeCrafting = {
       }
       
       .forge-design-select option:hover {
-        background: rgba(25,25,25,0.2);  /* ← 滑鼠移過去的背景色 */
+        background: rgba(0,0,0,0.2);  /* ← 滑鼠移過去的背景色 */
       }
       
       .forge-design-select option:checked {
-        background: rgba(25,25,25,0.2);   /* ← 被選中的背景色 */
+        background: rgba(0,0,0,0.2);   /* ← 被選中的背景色 */
         color: #fff;
       }
       .forge-material-row {
