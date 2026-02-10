@@ -19,9 +19,9 @@ const ForgeUtils = {
             .inventory-content  { display: flex; flex-direction: column; gap: 15px; }
             .inventory-section  { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 12px; }
             .inventory-title    { font-size: 0.85em; color: #f5a623; margin-bottom: 8px; }
-            .inventory-items    { font-size: 0.85em; color: #bbb; line-height: 1.8; }
+            .inventory-s    { font-size: 0.85em; color: #bbb; line-height: 1.8; }
             .inventory-list     { display: flex; flex-direction: column; gap: 5px; }
-            .inventory-item     { font-size: 0.82em; color: #ccc; padding: 5px 8px; background: rgba(0,0,0,0.2); border-radius: 5px; }
+            .inventory-     { font-size: 0.82em; color: #ccc; padding: 5px 8px; background: rgba(0,0,0,0.2); border-radius: 5px; }
             .inventory-empty    { font-size: 0.82em; color: #555; padding: 10px 0; text-align: center; }
         `;
         document.head.appendChild(style);
@@ -63,7 +63,7 @@ const ForgeUtils = {
         let contentHtml = '<div class="inventory-content">';
 
         // 金屬材料
-        const metalItems = Object.keys(player.materials.metal).map(id => {
+        const metals = Object.keys(player.materials.metal).map(id => {
             const amount = player.materials.metal[id];
             const mat    = CSVLoader.data.metal.find(m => m.m_id === id);
             return mat ? `${mat.name}×${amount}` : null;
@@ -71,11 +71,11 @@ const ForgeUtils = {
         contentHtml += `
             <div class="inventory-section">
                 <div class="inventory-title">【金屬】</div>
-                <div class="inventory-items">${metalItems.join(' | ')}</div>
+                <div class="inventory-s">${metals.join(' | ')}</div>
             </div>`;
 
         // 木材
-        const woodItems = Object.keys(player.materials.wood).map(id => {
+        const woods = Object.keys(player.materials.wood).map(id => {
             const amount = player.materials.wood[id];
             const mat    = CSVLoader.data.wood.find(w => w.w_id === id);
             return mat ? `${mat.name}×${amount}` : null;
@@ -83,14 +83,14 @@ const ForgeUtils = {
         contentHtml += `
             <div class="inventory-section">
                 <div class="inventory-title">【木材】</div>
-                <div class="inventory-items">${woodItems.join(' | ')}</div>
+                <div class="inventory-s">${woods.join(' | ')}</div>
             </div>`;
 
         // 設計圖
         let designsHtml = player.designs.length > 0
             ? player.designs.map(d => {
                 const chNum = ForgeScene.toChineseNumber(d.id);
-                return `<div class="inventory-item">${chNum} ${d.grade}！${d.physical}${d.mental}${d.weapon} 💰${d.blueprintPrice}元</div>`;
+                return `<div class="inventory-">${chNum} ${d.grade}！${d.physical}${d.mental}${d.weapon} 💰${d.blueprintPrice}元</div>`;
               }).join('')
             : '<div class="inventory-empty">還沒有設計圖</div>';
         contentHtml += `
@@ -103,7 +103,8 @@ const ForgeUtils = {
         let productsHtml = player.products.length > 0
             ? player.products.map(p => {
                 const chNum = ForgeScene.toChineseNumber(p.id);
-                return `<div class="inventory-item">${chNum} ${p.grade}！${p.physical}${p.mental}${p.weapon} 💰${p.sellPrice || '?'}元</div>`;
+                const decoMark = p.decorated ? (p.decorationPrefix || '🎀') : '';
+                return `<div class="inventory-">${decoMark}${chNum} ${p.grade}！${p.physical}${p.mental}${p.weapon} 💰${p.sellPrice || '?'}元</div>`;
               }).join('')
             : '<div class="inventory-empty">還沒有成品劍</div>';
         contentHtml += `
@@ -145,14 +146,14 @@ const ForgeUtils = {
         style.textContent = `
             .book-modal { background: linear-gradient(180deg, #252535 0%, #1a1a28 100%); border-radius: 16px; padding: 20px; max-width: 400px; width: 90%; max-height: 70vh; overflow-y: auto; }
             .book-list { display: flex; flex-direction: column; gap: 10px; margin: 15px 0; }
-            .book-item { padding: 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; cursor: pointer; transition: all 0.2s; text-align: center; }
-            .book-item:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); transform: translateY(-2px); }
-            .book-item-name { font-size: 1.1em; font-weight: bold; color: #f5a623; }
+            .book- { padding: 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; cursor: pointer; transition: all 0.2s; text-align: center; }
+            .book-:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); transform: translateY(-2px); }
+            .book--name { font-size: 1.1em; font-weight: bold; color: #f5a623; }
             .book-scroll { background: linear-gradient(180deg, #3a3a4a 0%, #2a2a38 100%); border-radius: 12px; max-width: 400px; width: 90%; border: 3px solid #556b2f; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-            .book-scroll-header { background: linear-gradient(180deg, #556b2f, #6b8e23); padding: 20px; text-align: center; border-radius: 9px 9px 0 0; display: flex; align-items: center; justify-content: center; }
+            .book-scroll-header { background: linear-gradient(180deg, #556b2f, #6b8e23); padding: 20px; text-align: center; border-radius: 9px 9px 0 0; display: flex; align-s: center; justify-content: center; }
             .book-scroll-title { font-size: 1.5em; font-weight: bold; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
             .book-scroll-meta { display: flex; justify-content: space-around; padding: 15px 20px; background: rgba(0,0,0,0.2); border-top: 1px solid rgba(85,107,47,0.3); border-bottom: 1px solid rgba(85,107,47,0.3); }
-            .book-scroll-meta-item { text-align: center; color: #ccc; font-size: 0.95em; }
+            .book-scroll-meta- { text-align: center; color: #ccc; font-size: 0.95em; }
             .book-scroll-meta-label { color: #888; margin-right: 5px; }
             .book-scroll-content { padding: 25px 30px; text-align: center; line-height: 1.8; color: #ddd; font-size: 1em; min-height: 100px; }
             .book-scroll-footer { padding: 20px; text-align: center; background: rgba(0,0,0,0.1); border-radius: 0 0 9px 9px; }
@@ -189,7 +190,7 @@ const ForgeUtils = {
             playerBooks.forEach(bookId => {
                 const book = CSVLoader.data.books.find(b => b.book_id === bookId);
                 if (book) {
-                    booksHtml += `<div class="book-item" onclick="ForgeUtils.openBookScroll('${bookId}')"><div class="book-item-name">📖 ${book.name}</div></div>`;
+                    booksHtml += `<div class="book-" onclick="ForgeUtils.openBookScroll('${bookId}')"><div class="book--name">📖 ${book.name}</div></div>`;
                 }
             });
             booksHtml += '</div>';
@@ -228,8 +229,8 @@ const ForgeUtils = {
             <div class="book-scroll">
                 <div class="book-scroll-header"><div class="book-scroll-title">${book.name}</div></div>
                 <div class="book-scroll-meta">
-                    <div class="book-scroll-meta-item"><span class="book-scroll-meta-label">⚡ EP：</span><span>${epCost}</span></div>
-                    <div class="book-scroll-meta-item"><span class="${isRead ? 'book-status-read' : 'book-status-unread'}">${isRead ? '已閱讀' : '未閱讀'}</span></div>
+                    <div class="book-scroll-meta-"><span class="book-scroll-meta-label">⚡ EP：</span><span>${epCost}</span></div>
+                    <div class="book-scroll-meta-"><span class="${isRead ? 'book-status-read' : 'book-status-unread'}">${isRead ? '已閱讀' : '未閱讀'}</span></div>
                 </div>
                 <div class="book-scroll-content">${book.description}</div>
                 <div class="book-scroll-footer">
