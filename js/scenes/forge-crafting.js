@@ -50,17 +50,13 @@ const ForgeCrafting = {
         border-color: #f5a623;  /* ← 這裡是選中時的邊框色 */
       }
       .forge-design-select option {
-        background:linear-gradient(180deg, #252535 0%, #1a1a28 100%);   /* ← 選項背景色（灰色在這） */
-        color: #fff;                   /* ← 選項文字顏色 */
-        padding: 10px;                 /* ← 選項內距 */
+        background: #2a2a3d;     /* 深紫灰色 */
+        color: #f5a623;          /* 金黃色文字 */
+        padding: 10px;
       }
       
       .forge-design-select option:hover {
-        background: rgba(0,0,0,0.2);  /* ← 滑鼠移過去的背景色 */
-      }
-      
-      .forge-design-select option:checked {
-        background: rgba(0,0,0,0.2);   /* ← 被選中的背景色 */
+        background: #3a3a4d;     /* 滑鼠移過去變亮一點 */
         color: #fff;
       }
       .forge-material-row {
@@ -214,7 +210,7 @@ const ForgeCrafting = {
           </select>
         </div>
         
-          <script> // 材料顯示<script>
+         /* 材料顯示*/
         <div class="forge-section" id="forgeMaterialSection">
           <div class="forge-material-row">
             <div class="forge-material-label">⚙️ 金<span id="forgeMetalNeed">?</span></div>
@@ -236,7 +232,7 @@ const ForgeCrafting = {
             </div>
           </div>
         </div>
-        <script>// 到這裡<script>
+       /* 到這裡*/
         
         <div class="forge-preview" id="forgePreview">
           <span class="forge-preview-item">⚡ <span class="forge-preview-value" id="forgeEP">0</span></span>
