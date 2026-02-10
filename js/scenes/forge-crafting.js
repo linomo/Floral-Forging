@@ -214,7 +214,7 @@ const ForgeCrafting = {
           </select>
         </div>
         
-          // 材料顯示
+          <script> // 材料顯示<script>
         <div class="forge-section" id="forgeMaterialSection">
           <div class="forge-material-row">
             <div class="forge-material-label">⚙️ 金<span id="forgeMetalNeed">?</span></div>
@@ -236,7 +236,7 @@ const ForgeCrafting = {
             </div>
           </div>
         </div>
-        // 到這裡
+        <script>// 到這裡<script>
         
         <div class="forge-preview" id="forgePreview">
           <span class="forge-preview-item">⚡ <span class="forge-preview-value" id="forgeEP">0</span></span>
