@@ -14,7 +14,7 @@ const DecorationUI = {
             .deco-modal {
                 background: linear-gradient(180deg, #252535 0%, #1a1a28 100%);
                 border-radius: 16px; padding: 20px;
-                max-width: 320px; width: 90%;
+                max-width: 400px; width: 90%;
             }
             .deco-select {
                 width: 100%; padding: 10px; font-size: 1em;
@@ -25,16 +25,22 @@ const DecorationUI = {
             }
             .deco-select:focus { outline: none; border-color: #f5a623; }
             .deco-select:disabled { opacity: 0.4; cursor: not-allowed; }
-            .deco-cost-row {
-                display: flex; gap: 8px; margin-bottom: 15px;
+            .deco-cost-row { display: flex; gap: 8px; margin-bottom: 15px; }
+            .deco-cost-btn {
+                flex: 1; padding: 8px; font-size: 0.9em;
+                background: rgba(255,255,255,0.1);
+                border: 1px solid rgba(255,255,255,0.2); border-radius: 6px;
+                color: #aaa; cursor: pointer; transition: all 0.2s; font-family: inherit;
             }
+            .deco-cost-btn:hover:not(:disabled) { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.4); }
+            .deco-cost-btn.selected { background: linear-gradient(90deg, #f5a623, #f5576c); border-color: #f5a623; color: #fff; font-weight: bold; }
+            .deco-cost-btn:disabled { opacity: 0.3; cursor: not-allowed; }
             .deco-action-btn {
                 width: 100%; padding: 12px; font-size: 1em;
                 background: linear-gradient(90deg, #f093fb, #f5576c);
                 border: none; border-radius: 10px;
                 color: #fff; cursor: pointer; font-weight: bold;
-                margin-bottom: 15px; font-family: inherit;
-                transition: all 0.2s;
+                margin-bottom: 15px; font-family: inherit; transition: all 0.2s;
             }
             .deco-action-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245, 87, 108, 0.3); }
             .deco-action-btn:disabled { background: rgba(255,255,255,0.1); color: #666; cursor: not-allowed; transform: none; }
@@ -42,10 +48,10 @@ const DecorationUI = {
                 padding: 20px; background: rgba(0,0,0,0.3);
                 border-radius: 12px; text-align: center; min-height: 80px;
             }
-            .deco-result-title { font-size: 1.2em; color: #f5a623; margin-bottom: 10px; }
+            .deco-result-title   { font-size: 1.2em; color: #f5a623; margin-bottom: 10px; }
             .deco-result-content { font-size: 1.1em; color: #fff; }
-            .deco-result-price { font-size: 1em; color: #7ed321; margin-top: 8px; }
-            .deco-result-note { font-size: 0.85em; color: #aaa; margin-top: 8px; }
+            .deco-result-price   { font-size: 1em; color: #7ed321; margin-top: 8px; }
+            .deco-result-note    { font-size: 0.85em; color: #aaa; margin-top: 8px; }
         `;
         document.head.appendChild(style);
     },
@@ -78,9 +84,9 @@ const DecorationUI = {
                     ${this._generateProductOptions(undecoratedProducts)}
                 </select>
 
-                <div class="deco-cost-row" id="decoCostRow">
+                <div class="deco-cost-row">
                     ${[10, 30, 100].map(cost => `
-                        <button class="forge-grade-btn" id="decoCost${cost}"
+                        <button class="deco-cost-btn" id="decoCost${cost}"
                             onclick="DecorationUI.selectCost(${cost})"
                             ${undecoratedProducts.length === 0 ? 'disabled' : ''}>
                             ${cost}
@@ -89,7 +95,7 @@ const DecorationUI = {
 
                 <button class="deco-action-btn" id="decoBtn" disabled
                     onclick="DecorationUI.execute()">
-                    變好看吧！
+                    🎀 變好看吧！
                 </button>
 
                 <div class="deco-result">
@@ -117,7 +123,6 @@ const DecorationUI = {
 
     _generateProductOptions(undecoratedProducts) {
         return undecoratedProducts.map(p => {
-            // 找到在 player.products 中的原始 index
             const realIndex = player.products.indexOf(p);
             const chNum = ForgeScene.toChineseNumber(p.id);
             return `<option value="${realIndex}">${chNum} ${p.grade}！${p.physical}${p.mental}${p.weapon}（💰${p.sellPrice}元）</option>`;
@@ -166,42 +171,38 @@ const DecorationUI = {
         player.dirtiness  = Math.min(100, player.dirtiness + Math.ceil(epCost / 2));
 
         // 計算結果
-        const randomNum   = DecorationCore.rollRandom(player.int);
-        const multiplier  = DecorationCore.getMultiplier(randomNum, this.selectedCost);
-        const newPrice    = Math.round(product.sellPrice * multiplier);
+        const randomNum  = DecorationCore.rollRandom(player.int);
+        const multiplier = DecorationCore.getMultiplier(randomNum, this.selectedCost);
+        const newPrice   = Math.round(product.sellPrice * multiplier);
 
-        // 套用並鎖定
-        product.sellPrice  = newPrice;
-        product.decorated  = true;
+        // 套用並標記已裝飾（下次開啟時從清單消失）
+        product.sellPrice = newPrice;
+        product.decorated = true;
 
         // 決定前綴與訊息
         let prefix, note;
-        if (multiplier > 1) {
-            prefix = '🎀';
-            note   = '變好看了！跟我一樣！';
-        } else if (multiplier < 1) {
-            prefix = '💥';
-            note   = '大爆走了啊啊啊！';
-        } else {
-            prefix = '〰️';
-            note   = '沒有反應只是一個成品。';
-        }
+        if (multiplier > 1)      { prefix = '🎀'; note = '變好看了！跟我一樣！'; }
+        else if (multiplier < 1) { prefix = '💥'; note = '大爆走了啊啊啊！'; }
+        else                     { prefix = '〰️'; note = '沒有反應只是一個成品。'; }
 
         const chNum = ForgeScene.toChineseNumber(product.id);
         document.getElementById('decoResultContent').textContent =
             `${prefix} ${chNum} ${product.grade}！${product.physical}${product.mental}${product.weapon}`;
-        document.getElementById('decoResultPrice').textContent =
-            `💰 售價 ${newPrice}元`;
-        document.getElementById('decoResultNote').textContent = note;
+        document.getElementById('decoResultPrice').textContent = `💰 售價 ${newPrice}元`;
+        document.getElementById('decoResultNote').textContent  = note;
+
+        // 鎖住操作區（不自動關閉，讓玩家自己關）
+        document.getElementById('decoBtn').disabled = true;
+        document.getElementById('decoProductSelect').disabled = true;
+        [10, 30, 100].forEach(c => {
+            const btn = document.getElementById(`decoCost${c}`);
+            if (btn) btn.disabled = true;
+        });
 
         updateStatsDisplay();
         showToast(`🎨 裝飾完成！${prefix}`);
         DialogueSystem.showDialogue('PC', note);
-
-        // 重新整理彈窗（鎖定已裝飾成品）
-        setTimeout(() => { this.close(); this.open(); }, 2000);
     }
 };
 
 window.DecorationUI = DecorationUI;
-
