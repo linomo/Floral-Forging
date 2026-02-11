@@ -151,7 +151,7 @@ const CommissionUI = {
         const modal = document.getElementById('commissionModal');
         if (modal) modal.innerHTML = this._buildBoardHTML();
         showToast('📨 委託更新了！');
-        DialogueSystem.showDialogue('PC', '新的委託來了！讓我看看有沒有有趣的...');
+        DialogueSystem.showDialogue('PC', '新的委託來了！發家致富靠這次！');
     },
 
     _drawNew() {
