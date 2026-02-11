@@ -88,6 +88,14 @@ function updateSceneValues() {
 async function initGame() {
     console.log('🎮 初始化遊戲...');
 
+    // 沒有新遊戲資料也沒有存檔，導回開始畫面
+    const hasNewGame = localStorage.getItem('floralForger_newGame');
+    const hasSave    = localStorage.getItem('floralForger_save');
+    if (!hasNewGame && !hasSave) {
+        window.location.href = 'start.html';
+        return;
+    }
+
     const loaded = await CSVLoader.loadAll();
     if (!loaded) { alert('資料載入失敗，請重新整理頁面！'); return; }
 
