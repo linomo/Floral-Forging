@@ -229,7 +229,7 @@ const ForgeUtils = {
             <div class="book-scroll">
                 <div class="book-scroll-header"><div class="book-scroll-title">${book.name}</div></div>
                 <div class="book-scroll-meta">
-                    <div class="book-scroll-meta-"><span class="book-scroll-meta-label">⚡ EP：</span><span>${epCost}</span></div>
+                    <div class="book-scroll-meta-"><span class="book-scroll-meta-label">⚡：</span><span>${epCost}</span></div>
                     <div class="book-scroll-meta-"><span class="${isRead ? 'book-status-read' : 'book-status-unread'}">${isRead ? '已閱讀' : '未閱讀'}</span></div>
                 </div>
                 <div class="book-scroll-content">${book.description}</div>
