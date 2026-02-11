@@ -8,7 +8,8 @@ const CSVLoader = {
         grades: [], physical: [], mental: [],
         weapons: [], metal: [], wood: [],
         comments: [], luckRandom: [], books: [],
-        forgeMap: [], modalEpCost: []
+        forgeMap: [], modalEpCost: [],
+        commissions: []
     },
 
     async loadCSV(path) {
@@ -50,6 +51,9 @@ const CSVLoader = {
         this.data.comments = await this.loadCSV('data/forging/grade_comments.csv');
         this.data.modalEpCost = await this.loadCSV('data/forging/modal_ep_cost.csv');
 
+        // 委託
+        this.data.commissions = await this.loadCSV('data/forging/commission.csv');
+
         // 地圖
         this.data.forgeMap = await this.loadCSV('data/map/forge_map.csv');
 
@@ -74,6 +78,10 @@ const CSVLoader = {
             e => e.modal_id === modalId && e.action_name === actionName
         );
         return entry ? parseInt(entry.ep_cost) : 0;
+    },
+
+    getCommission(commissionId) {
+        return this.data.commissions.find(c => c.commission_id === commissionId);
     }
 };
 
