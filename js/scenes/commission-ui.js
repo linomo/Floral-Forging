@@ -52,11 +52,11 @@ const CommissionUI = {
             .commission-scroll {
                 background: linear-gradient(180deg, #3a3a4a 0%, #2a2a38 100%);
                 border-radius: 12px; max-width: 400px; width: 90%;
-                border: 3px solid #7a6840;
+                border: 3px solid #556b2f;
                 box-shadow: 0 10px 40px rgba(0,0,0,0.5);
             }
             .commission-scroll-header {
-                background: linear-gradient(180deg, #7a6840, #9a8450);
+                background: linear-gradient(180deg, #556b2f, #6b8e23);
                 padding: 18px 20px; border-radius: 9px 9px 0 0;
                 display: flex; align-items: center; justify-content: space-between;
                 flex-wrap: wrap; gap: 8px;
