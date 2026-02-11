@@ -16,7 +16,10 @@ const player = {
     money:     1000,
     currentEP: 0,
     dirtiness: 0,
-    favor:     { SF: 20, SS: 10, DS: 0 },
+    favor: {
+        SF: 20, SS: 10, DS: 0,
+        sunstreet: 0, moonstreet: 0, starstreet: 0
+    },
 
     materials: {
         metal: { m00: 10, m01: 10, m02: 10, m03: 10, m04: 10 },
@@ -29,7 +32,11 @@ const player = {
     books:           ['book01'],
     readBooks:       [],
     unlockedWeapons: [],
-    unlockedAvatars: ['avatars01']
+    unlockedAvatars: ['avatars01'],
+
+    // 委託系統
+    currentCommissions:           [],   // 本旬板子上的三個 commission_id
+    completedCommissionsThisBoard: []   // 本旬已完成的 commission_id
 };
 
 // === 場景系統 ===
@@ -97,7 +104,15 @@ async function initGame() {
     } else {
         const saved = localStorage.getItem('floralForger_save');
         if (saved) {
-            Object.assign(player, JSON.parse(saved));
+            const savedData = JSON.parse(saved);
+            // 合併儲存資料（確保新欄位有預設值）
+            Object.assign(player, savedData);
+            // 補齊可能缺失的新欄位
+            if (!player.favor.sunstreet)  player.favor.sunstreet  = 0;
+            if (!player.favor.moonstreet) player.favor.moonstreet = 0;
+            if (!player.favor.starstreet) player.favor.starstreet = 0;
+            if (!player.currentCommissions)            player.currentCommissions            = [];
+            if (!player.completedCommissionsThisBoard) player.completedCommissionsThisBoard = [];
             console.log('📂 讀取存檔成功', player);
         } else {
             player.currentEP = Math.floor(2 * (player.str + player.int + player.dex) / 3);
@@ -108,7 +123,7 @@ async function initGame() {
     updatePlayerDisplay();
     updateStatsDisplay();
     await renderScene();
-    document.getElementById('speaker-name').textContent = player.name;//初始讀取名字
+    document.getElementById('speaker-name').textContent = player.name;
     DialogueSystem.showDialogue('PC', '是時候展現真正的技術了！');
     console.log('✅ 鍛造室初始化完成！', player);
 }
@@ -150,7 +165,14 @@ const GameSystem = {
     load() {
         const saved = localStorage.getItem('floralForger_save');
         if (!saved) { showToast('❌ 沒有存檔！'); return; }
-        Object.assign(player, JSON.parse(saved));
+        const savedData = JSON.parse(saved);
+        Object.assign(player, savedData);
+        // 補齊可能缺失的新欄位
+        if (!player.favor.sunstreet)  player.favor.sunstreet  = 0;
+        if (!player.favor.moonstreet) player.favor.moonstreet = 0;
+        if (!player.favor.starstreet) player.favor.starstreet = 0;
+        if (!player.currentCommissions)            player.currentCommissions            = [];
+        if (!player.completedCommissionsThisBoard) player.completedCommissionsThisBoard = [];
         updatePlayerDisplay();
         updateStatsDisplay();
         renderScene();
