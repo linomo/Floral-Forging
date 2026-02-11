@@ -117,7 +117,8 @@ const ForgeScene = {
             case 'smelt_modal':      SmeltUI.open();                 break;
             case 'book_modal':       ForgeUtils.openBookModal();     break;
             case 'inventory_modal':  ForgeUtils.openInventory();     break;
-            case 'decoration_modal': DecorationUI.open();            break;
+            case 'decoration_modal':  DecorationUI.open();             break;
+            case 'commission_modal':  CommissionUI.open();             break;
             default: console.warn(`未知 modal: ${obj.action_param}`);
         }
     },
