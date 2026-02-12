@@ -80,7 +80,15 @@ const DesignUI = {
             .effect-tag.positive { color: #7ed321; }
             .effect-tag.negative { color: #f5576c; }
             .effect-tag.special  { color: #f5a623; background: rgba(245,166,35,0.2); }
-            .card-placeholder { padding: 40px 20px; text-align: center; color: #444; font-size: 0.9em; }
+            .card-placeholder { 
+                height: 280px;  /* 跟 card 一樣高 */
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-align: center; 
+                color: #444; 
+                font-size: 0.9em; 
+            }
 
             /* === 評論容器（獨立區塊，在 wrapper 內）=== */
             .comments-container {
