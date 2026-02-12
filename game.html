@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FLORAL FORGER</title>
-  <!-- v20260212-05 -->
+  <!-- v20260212-07 -->
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -139,10 +139,8 @@
       padding: 20px 25px; /* 加大內距 */
       font-size: 1.05em; /* 稍微加大字體 */
       line-height: 1.7;
-      display: flex; align-items: flex-start; gap: 12px;
       flex: 1; position: relative;
     }
-    .dialogue-emoji { font-size: 1.8em; flex-shrink: 0; /* 加大圖示 */ }
     .dialogue-text { flex: 1; }
 
 
@@ -248,7 +246,6 @@
           <div class="speaker-name" id="speaker-name"></div>
         </div>
         <div class="dialogue-content">
-          <span class="dialogue-emoji" id="dialogue-emoji">🔨</span>
           <span class="dialogue-text" id="dialogue-text">該起床了!</span>
         </div>
         <!-- 設計圖評論區（已廢棄，評論現在在卡片內）-->
@@ -270,7 +267,7 @@
 
   <!-- 2. 系統：角色 / 對話 / 遊戲狀態 -->
   <script src="js/systems/character.js"></script>
-  <script src="js/systems/dialogue.js?v=20260212-03"></script>
+  <script src="js/systems/dialogue.js?v=20260212-07"></script></script>
   <script src="js/systems/game.js"></script>
 
   <!-- 3. 核心：各系統計算邏輯 -->
