@@ -1,287 +1,204 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FLORAL FORGER</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: "Microsoft JhengHei", "PingFang TC", sans-serif;
-      background: #0d0d14;
-      min-height: 100vh;
-      color: #eee;
-      display: flex;
+/**
+ * GameSystem - 玩家資料 & 遊戲核心
+ * js/systems/game.js
+ */
+
+// === 玩家資料 ===
+const player = {
+    name:      '小哈',
+    avatar:    '🔨',
+    str:       30,
+    int:       30,
+    dex:       100,
+    luck:      50,
+    mood:      50,
+    stress:    25,
+    money:     1000,
+    currentEP: 0,
+    dirtiness: 0,
+    favor: {
+        SF: 20, SS: 10, DS: 0,
+        sunstreet: 0, moonstreet: 0, starstreet: 0
+    },
+
+    materials: {
+        metal: { m00: 10, m01: 10, m02: 10, m03: 10, m04: 10 },
+        wood:  { w00: 10, w01: 10, w02: 10, w03: 10, w04: 10 }
+    },
+
+    designs:         [],
+    products:        [],
+    equipment:       ['equip01'],
+    books:           ['book01'],
+    readBooks:       [],
+    unlockedWeapons: [],
+    unlockedAvatars: ['avatars01'],
+
+    // 委託系統
+    currentCommissions:           [],   // 本旬板子上的三個 commission_id
+    completedCommissionsThisBoard: []   // 本旬已完成的 commission_id
+};
+
+// === 場景系統 ===
+const SCENES = {
+    forge:    { name: '鍛造室',   icon: '📍' },
+    room:     { name: '小哈的房間', icon: '🏠' },
+    schedule: { name: '行程表',   icon: '📅' }
+};
+
+let currentScene = 'forge';
+
+function switchScene(sceneId) {
+    if (!SCENES[sceneId]) { console.error(`場景不存在: ${sceneId}`); return; }
+    currentScene = sceneId;
+    renderScene();
+}
+
+async function renderScene() {
+    const headerEl  = document.getElementById('room-header');
+    const contentEl = document.getElementById('room-content');
+    if (!headerEl || !contentEl) { console.error('場景容器不存在！'); return; }
+
+    let sceneData = { header: '', content: '' };
+    switch (currentScene) {
+        case 'forge':
+            sceneData = typeof ForgeScene !== 'undefined'
+                ? await ForgeScene.render()
+                : { header: '📍 鍛造室', content: '<div style="text-align:center;color:#f5576c;padding:40px">錯誤：forge.js 未載入</div>' };
+            break;
+        case 'room':
+            sceneData = { header: '🏠 小哈的房間', content: '<div style="text-align:center;color:#666;padding:40px">房間場景開發中...</div>' };
+            break;
+        case 'schedule':
+            sceneData = { header: '📅 行程表', content: '<div style="text-align:center;color:#666;padding:40px">行程表開發中...</div>' };
+            break;
     }
 
-    /* === 左側面板 === */
-    .left-panel {
-      width: 180px;
-      background: linear-gradient(180deg, #1a1a28 0%, #12121a 100%);
-      border-right: 1px solid rgba(255,255,255,0.1);
-      padding: 15px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+    headerEl.innerHTML  = sceneData.header;
+    contentEl.innerHTML = sceneData.content;
+}
+
+function updateSceneValues() {
+    if (currentScene === 'forge' && typeof ForgeScene !== 'undefined') {
+        ForgeScene.updateValues();
     }
-    .date-section { text-align: center; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-    .date-year { font-size: 1.1em; color: #f5a623; font-weight: bold; }
-    .date-month { font-size: 0.95em; color: #ccc; margin: 3px 0; }
-    .date-day { font-size: 0.85em; color: #888; }
+}
 
-    .avatar-section { text-align: center; }
-    .avatar-box {
-      width: 80px; height: 80px;
-      background: linear-gradient(135deg, #2a2a3d, #1a1a28);
-      border: 2px solid #4a90d9; border-radius: 12px;
-      margin: 0 auto 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 2.5em;
+// === 初始化遊戲 ===
+async function initGame() {
+    console.log('🎮 初始化遊戲...');
+
+    // 檢查是否有「進入遊戲」標記
+    const enterGame = localStorage.getItem('floralForger_enterGame');
+    
+    console.log('📋 狀態檢查:');
+    console.log('  - floralForger_enterGame:', enterGame ? '✓' : '✗');
+    
+    // 如果沒有進入遊戲標記，導回開始畫面
+    if (!enterGame) {
+        console.log('📝 無進入標記，立即導向開始畫面...');
+        window.location.href = 'index.html';
+        return;
     }
-    .avatar-name { font-weight: bold; color: #4a90d9; }
+    
+    // 清除進入標記（下次開啟會回到 index.html）
+    localStorage.removeItem('floralForger_enterGame');
+    console.log('✅ 清除進入標記');
 
-    .stats-section { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px; }
-    .stat-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.85em; }
-    .stat-row:last-child { margin-bottom: 0; }
-    .stat-label { color: #888; }
-    .stat-value { color: #fff; font-weight: bold; }
+    const loaded = await CSVLoader.loadAll();
+    if (!loaded) { alert('資料載入失敗，請重新整理頁面！'); return; }
 
-    .bar-section { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px; }
-    .bar-item { margin-bottom: 10px; }
-    .bar-item:last-child { margin-bottom: 0; }
-    .bar-header { display: flex; justify-content: space-between; font-size: 0.8em; margin-bottom: 5px; }
-    .bar-label { color: #888; }
-    .bar-icons { display: flex; justify-content: space-between; font-size: 0.9em; }
-    .bar-track { height: 8px; background: rgba(0,0,0,0.3); border-radius: 4px; overflow: hidden; }
-    .bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s; background: linear-gradient(90deg, #7ed321, #f5a623, #f5576c); }
-
-    .equip-section { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px; }
-    .equip-label { font-size: 0.8em; color: #888; margin-bottom: 6px; }
-    .equip-slot {
-      background: rgba(255,255,255,0.05); border: 1px dashed rgba(255,255,255,0.2);
-      border-radius: 6px; padding: 10px; cursor: pointer; text-align: center;
+    // 檢查是新遊戲還是讀取存檔
+    const newGameData = localStorage.getItem('floralForger_newGame');
+    if (newGameData) {
+        console.log('🆕 開始新遊戲');
+        localStorage.removeItem('floralForger_save');
+        const data    = JSON.parse(newGameData);
+        player.name   = data.playerName;
+        player.avatar = data.playerAvatar || '🔨';
+        player.currentEP = Math.floor(2 * (player.str + player.int + player.dex) / 3);
+        localStorage.removeItem('floralForger_newGame');
+        console.log(`👋 歡迎，${player.name}！初始 EP: ${player.currentEP}`);
+    } else {
+        const saved = localStorage.getItem('floralForger_save');
+        if (saved) {
+            const savedData = JSON.parse(saved);
+            // 合併儲存資料（確保新欄位有預設值）
+            Object.assign(player, savedData);
+            // 補齊可能缺失的新欄位
+            if (!player.favor.sunstreet)  player.favor.sunstreet  = 0;
+            if (!player.favor.moonstreet) player.favor.moonstreet = 0;
+            if (!player.favor.starstreet) player.favor.starstreet = 0;
+            if (!player.currentCommissions)            player.currentCommissions            = [];
+            if (!player.completedCommissionsThisBoard) player.completedCommissionsThisBoard = [];
+            console.log('📂 讀取存檔成功', player);
+        } else {
+            player.currentEP = Math.floor(2 * (player.str + player.int + player.dex) / 3);
+            console.log('📝 初次遊玩，初始化數值');
+        }
     }
-    .equip-slot:hover { background: rgba(255,255,255,0.1); }
-    .equip-slot .equip-icon { font-size: 1.5em; display: block; margin-bottom: 4px; }
-    .equip-slot .equip-name { font-size: 0.8em; color: #ccc; display: block; }
-    .equip-slot .equip-effect { font-size: 0.75em; color: #7ed321; margin-top: 3px; display: block; }
 
-    .save-section { display: flex; gap: 8px; margin-top: auto; }
-    .save-btn {
-      flex: 1; padding: 8px;
-      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 6px; color: #666; cursor: pointer; font-size: 0.8em;
+    updatePlayerDisplay();
+    updateStatsDisplay();
+    await renderScene();
+    document.getElementById('speaker-name').textContent = player.name;
+    DialogueSystem.showDialogue('PC', '是時候展現真正的技術了！');
+    console.log('✅ 鍛造室初始化完成！', player);
+}
+
+// === 顯示更新 ===
+function updatePlayerDisplay() {
+    CharacterSystem.updateDisplay(player.name, player.avatar);
+}
+
+function updateStatsDisplay() {
+    document.getElementById('str-val').textContent    = player.str;
+    document.getElementById('int-val').textContent    = player.int;
+    document.getElementById('dex-val').textContent    = player.dex;
+    document.getElementById('luck-val').textContent   = player.luck;
+    document.getElementById('mood-bar').style.width   = player.mood   + '%';
+    document.getElementById('stress-bar').style.width = player.stress + '%';
+
+    const moneyEl = document.getElementById('money-val');
+    if (moneyEl) moneyEl.textContent = player.money;
+
+    updateSceneValues();
+    localStorage.setItem('floralForger_save', JSON.stringify(player));
+}
+
+// === 工具函數 ===
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    if (!toast) return;
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+function nextDialogue() { showToast('（繼續中...）'); }
+
+// === 存讀檔 ===
+const GameSystem = {
+    save() { localStorage.setItem('floralForger_save', JSON.stringify(player)); showToast('💾 已儲存！'); },
+    load() {
+        const saved = localStorage.getItem('floralForger_save');
+        if (!saved) { showToast('❌ 沒有存檔！'); return; }
+        const savedData = JSON.parse(saved);
+        Object.assign(player, savedData);
+        // 補齊可能缺失的新欄位
+        if (!player.favor.sunstreet)  player.favor.sunstreet  = 0;
+        if (!player.favor.moonstreet) player.favor.moonstreet = 0;
+        if (!player.favor.starstreet) player.favor.starstreet = 0;
+        if (!player.currentCommissions)            player.currentCommissions            = [];
+        if (!player.completedCommissionsThisBoard) player.completedCommissionsThisBoard = [];
+        updatePlayerDisplay();
+        updateStatsDisplay();
+        renderScene();
+        showToast('📂 讀取成功！');
     }
-    .save-btn:hover { background: rgba(255,255,255,0.1); color: #aaa; }
+};
 
-    /* === 右側主區 === */
-    .right-main { flex: 1; display: flex; flex-direction: column; }
+window.player     = player;
+window.GameSystem = GameSystem;
 
-    .operation-area {
-      flex: 6;
-      background: linear-gradient(180deg, #1a1a28 0%, #151520 100%);
-      padding: 20px;
-      display: flex; flex-direction: column; align-items: center;
-      position: relative;
-    }
-    .room-header {
-      width: 100%; display: flex; align-items: center;
-      padding-bottom: 12px; margin-bottom: 15px;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      font-size: 0.9em;
-    }
-    #room-content {
-      display: flex; align-items: center; justify-content: center;
-      flex: 1; width: 100%;
-    }
-    .room-grid {
-      display: grid;
-      gap: 10px;
-    }
-    .room-item {
-      width: 80px; height: 60px;
-      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 8px;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      cursor: pointer; transition: all 0.2s;
-    }
-    .room-item:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
-    .room-item .icon { font-size: 1.8em; }
-    .room-item .label { font-size: 0.75em; color: #666; margin-top: 4px; }
-    .room-item.empty { background: transparent; border-color: transparent; cursor: default; }
-    .room-item.empty:hover { transform: none; background: transparent; }
-
-    .dialogue-area {
-      flex: 4;
-      background: linear-gradient(180deg, #151520 0%, #101018 100%);
-      border-top: 1px solid rgba(255,255,255,0.1);
-      padding: 15px 20px;
-      display: flex; flex-direction: column;
-    }
-    .dialogue-box {
-      background: rgba(30, 30, 45, 0.95); border-radius: 10px;
-      border: 1px solid rgba(255,255,255,0.1);
-      flex: 1; display: flex; flex-direction: column; overflow: hidden;
-    }
-    .dialogue-header {
-      display: flex; align-items: center;
-      padding: 10px 15px;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      background: rgba(0,0,0,0.2);
-    }
-    .color-block { width: 16px; height: 16px; border-radius: 3px; margin-right: 10px; }
-    .speaker-name { font-weight: bold; font-size: 0.95em; }
-
-    .dialogue-content {
-      padding: 15px; font-size: 1em; line-height: 1.6;
-      display: flex; align-items: flex-start; gap: 10px;
-      flex: 1; position: relative;
-    }
-    .dialogue-emoji { font-size: 1.2em; }
-    .dialogue-text { flex: 1; }
-
-
-    /* === 共用 Modal 樣式 === */
-    .modal-overlay {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.85);
-      display: none; align-items: center; justify-content: center;
-      z-index: 100;
-    }
-    .modal-overlay.show { display: flex; }
-    .modal-title { text-align: center; color: #f5a623; margin-bottom: 15px; font-size: 1.1em; }
-    .modal-actions { display: flex; gap: 10px; margin-top: 15px; }
-    .modal-btn {
-      flex: 1; padding: 10px; border-radius: 8px;
-      border: 1px solid rgba(255,255,255,0.1);
-      background: rgba(255,255,255,0.05); color: #aaa;
-      cursor: pointer; font-size: 0.9em; font-family: inherit;
-    }
-    .modal-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
-    .modal-btn.primary { background: linear-gradient(90deg, #4ecdc4, #44a08d); border: none; color: #fff; }
-
-
-
-
-    /* === Toast === */
-    .effect-toast {
-      position: fixed; top: 20px; left: 50%;
-      transform: translateX(-50%) translateY(-100px);
-      background: rgba(126, 211, 33, 0.95);
-      color: #fff; padding: 10px 20px;
-      border-radius: 25px; font-weight: bold; font-size: 0.9em;
-      opacity: 0; transition: all 0.4s; z-index: 200;
-      pointer-events: none;
-    }
-    .effect-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-  </style>
-</head>
-<body>
-
-  <!-- ====== 左側面板 ====== -->
-  <div class="left-panel">
-    <div class="date-section">
-      <div class="date-year" id="date-year">元年</div>
-      <div class="date-month" id="date-month">一月 上旬</div>
-      <div class="date-day" id="date-day">第一天</div>
-    </div>
-    <div class="avatar-section">
-      <div class="avatar-box" id="avatar-box">🔨</div>
-      <div class="avatar-name" id="avatar-name">小哈</div>
-    </div>
-    <div class="stats-section">
-      <div class="stat-row"><span class="stat-label">力量</span><span class="stat-value" id="str-val">0</span></div>
-      <div class="stat-row"><span class="stat-label">智力</span><span class="stat-value" id="int-val">0</span></div>
-      <div class="stat-row"><span class="stat-label">敏捷</span><span class="stat-value" id="dex-val">0</span></div>
-      <div class="stat-row"><span class="stat-label">幸運</span><span class="stat-value" id="luck-val">0</span></div>
-      <div class="stat-row"><span class="stat-label">💰 金錢</span><span class="stat-value" id="money-val">0</span></div>
-    </div>
-    <div class="bar-section">
-      <div class="bar-item">
-        <div class="bar-header"><span class="bar-label">心情</span></div>
-        <div class="bar-icons"><span>🌋</span><span>🌸</span></div>
-        <div class="bar-track"><div class="bar-fill" id="mood-bar" style="width: 50%"></div></div>
-      </div>
-      <div class="bar-item">
-        <div class="bar-header"><span class="bar-label">壓力</span></div>
-        <div class="bar-icons"><span>☀️</span><span>🌪️</span></div>
-        <div class="bar-track"><div class="bar-fill" id="stress-bar" style="width: 25%"></div></div>
-      </div>
-    </div>
-    <div class="equip-section">
-      <div class="equip-label">裝備</div>
-      <div class="equip-slot">
-        <span class="equip-icon">🩲</span>
-        <span class="equip-name">師父的內褲</span>
-        <span class="equip-effect">心情+10</span>
-      </div>
-    </div>
-    <div class="save-section">
-      <button class="save-btn" onclick="GameSystem.save()">💾 儲存</button>
-      <button class="save-btn" onclick="GameSystem.load()">📂 讀取</button>
-    </div>
-  </div>
-
-  <!-- ====== 右側主區 ====== -->
-  <div class="right-main">
-    <!-- 操作區 -->
-    <div class="operation-area">
-      <div class="room-header" id="room-header">
-        <!-- 由 ForgeScene.renderHeader() 填入 -->
-      </div>
-      <div id="room-content">
-        <!-- 由 ForgeScene.renderContent() 填入 -->
-        <div style="color: #444; font-size: 0.9em;">載入中...</div>
-      </div>
-    </div>
-
-    <!-- 對話區 -->
-    <div class="dialogue-area">
-      <div class="dialogue-box">
-        <div class="dialogue-header">
-          <div class="color-block" id="speaker-color" style="background: #B5CAA0"></div>
-          <div class="speaker-name" id="speaker-name" style="color: #B5CAA0"></div>
-          </div>
-          <div class="dialogue-content">
-            <span class="dialogue-text" id="dialogue-text">該起床了!</span>
-        </div>
-        <!-- 設計圖評論區（由 DialogueSystem 填入）-->
-        <div id="design-comments"></div>
-      </div>
-    </div>
-
- 
-
-  <!-- ====== Toast ====== -->
-  <div class="effect-toast" id="toast"></div>
-
-  <!-- ======================================================
-       Script 載入順序（依賴關係由上往下）
-       ====================================================== -->
-
-  <!-- 1. 核心：CSV 資料載入（其他一切的基礎）-->
-  <script src="js/core/csv-loader.js"></script>
-
-  <!-- 2. 系統：角色 / 對話 / 遊戲狀態 -->
-  <script src="js/systems/character.js"></script>
-  <script src="js/systems/dialogue.js"></script>
-  <script src="js/systems/game.js"></script>
-
-  <!-- 3. 核心：各系統計算邏輯 -->
-  <script src="js/core/design.js"></script>
-  <script src="js/core/crafting.js"></script>
-  <script src="js/core/smelt.js"></script>
-  <script src="js/core/decoration.js"></script>
-  <script src="js/core/commission.js"></script>
-
-  <!-- 4. 場景：各 UI 彈窗 -->
-  <script src="js/scenes/forge.js"></script>
-  <script src="js/scenes/design-ui.js"></script>
-  <script src="js/scenes/crafting-ui.js"></script>
-  <script src="js/scenes/smelt-ui.js"></script>
-  <script src="js/scenes/decoration-ui.js"></script>
-  <script src="js/scenes/commission-ui.js"></script>
-  <script src="js/scenes/forge-utils.js"></script>
-
-</body>
-</html>
+document.addEventListener('DOMContentLoaded', initGame);
