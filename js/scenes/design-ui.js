@@ -70,16 +70,30 @@ const DesignUI = {
             .effect-tag.special  { color: #f5a623; background: rgba(245,166,35,0.2); }
             .card-placeholder { padding: 40px 20px; text-align: center; color: #444; font-size: 0.9em; }
 
-            /* === 設計圖評論區塊 === */
+            /* === 卡片內評論區塊 === */
+            .card-comments {
+                padding: 10px 12px;
+                border-top: 1px solid rgba(255,255,255,0.05);
+                background: rgba(0,0,0,0.15);
+            }
+            .comment-line { 
+                display: flex; 
+                gap: 6px; 
+                margin-bottom: 5px; 
+                font-size: 0.8em; 
+                line-height: 1.4; 
+            }
+            .comment-line:last-child { margin-bottom: 0; }
+            .comment-icon { font-size: 1em; }
+            .comment-text { color: #bbb; }
+
+            /* === 設計圖評論區塊（對話框下方，已廢棄）=== */
             #design-comments {
                 display: none;
                 padding: 10px 15px;
                 border-top: 1px solid rgba(255,255,255,0.05);
                 background: rgba(0,0,0,0.15);
             }
-            .comment-line { display: flex; gap: 6px; margin-bottom: 5px; font-size: 0.8em; line-height: 1.4; }
-            .comment-line:last-child { margin-bottom: 0; }
-            .comment-text { color: #bbb; }
         `;
         document.head.appendChild(style);
     },
@@ -192,6 +206,24 @@ const DesignUI = {
         console.log('📝 評論數量:', design.comments ? design.comments.length : 'undefined');
         console.log('📝 評論內容:', design.comments);
         
+        // 渲染評論 HTML
+        let commentsHtml = '';
+        if (design.comments && design.comments.length > 0) {
+            console.log(`✅ 有 ${design.comments.length} 條評論，開始渲染`);
+            commentsHtml = design.comments.map((c, index) => {
+                console.log(`  評論 ${index + 1}:`, c);
+                const char = CharacterSystem.getCharacter(c.chara_id);
+                console.log(`    角色資料:`, char);
+                const icon = char ? char.icon : '❓';
+                const color = char ? char.color : '#888';
+                return `
+                    <div class="comment-line">
+                        <span class="comment-icon" style="color: ${color}">${icon}</span>
+                        <span class="comment-text">「${c.comment}」</span>
+                    </div>`;
+            }).join('');
+        }
+        
         const card = document.getElementById('designCard');
         card.className = `card grade-${design.grade}`;
         card.innerHTML = `
@@ -209,12 +241,13 @@ const DesignUI = {
                 <div class="effect-title">📝 讓我看看！</div>
                 <div class="effect-row">${design.effects.length > 0 ? design.effects.join('') : '&nbsp;'}</div>
             </div>
+            ${design.comments && design.comments.length > 0 ? `
+            <div class="card-comments">
+                ${commentsHtml}
+            </div>` : ''}
         `;
         
-        console.log('🗣️ 準備呼叫 DialogueSystem.showDesignComments');
-        console.log('🗣️ 傳入評論:', design.comments);
-        DialogueSystem.showDesignComments(design.comments);
-        console.log('✅ showDesignComments 呼叫完成');
+        console.log('✅ 卡片渲染完成（含評論）');
         console.log('═══════════════════════════════════');
     }
 };
