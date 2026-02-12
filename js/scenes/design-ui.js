@@ -40,6 +40,7 @@ const DesignUI = {
                 background: rgba(0,0,0,0.3); border-radius: 12px;
                 overflow: hidden; border: 2px solid #333;
                 width: 100%; /* 撐滿容器 */
+                min-height: 280px;  /* 最小高度，確保大小一致 */
             }
             .card.grade-爛 { border-color: #555; }
             .card.grade-普 { border-color: #4ecdc4; }
