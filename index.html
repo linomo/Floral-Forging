@@ -302,6 +302,8 @@
     function continueGame() {
       const savedGame = localStorage.getItem('floralForger_save');
       if (savedGame) {
+        // 設置進入遊戲標記
+        localStorage.setItem('floralForger_enterGame', 'true');
         window.location.href = 'game.html';
       } else {
         alert('尚未有存檔，請開始新遊戲！');
@@ -329,6 +331,9 @@
       };
       
       localStorage.setItem('floralForger_newGame', JSON.stringify(newGame));
+      
+      // 設置進入遊戲標記
+      localStorage.setItem('floralForger_enterGame', 'true');
       
       // 跳轉到主遊戲
       window.location.href = 'game.html';
