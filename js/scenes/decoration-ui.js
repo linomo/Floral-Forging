@@ -1,123 +1,67 @@
 /**
- * DesignUI - 設計圖彈窗
- * js/scenes/design-ui.js
+ * DecorationUI - 裝飾彈窗
+ * js/scenes/decoration-ui.js
  */
-const DesignUI = {
-    currentDesign: null,
+const DecorationUI = {
+    selectedProductIndex: null,
+    selectedCost: null,
 
     _initStyles() {
-        if (document.getElementById('design-system-styles')) return;
+        if (document.getElementById('decoration-system-styles')) return;
         const style = document.createElement('style');
-        style.id = 'design-system-styles';
+        style.id = 'decoration-system-styles';
         style.textContent = `
-            /* === 設計圖包裹容器 === */
-            .design-wrapper {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 15px;
-                max-height: 90vh;
-                overflow-y: auto;
-            }
-            
-            /* === 設計圖 Modal === */
-            .design-modal {
+            .deco-modal {
                 background: linear-gradient(180deg, #252535 0%, #1a1a28 100%);
                 border-radius: 16px; padding: 20px;
-                max-width: 420px; width: 90%;
+                max-width: 400px; width: 90%;
             }
-            .draw-btn {
+            .deco-select {
+                width: 100%; padding: 10px; font-size: 1em;
+                background: #B0D068;
+                border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;
+                color: #fff; margin-bottom: 15px;
+                font-family: inherit; text-align: center;
+            }
+            .deco-select:focus { outline: none; border-color: #f5a623; }
+            .deco-select:disabled { opacity: 0.4; cursor: not-allowed; }
+            .deco-cost-row { display: flex; gap: 8px; margin-bottom: 15px; }
+            .deco-cost-btn {
+                flex: 1; padding: 8px; font-size: 0.9em;
+                background: rgba(255,255,255,0.1);
+                border: 1px solid rgba(255,255,255,0.2); border-radius: 6px;
+                color: #aaa; cursor: pointer; transition: all 0.2s; font-family: inherit;
+            }
+            .deco-cost-btn:hover:not(:disabled) { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.4); }
+            .deco-cost-btn.selected { background: linear-gradient(90deg, #f5a623, #f5576c); border-color: #f5a623; color: #fff; font-weight: bold; }
+            .deco-cost-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+            .deco-action-btn {
                 width: 100%; padding: 12px; font-size: 1em;
                 background: linear-gradient(90deg, #f093fb, #f5576c);
                 border: none; border-radius: 10px;
                 color: #fff; cursor: pointer; font-weight: bold;
-                margin-bottom: 15px; font-family: inherit;
+                margin-bottom: 15px; font-family: inherit; transition: all 0.2s;
             }
-            .draw-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245, 87, 108, 0.3); }
-
-            /* === 設計圖卡片（居中，固定寬度）=== */
-            .card {
-                background: rgba(0,0,0,0.3); border-radius: 12px;
-                overflow: hidden; border: 2px solid #333;
-                width: 380px; /* 固定寬度 */
-                margin: 0 auto; /* 居中 */
+            .deco-action-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245, 87, 108, 0.3); }
+            .deco-action-btn:disabled { background: rgba(255,255,255,0.1); color: #666; cursor: not-allowed; transform: none; }
+            .deco-result {
+                padding: 20px; background: rgba(0,0,0,0.3);
+                border-radius: 12px; text-align: center; min-height: 80px;
             }
-            .card.grade-爛 { border-color: #555; }
-            .card.grade-普 { border-color: #4ecdc4; }
-            .card.grade-好 { border-color: #ffe66d; }
-            .card.grade-奇 { border-color: #ff6b6b; box-shadow: 0 5px 20px rgba(255,107,107,0.3); }
-            .card.grade-奇‽ { border-color: #ff6b6b; animation: glow 1.5s infinite; }
-            @keyframes glow {
-                0%, 100% { box-shadow: 0 5px 20px rgba(255,107,107,0.3); }
-                50%       { box-shadow: 0 5px 30px rgba(255,107,107,0.6); }
+            .deco-result-title   { font-size: 1.2em; color: #f5a623; margin-bottom: 10px; }
+            .deco-result-content { font-size: 1.1em; color: #fff; }
+            .deco-result-price   { font-size: 1em; color: #7ed321; margin-top: 8px; }
+            .deco-result-note    { font-size: 0.85em; color: #aaa; margin-top: 8px; }
+            .deco-result-stats   {
+                display: flex; justify-content: center; flex-wrap: wrap; gap: 6px;
+                margin-top: 10px; min-height: 24px;
             }
-            .card-header { padding: 12px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
-            .card-grade { font-size: 0.8em; margin-bottom: 3px; }
-            .grade-爛  { color: #888; }
-            .grade-普  { color: #4ecdc4; }
-            .grade-好  { color: #ffe66d; }
-            .grade-奇, .grade-奇‽ { color: #ff6b6b; }
-            .card-weapon { font-size: 1.2em; font-weight: bold; color: #fff; }
-            .card-info {
-                padding: 10px 12px; background: rgba(0,0,0,0.2);
-                display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 0.8em;
+            .deco-stat-tag {
+                padding: 2px 8px; border-radius: 8px; font-size: 0.82em; font-weight: bold;
+                background: rgba(255,255,255,0.08);
             }
-            .info-item  { display: flex; justify-content: space-between; }
-            .info-label { color: #666; }
-            .info-value { color: #fff; }
-            .info-value.metal { color: #f5a623; }
-            .info-value.wood  { color: #7ed321; }
-            .info-value.price { color: #f5576c; }
-            .info-value.ep    { color: #4ecdc4; }
-            .card-effects {
-                padding: 8px 12px;
-                border-top: 1px solid rgba(255,255,255,0.05);
-                font-size: 0.75em;
-            }
-            .effect-title { color: #666; margin-bottom: 4px; }
-            .effect-row   { display: flex; flex-wrap: wrap; gap: 6px; min-height: 22px; }
-            .effect-tag   { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 8px; }
-            .effect-tag.positive { color: #7ed321; }
-            .effect-tag.negative { color: #f5576c; }
-            .effect-tag.special  { color: #f5a623; background: rgba(245,166,35,0.2); }
-            .card-placeholder { padding: 40px 20px; text-align: center; color: #444; font-size: 0.9em; }
-
-            /* === 評論容器（獨立區塊，在 wrapper 內）=== */
-            .comments-container {
-                width: 570px; /* 比設計圖 Modal 寬 */
-                max-width: 90%;
-                background: rgba(20, 20, 30, 0.95);
-                border-radius: 12px;
-                border: 1px solid rgba(255,255,255,0.15);
-                padding: 15px 20px;
-                box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            }
-            .comments-list {
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-            }
-            .comment-line { 
-                display: flex; 
-                gap: 10px; 
-                align-items: flex-start;
-                font-size: 0.9em; 
-                line-height: 1.6; 
-            }
-            .comment-icon { 
-                font-size: 1.3em; 
-                flex-shrink: 0;
-                margin-top: 2px;
-            }
-            .comment-text { 
-                flex: 1;
-                word-wrap: break-word;
-            }
-
-            /* === 設計圖評論區塊（對話框下方，已廢棄）=== */
-            #design-comments {
-                display: none;
-            }
+            .deco-stat-tag.positive { color: #7ed321; }
+            .deco-stat-tag.negative { color: #f5576c; }
         `;
         document.head.appendChild(style);
     },
@@ -125,176 +69,182 @@ const DesignUI = {
     open() {
         this._initStyles();
 
-        let modal = document.getElementById('designModal');
+        let modal = document.getElementById('decorationModal');
         if (!modal) {
             modal = document.createElement('div');
-            modal.id = 'designModal';
+            modal.id = 'decorationModal';
             modal.className = 'modal-overlay';
             document.body.appendChild(modal);
         }
 
-        modal.innerHTML = `
-            <div class="design-wrapper">
-                <div class="design-modal">
-                    <div class="modal-title">📜 繪製設計圖</div>
-                    <button class="draw-btn" onclick="drawDesign()">🎴 開始繪製！</button>
-                    
-                    <!-- 設計圖卡片 -->
-                    <div class="card" id="designCard">
-                        <div class="card-placeholder">在腦中構思設計圖...</div>
-                    </div>
-                    
-                    <div class="modal-actions">
-                        <button class="modal-btn primary" onclick="closeDesignModal()">關閉</button>
-                    </div>
-                </div>
-                
-                <!-- 評論框（獨立顯示）-->
-                <div class="comments-container" id="commentsContainer" style="display: none;">
-                    <div class="comments-list" id="commentsList"></div>
-                </div>
-            </div>
-        `;
+        this.selectedProductIndex = null;
+        this.selectedCost = null;
 
-        this.currentDesign = null;
+        const undecoratedProducts = player.products.filter(p => !p.decorated);
+
+        modal.innerHTML = `
+            <div class="deco-modal">
+                <div class="modal-title">🎨 裝飾</div>
+
+                <select class="deco-select" id="decoProductSelect"
+                    ${undecoratedProducts.length === 0 ? 'disabled' : ''}>
+                    <option value="">
+                        ${undecoratedProducts.length === 0 ? '沒有可裝飾的成品' : '選擇成品'}
+                    </option>
+                    ${this._generateProductOptions(undecoratedProducts)}
+                </select>
+
+                <div class="deco-cost-row">
+                    ${[10, 30, 100].map(cost => `
+                        <button class="deco-cost-btn" id="decoCost${cost}"
+                            onclick="DecorationUI.selectCost(${cost})"
+                            ${undecoratedProducts.length === 0 ? 'disabled' : ''}>
+                            ${cost}
+                        </button>`).join('')}
+                </div>
+
+                <button class="deco-action-btn" id="decoBtn" disabled
+                    onclick="DecorationUI.execute()">
+                    🎀 變好看吧！
+                </button>
+
+                <div class="deco-result">
+                    <div class="deco-result-title">☄️ 降落！☄️</div>
+                    <div class="deco-result-content" id="decoResultContent">等待裝飾...</div>
+                    <div class="deco-result-price"   id="decoResultPrice"></div>
+                    <div class="deco-result-note"    id="decoResultNote"></div>
+                    <div class="deco-result-stats"   id="decoResultStats"></div>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="modal-btn primary" onclick="DecorationUI.close()">關閉</button>
+                </div>
+            </div>`;
+
+        document.getElementById('decoProductSelect')
+            .addEventListener('change', e => this._onSelectProduct(e));
+
         modal.classList.add('show');
     },
 
     close() {
-        const modal = document.getElementById('designModal');
+        const modal = document.getElementById('decorationModal');
         if (modal) modal.classList.remove('show');
-        DialogueSystem.hideDesignComments();
     },
 
-    draw() {
-        const epCost = CSVLoader.getModalEpCost('design_modal', '繪製') || 0;
-        const baseMoneyCost = 30;
+    _generateProductOptions(undecoratedProducts) {
+        return undecoratedProducts.map(p => {
+            const realIndex = player.products.indexOf(p);
+            const chNum = ForgeScene.toChineseNumber(p.id);
+            return `<option value="${realIndex}">${chNum} ${p.grade}！${p.physical}${p.mental}${p.weapon}（💰${p.sellPrice}元）</option>`;
+        }).join('');
+    },
 
-        if (player.currentEP < epCost) {
-            showToast('⚡ 元氣不足，無法構思設計圖！');
-            return;
-        }
-        if (player.money < baseMoneyCost) {
-            showToast('💰 錢不夠買紙筆...');
-            return;
-        }
+    _onSelectProduct(e) {
+        const val = e.target.value;
+        this.selectedProductIndex = val !== '' ? parseInt(val) : null;
+        this._updateBtn();
+    },
 
-        const design = DesignGenerator.draw(player);
-        if (!design) {
-            showToast('❌ 你還沒學會任何武器的製作方法！請先去書架閱讀書籍。');
-            DialogueSystem.showDialogue('PC', '欸？我根本不知道要畫什麼劍...還是先去看看書吧。');
-            return;
-        }
+    selectCost(cost) {
+        this.selectedCost = cost;
+        [10, 30, 100].forEach(c => {
+            const btn = document.getElementById(`decoCost${c}`);
+            if (btn) btn.classList.toggle('selected', c === cost);
+        });
+        this._updateBtn();
+    },
 
-        const dirtinessIncrease = Math.ceil(epCost / 2);
-        let extraCleaningFee = 0;
-        if (player.dirtiness >= 99) extraCleaningFee = dirtinessIncrease;
+    _updateBtn() {
+        const btn = document.getElementById('decoBtn');
+        if (!btn) return;
+        const epCost = DecorationCore.calcEP(player.mood);
+        const ready  = this.selectedProductIndex !== null
+                    && this.selectedCost !== null
+                    && player.currentEP >= epCost
+                    && player.money >= this.selectedCost;
+        btn.disabled = !ready;
+    },
 
+    // 格式化數值變動標籤
+    _statTag(label, value) {
+        const sign = value > 0 ? '+' : '';
+        const cls  = value > 0 ? 'positive' : 'negative';
+        return `<span class="deco-stat-tag ${cls}">${label} ${sign}${value}</span>`;
+    },
+
+    execute() {
+        if (this.selectedProductIndex === null || this.selectedCost === null) return;
+
+        const product = player.products[this.selectedProductIndex];
+        if (!product) return;
+
+        const epCost = DecorationCore.calcEP(player.mood);
+        if (player.currentEP < epCost) { showToast('⚡ 元氣不足！'); return; }
+        if (player.money < this.selectedCost) { showToast('💰 錢不夠！'); return; }
+
+        // 消耗資源
         player.currentEP -= epCost;
-        player.money     -= (baseMoneyCost + extraCleaningFee);
-        player.dirtiness  = Math.min(100, player.dirtiness + dirtinessIncrease);
+        player.money     -= this.selectedCost;
+        player.dirtiness  = Math.min(100, player.dirtiness + Math.ceil(epCost / 2));
 
-        const gradeData  = CSVLoader.data.grades.find(g => g.grade === design.grade.replace('‽', ''));
-        const gradeMulti = gradeData ? parseFloat(gradeData.effect_value_.replace('*', '')) : 1;
-        design.blueprintPrice = Math.floor(30 * Math.pow(gradeMulti, 3));
-
-        this._applyMentalEffects(design.mentalPrefixData);
-
-        design.id = player.designs.length + 1;
-        player.designs.push(design);
-        this.currentDesign = design;
-
-        this._renderCard(design);
-        updateStatsDisplay();
-
-        if (extraCleaningFee > 0) {
-            DialogueSystem.showDialogue('PC', '被小師兄收取清潔費了嗚嗚。也是啦陳年汙垢好難處理。');
-        }
-        showToast(`📜 獲得設計圖：${design.grade}！${design.weapon}`);
-        DialogueSystem.showDialogue('PC', `完成了！${design.grade}！${design.physical}${design.mental}${design.weapon}！`);
-    },
-
-    _applyMentalEffects(mentalData) {
-        if (!mentalData) return;
-        for (let i = 1; i <= 3; i++) {
-            const stat  = mentalData[`effect_sta_${i}`];
-            const value = mentalData[`effect_value_${i}`];
-            if (!stat || !value) continue;
-            const num = parseInt(value) || 0;
-            switch (stat) {
-                case 'STRESS':   player.stress   = Math.max(0, Math.min(100, player.stress   + num)); break;
-                case 'MOOD':     player.mood      = Math.max(0, Math.min(100, player.mood     + num)); break;
-                case 'INT':      player.int       = Math.max(0, Math.min(100, player.int      + num)); break;
-                case 'LUCK':     player.luck      = Math.max(0, Math.min(100, player.luck     + num)); break;
-                case 'SF_FAVOR': player.favor.SF  = Math.max(0, Math.min(100, (player.favor.SF  || 0) + num)); break;
-                case 'SS_FAVOR': player.favor.SS  = Math.max(0, Math.min(100, (player.favor.SS  || 0) + num)); break;
-                case 'DS_FAVOR': player.favor.DS  = Math.max(0, Math.min(100, (player.favor.DS  || 0) + num)); break;
+        // 套用花費固定效果
+        const statChanges = [];
+        const costEffect = DecorationCore.getCostEffect(this.selectedCost);
+        if (costEffect) {
+            if (costEffect.stat === 'mood') {
+                player.mood   = Math.max(0, Math.min(100, player.mood   + costEffect.value));
+                statChanges.push(this._statTag('MOOD', costEffect.value));
+            } else if (costEffect.stat === 'stress') {
+                player.stress = Math.max(0, Math.min(100, player.stress + costEffect.value));
+                statChanges.push(this._statTag('STRESS', costEffect.value));
             }
         }
-    },
 
-    _renderCard(design) {
-        console.log('═══════════════════════════════════');
-        console.log('🎨 開始渲染設計圖卡片');
-        console.log('📊 設計圖資料:', design);
-        console.log('📝 評論數量:', design.comments ? design.comments.length : 'undefined');
-        console.log('📝 評論內容:', design.comments);
-        
-        // 渲染設計圖卡片（不含評論）
-        const card = document.getElementById('designCard');
-        card.className = `card grade-${design.grade}`;
-        card.innerHTML = `
-            <div class="card-header">
-                <div class="card-grade grade-${design.grade}">${design.grade}！${design.physical}${design.mental}</div>
-                <div class="card-weapon">${design.weapon}</div>
-            </div>
-            <div class="card-info">
-                <div class="info-item"><span class="info-label">⚙️ 金</span><span class="info-value metal">${design.metalNeed}</span></div>
-                <div class="info-item"><span class="info-label">🥖 木</span><span class="info-value wood">${design.woodNeed}</span></div>
-                <div class="info-item"><span class="info-label">💰 圖紙</span><span class="info-value price">${design.blueprintPrice}</span></div>
-                <div class="info-item"><span class="info-label">⚡ EP</span><span class="info-value ep">${design.ep}</span></div>
-            </div>
-            <div class="card-effects">
-                <div class="effect-title">📝 讓我看看！</div>
-                <div class="effect-row">${design.effects.length > 0 ? design.effects.join('') : '&nbsp;'}</div>
-            </div>
-        `;
-        
-        // 渲染評論到獨立容器
-        const commentsContainer = document.getElementById('commentsContainer');
-        const commentsList = document.getElementById('commentsList');
-        
-        if (design.comments && design.comments.length > 0) {
-            console.log(`✅ 有 ${design.comments.length} 條評論，渲染到獨立容器`);
-            
-            const commentsHtml = design.comments.map((c, index) => {
-                console.log(`  評論 ${index + 1}:`, c);
-                const char = CharacterSystem.getCharacter(c.chara_id);
-                console.log(`    角色資料:`, char);
-                const icon = char ? char.icon : '❓';
-                const color = char ? char.color : '#888';
-                return `
-                    <div class="comment-line">
-                        <span class="comment-icon" style="color: ${color}">${icon}</span>
-                        <span class="comment-text" style="color: ${color}">「${c.comment}」</span>
-                    </div>`;
-            }).join('');
-            
-            commentsList.innerHTML = commentsHtml;
-            commentsContainer.style.display = 'block';
-            console.log('✅ 評論渲染到獨立容器');
+        // 計算裝飾結果
+        const randomNum  = DecorationCore.rollRandom(player.int);
+        const multiplier = DecorationCore.getMultiplier(randomNum, this.selectedCost);
+        const newPrice   = Math.round(product.sellPrice * multiplier);
+
+        // 套用結果效果
+        let prefix, note;
+        if (multiplier > 1) {
+            prefix = '🎀'; note = '變好看了！跟我一樣！';
+            player.mood   = Math.max(0, Math.min(100, player.mood + 10));
+            statChanges.push(this._statTag('MOOD', +10));
+        } else if (multiplier < 1) {
+            prefix = '💥'; note = '大爆走了啊啊啊！';
+            player.stress = Math.max(0, Math.min(100, player.stress + 10));
+            statChanges.push(this._statTag('STRESS', +10));
         } else {
-            commentsContainer.style.display = 'none';
-            console.log('⚠️ 無評論，隱藏容器');
+            prefix = '〰️'; note = '沒有反應只是一個成品。';
         }
-        
-        console.log('✅ 卡片渲染完成');
-        console.log('═══════════════════════════════════');
+
+        // 套用並鎖定
+        product.sellPrice = newPrice;
+        product.decorated = true;
+        product.decorationPrefix = prefix;
+
+        // 顯示結果
+        const chNum = ForgeScene.toChineseNumber(product.id);
+        document.getElementById('decoResultContent').textContent =
+            `${prefix} ${chNum} ${product.grade}！${product.physical}${product.mental}${product.weapon}`;
+        document.getElementById('decoResultPrice').textContent = `💰 售價 ${newPrice}元`;
+        document.getElementById('decoResultNote').textContent  = note;
+        document.getElementById('decoResultStats').innerHTML   = statChanges.join('');
+
+        // 鎖住操作區
+        document.getElementById('decoBtn').disabled = true;
+        document.getElementById('decoProductSelect').disabled = true;
+        [10, 30, 100].forEach(c => {
+            const btn = document.getElementById(`decoCost${c}`);
+            if (btn) btn.disabled = true;
+        });
+
+        updateStatsDisplay();
+        showToast(`🎨 裝飾完成！${prefix}`);
+        DialogueSystem.showDialogue('PC', note);
     }
 };
 
-window.DesignUI = DesignUI;
-
-// HTML onclick 相容
-function drawDesign()       { DesignUI.draw();  }
-function closeDesignModal() { DesignUI.close(); }
+window.DecorationUI = DecorationUI;
