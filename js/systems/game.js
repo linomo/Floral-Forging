@@ -88,17 +88,27 @@ function updateSceneValues() {
 async function initGame() {
     console.log('🎮 初始化遊戲...');
 
-    // 沒有新遊戲資料也沒有存檔，導回開始畫面
-    const hasNewGame = localStorage.getItem('floralForger_newGame');
-    const hasSave    = localStorage.getItem('floralForger_save');
-    if (!hasNewGame && !hasSave) {
+    // 檢查是否有「進入遊戲」標記
+    const enterGame = localStorage.getItem('floralForger_enterGame');
+    
+    console.log('📋 狀態檢查:');
+    console.log('  - floralForger_enterGame:', enterGame ? '✓' : '✗');
+    
+    // 如果沒有進入遊戲標記，導回開始畫面
+    if (!enterGame) {
+        console.log('📝 無進入標記，立即導向開始畫面...');
         window.location.href = 'start.html';
         return;
     }
+    
+    // 清除進入標記（下次開啟會回到 start.html）
+    localStorage.removeItem('floralForger_enterGame');
+    console.log('✅ 清除進入標記');
 
     const loaded = await CSVLoader.loadAll();
     if (!loaded) { alert('資料載入失敗，請重新整理頁面！'); return; }
 
+    // 檢查是新遊戲還是讀取存檔
     const newGameData = localStorage.getItem('floralForger_newGame');
     if (newGameData) {
         console.log('🆕 開始新遊戲');
