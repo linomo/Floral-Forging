@@ -21,7 +21,7 @@ const DialogueSystem = {
     },
 
     // 顯示設計圖評論（對話框下方 #design-comments）
-    // comments = grade_comments.csv 資料列陣列 [{grade, icon, comment}, ...]
+    // comments = grade_comments.csv 資料列陣列 [{grade, chara_id, comment}, ...]
     showDesignComments(comments) {
         const box = document.getElementById('design-comments');
         if (!box) return;
@@ -31,11 +31,18 @@ const DialogueSystem = {
             return;
         }
 
-        box.innerHTML = comments.map(c => `
-            <div class="comment-line">
-                <span class="comment-icon">${c.icon}</span>
-                <span class="comment-text">「${c.comment}」</span>
-            </div>`).join('');
+        box.innerHTML = comments.map(c => {
+            // 透過 chara_id 取得角色資料
+            const char = CharacterSystem.getCharacter(c.chara_id);
+            const icon = char ? char.icon : '❓';
+            const color = char ? char.color : '#888';
+            
+            return `
+                <div class="comment-line">
+                    <span class="comment-icon" style="color: ${color}">${icon}</span>
+                    <span class="comment-text">「${c.comment}」</span>
+                </div>`;
+        }).join('');
 
         box.style.display = 'block';
     },
