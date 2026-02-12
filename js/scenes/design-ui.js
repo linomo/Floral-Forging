@@ -275,7 +275,7 @@ const DesignUI = {
                 return `
                     <div class="comment-line">
                         <span class="comment-icon" style="color: ${color}">${icon}</span>
-                        <span class="comment-text" style="color: ${color}">「${c.comment}」</span>
+                        <span class="comment-text" style="color: ${color}">${c.comment}</span>
                     </div>`;
             }).join('');
             
