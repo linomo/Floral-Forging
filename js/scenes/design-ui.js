@@ -241,7 +241,7 @@ const DesignUI = {
                 <div class="info-item"><span class="info-label">⚙️ 金</span><span class="info-value metal">${design.metalNeed}</span></div>
                 <div class="info-item"><span class="info-label">🥖 木</span><span class="info-value wood">${design.woodNeed}</span></div>
                 <div class="info-item"><span class="info-label">💰 圖紙</span><span class="info-value price">${design.blueprintPrice}</span></div>
-                <div class="info-item"><span class="info-label">⚡ EP</span><span class="info-value ep">${design.ep}</span></div>
+                <div class="info-item"><span class="info-label">⚡ 元氣</span><span class="info-value ep">${design.ep}</span></div>
             </div>
             <div class="card-effects">
                 <div class="effect-title">📝 讓我看看！</div>
