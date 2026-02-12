@@ -1,259 +1,293 @@
-/**
- * DesignUI - 設計圖彈窗
- * js/scenes/design-ui.js
- */
-const DesignUI = {
-    currentDesign: null,
-
-    _initStyles() {
-        if (document.getElementById('design-system-styles')) return;
-        const style = document.createElement('style');
-        style.id = 'design-system-styles';
-        style.textContent = `
-            /* === 設計圖 Modal === */
-            .design-modal {
-                background: linear-gradient(180deg, #252535 0%, #1a1a28 100%);
-                border-radius: 16px; padding: 20px;
-                max-width: 380px; width: 90%;
-            }
-            .draw-btn {
-                width: 100%; padding: 12px; font-size: 1em;
-                background: linear-gradient(90deg, #f093fb, #f5576c);
-                border: none; border-radius: 10px;
-                color: #fff; cursor: pointer; font-weight: bold;
-                margin-bottom: 15px; font-family: inherit;
-            }
-            .draw-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245, 87, 108, 0.3); }
-
-            /* === 設計圖卡片 === */
-            .card {
-                background: rgba(0,0,0,0.3); border-radius: 12px;
-                overflow: hidden; border: 2px solid #333;
-            }
-            .card.grade-爛 { border-color: #555; }
-            .card.grade-普 { border-color: #4ecdc4; }
-            .card.grade-好 { border-color: #ffe66d; }
-            .card.grade-奇 { border-color: #ff6b6b; box-shadow: 0 5px 20px rgba(255,107,107,0.3); }
-            .card.grade-奇‽ { border-color: #ff6b6b; animation: glow 1.5s infinite; }
-            @keyframes glow {
-                0%, 100% { box-shadow: 0 5px 20px rgba(255,107,107,0.3); }
-                50%       { box-shadow: 0 5px 30px rgba(255,107,107,0.6); }
-            }
-            .card-header { padding: 12px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
-            .card-grade { font-size: 0.8em; margin-bottom: 3px; }
-            .grade-爛  { color: #888; }
-            .grade-普  { color: #4ecdc4; }
-            .grade-好  { color: #ffe66d; }
-            .grade-奇, .grade-奇‽ { color: #ff6b6b; }
-            .card-weapon { font-size: 1.2em; font-weight: bold; color: #fff; }
-            .card-info {
-                padding: 10px 12px; background: rgba(0,0,0,0.2);
-                display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 0.8em;
-            }
-            .info-item  { display: flex; justify-content: space-between; }
-            .info-label { color: #666; }
-            .info-value { color: #fff; }
-            .info-value.metal { color: #f5a623; }
-            .info-value.wood  { color: #7ed321; }
-            .info-value.price { color: #f5576c; }
-            .info-value.ep    { color: #4ecdc4; }
-            .card-effects {
-                padding: 8px 12px;
-                border-top: 1px solid rgba(255,255,255,0.05);
-                font-size: 0.75em;
-            }
-            .effect-title { color: #666; margin-bottom: 4px; }
-            .effect-row   { display: flex; flex-wrap: wrap; gap: 6px; min-height: 22px; }
-            .effect-tag   { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 8px; }
-            .effect-tag.positive { color: #7ed321; }
-            .effect-tag.negative { color: #f5576c; }
-            .effect-tag.special  { color: #f5a623; background: rgba(245,166,35,0.2); }
-            .card-placeholder { padding: 40px 20px; text-align: center; color: #444; font-size: 0.9em; }
-
-            /* === 卡片內評論區塊 === */
-            .card-comments {
-                padding: 10px 12px;
-                border-top: 1px solid rgba(255,255,255,0.05);
-                background: rgba(0,0,0,0.15);
-            }
-            .comment-line { 
-                display: flex; 
-                gap: 6px; 
-                margin-bottom: 5px; 
-                font-size: 0.8em; 
-                line-height: 1.4; 
-            }
-            .comment-line:last-child { margin-bottom: 0; }
-            .comment-icon { font-size: 1em; }
-            .comment-text { /* 顏色由角色決定 */ }
-
-            /* === 設計圖評論區塊（對話框下方，已廢棄）=== */
-            #design-comments {
-                display: none;
-                padding: 10px 15px;
-                border-top: 1px solid rgba(255,255,255,0.05);
-                background: rgba(0,0,0,0.15);
-            }
-        `;
-        document.head.appendChild(style);
-    },
-
-    open() {
-        this._initStyles();
-
-        let modal = document.getElementById('designModal');
-        if (!modal) {
-            modal = document.createElement('div');
-            modal.id = 'designModal';
-            modal.className = 'modal-overlay';
-            document.body.appendChild(modal);
-        }
-
-        modal.innerHTML = `
-            <div class="design-modal">
-                <div class="modal-title">📜 繪製設計圖</div>
-                <button class="draw-btn" onclick="drawDesign()">🎴 開始繪製！</button>
-                <div class="card" id="designCard">
-                    <div class="card-placeholder">在腦中構思設計圖...</div>
-                </div>
-                <div class="modal-actions">
-                    <button class="modal-btn primary" onclick="closeDesignModal()">關閉</button>
-                </div>
-            </div>`;
-
-        this.currentDesign = null;
-        DialogueSystem.hideDesignComments();
-        modal.classList.add('show');
-    },
-
-    close() {
-        const modal = document.getElementById('designModal');
-        if (modal) modal.classList.remove('show');
-        DialogueSystem.hideDesignComments();
-    },
-
-    draw() {
-        const epCost = CSVLoader.getModalEpCost('design_modal', '繪製') || 0;
-        const baseMoneyCost = 30;
-
-        if (player.currentEP < epCost) {
-            showToast('⚡ 元氣不足，無法構思設計圖！');
-            return;
-        }
-        if (player.money < baseMoneyCost) {
-            showToast('💰 錢不夠買紙筆...');
-            return;
-        }
-
-        const design = DesignGenerator.draw(player);
-        if (!design) {
-            showToast('❌ 你還沒學會任何武器的製作方法！請先去書架閱讀書籍。');
-            DialogueSystem.showDialogue('PC', '欸？我根本不知道要畫什麼劍...還是先去看看書吧。');
-            return;
-        }
-
-        const dirtinessIncrease = Math.ceil(epCost / 2);
-        let extraCleaningFee = 0;
-        if (player.dirtiness >= 99) extraCleaningFee = dirtinessIncrease;
-
-        player.currentEP -= epCost;
-        player.money     -= (baseMoneyCost + extraCleaningFee);
-        player.dirtiness  = Math.min(100, player.dirtiness + dirtinessIncrease);
-
-        const gradeData  = CSVLoader.data.grades.find(g => g.grade === design.grade.replace('‽', ''));
-        const gradeMulti = gradeData ? parseFloat(gradeData.effect_value_.replace('*', '')) : 1;
-        design.blueprintPrice = Math.floor(30 * Math.pow(gradeMulti, 3));
-
-        this._applyMentalEffects(design.mentalPrefixData);
-
-        design.id = player.designs.length + 1;
-        player.designs.push(design);
-        this.currentDesign = design;
-
-        this._renderCard(design);
-        updateStatsDisplay();
-
-        if (extraCleaningFee > 0) {
-            DialogueSystem.showDialogue('PC', '被小師兄收取清潔費了嗚嗚。也是啦陳年汙垢好難處理。');
-        }
-        showToast(`📜 獲得設計圖：${design.grade}！${design.weapon}`);
-        DialogueSystem.showDialogue('PC', `完成了！${design.grade}！${design.physical}${design.mental}${design.weapon}！`);
-    },
-
-    _applyMentalEffects(mentalData) {
-        if (!mentalData) return;
-        for (let i = 1; i <= 3; i++) {
-            const stat  = mentalData[`effect_sta_${i}`];
-            const value = mentalData[`effect_value_${i}`];
-            if (!stat || !value) continue;
-            const num = parseInt(value) || 0;
-            switch (stat) {
-                case 'STRESS':   player.stress   = Math.max(0, Math.min(100, player.stress   + num)); break;
-                case 'MOOD':     player.mood      = Math.max(0, Math.min(100, player.mood     + num)); break;
-                case 'INT':      player.int       = Math.max(0, Math.min(100, player.int      + num)); break;
-                case 'LUCK':     player.luck      = Math.max(0, Math.min(100, player.luck     + num)); break;
-                case 'SF_FAVOR': player.favor.SF  = Math.max(0, Math.min(100, (player.favor.SF  || 0) + num)); break;
-                case 'SS_FAVOR': player.favor.SS  = Math.max(0, Math.min(100, (player.favor.SS  || 0) + num)); break;
-                case 'DS_FAVOR': player.favor.DS  = Math.max(0, Math.min(100, (player.favor.DS  || 0) + num)); break;
-            }
-        }
-    },
-
-    _renderCard(design) {
-        console.log('═══════════════════════════════════');
-        console.log('🎨 開始渲染設計圖卡片');
-        console.log('📊 設計圖資料:', design);
-        console.log('📝 評論數量:', design.comments ? design.comments.length : 'undefined');
-        console.log('📝 評論內容:', design.comments);
-        
-        // 渲染評論 HTML
-        let commentsHtml = '';
-        if (design.comments && design.comments.length > 0) {
-            console.log(`✅ 有 ${design.comments.length} 條評論，開始渲染`);
-            commentsHtml = design.comments.map((c, index) => {
-                console.log(`  評論 ${index + 1}:`, c);
-                const char = CharacterSystem.getCharacter(c.chara_id);
-                console.log(`    角色資料:`, char);
-                const icon = char ? char.icon : '❓';
-                const color = char ? char.color : '#888';
-                return `
-                    <div class="comment-line">
-                        <span class="comment-icon" style="color: ${color}">${icon}</span>
-                        <span class="comment-text" style="color: ${color}">「${c.comment}」</span>
-                    </div>`;
-            }).join('');
-        }
-        
-        const card = document.getElementById('designCard');
-        card.className = `card grade-${design.grade}`;
-        card.innerHTML = `
-            <div class="card-header">
-                <div class="card-grade grade-${design.grade}">${design.grade}！${design.physical}${design.mental}</div>
-                <div class="card-weapon">${design.weapon}</div>
-            </div>
-            <div class="card-info">
-                <div class="info-item"><span class="info-label">⚙️ 金</span><span class="info-value metal">${design.metalNeed}</span></div>
-                <div class="info-item"><span class="info-label">🥖 木</span><span class="info-value wood">${design.woodNeed}</span></div>
-                <div class="info-item"><span class="info-label">💰 圖紙</span><span class="info-value price">${design.blueprintPrice}</span></div>
-                <div class="info-item"><span class="info-label">⚡ EP</span><span class="info-value ep">${design.ep}</span></div>
-            </div>
-            <div class="card-effects">
-                <div class="effect-title">📝 讓我看看！</div>
-                <div class="effect-row">${design.effects.length > 0 ? design.effects.join('') : '&nbsp;'}</div>
-            </div>
-            ${design.comments && design.comments.length > 0 ? `
-            <div class="card-comments">
-                ${commentsHtml}
-            </div>` : ''}
-        `;
-        
-        console.log('✅ 卡片渲染完成（含評論）');
-        console.log('═══════════════════════════════════');
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FLORAL FORGER</title>
+  <!-- v20260212-05 -->
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Microsoft JhengHei", "PingFang TC", sans-serif;
+      background: #0d0d14;
+      min-height: 100vh;
+      color: #eee;
+      display: flex;
     }
-};
 
-window.DesignUI = DesignUI;
+    /* === 左側面板 === */
+    .left-panel {
+      width: 180px;
+      background: linear-gradient(180deg, #1a1a28 0%, #12121a 100%);
+      border-right: 1px solid rgba(255,255,255,0.1);
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .date-section { text-align: center; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .date-year { font-size: 1.1em; color: #f5a623; font-weight: bold; }
+    .date-month { font-size: 0.95em; color: #ccc; margin: 3px 0; }
+    .date-day { font-size: 0.85em; color: #888; }
 
-// HTML onclick 相容
-function drawDesign()       { DesignUI.draw();  }
-function closeDesignModal() { DesignUI.close(); }
+    .avatar-section { text-align: center; }
+    .avatar-box {
+      width: 80px; height: 80px;
+      background: linear-gradient(135deg, #2a2a3d, #1a1a28);
+      border: 2px solid #4a90d9; border-radius: 12px;
+      margin: 0 auto 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.5em;
+    }
+    .avatar-name { font-weight: bold; color: #4a90d9; }
+
+    .stats-section { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px; }
+    .stat-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.85em; }
+    .stat-row:last-child { margin-bottom: 0; }
+    .stat-label { color: #888; }
+    .stat-value { color: #fff; font-weight: bold; }
+
+    .bar-section { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px; }
+    .bar-item { margin-bottom: 10px; }
+    .bar-item:last-child { margin-bottom: 0; }
+    .bar-header { display: flex; justify-content: space-between; font-size: 0.8em; margin-bottom: 5px; }
+    .bar-label { color: #888; }
+    .bar-icons { display: flex; justify-content: space-between; font-size: 0.9em; }
+    .bar-track { height: 8px; background: rgba(0,0,0,0.3); border-radius: 4px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s; background: linear-gradient(90deg, #7ed321, #f5a623, #f5576c); }
+
+    .equip-section { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px; }
+    .equip-label { font-size: 0.8em; color: #888; margin-bottom: 6px; }
+    .equip-slot {
+      background: rgba(255,255,255,0.05); border: 1px dashed rgba(255,255,255,0.2);
+      border-radius: 6px; padding: 10px; cursor: pointer; text-align: center;
+    }
+    .equip-slot:hover { background: rgba(255,255,255,0.1); }
+    .equip-slot .equip-icon { font-size: 1.5em; display: block; margin-bottom: 4px; }
+    .equip-slot .equip-name { font-size: 0.8em; color: #ccc; display: block; }
+    .equip-slot .equip-effect { font-size: 0.75em; color: #7ed321; margin-top: 3px; display: block; }
+
+    .save-section { display: flex; gap: 8px; margin-top: auto; }
+    .save-btn {
+      flex: 1; padding: 8px;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px; color: #666; cursor: pointer; font-size: 0.8em;
+    }
+    .save-btn:hover { background: rgba(255,255,255,0.1); color: #aaa; }
+
+    /* === 右側主區 === */
+    .right-main { flex: 1; display: flex; flex-direction: column; }
+
+    .operation-area {
+      flex: 6;
+      background: linear-gradient(180deg, #1a1a28 0%, #151520 100%);
+      padding: 20px;
+      display: flex; flex-direction: column; align-items: center;
+      position: relative;
+    }
+    .room-header {
+      width: 100%; display: flex; align-items: center;
+      padding-bottom: 12px; margin-bottom: 15px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      font-size: 0.9em;
+    }
+    #room-content {
+      display: flex; align-items: center; justify-content: center;
+      flex: 1; width: 100%;
+    }
+    .room-grid {
+      display: grid;
+      gap: 10px;
+    }
+    .room-item {
+      width: 80px; height: 60px;
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .room-item:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
+    .room-item .icon { font-size: 1.8em; }
+    .room-item .label { font-size: 0.75em; color: #666; margin-top: 4px; }
+    .room-item.empty { background: transparent; border-color: transparent; cursor: default; }
+    .room-item.empty:hover { transform: none; background: transparent; }
+
+    .dialogue-area {
+      flex: 4;
+      width: 100%; /* 確保撐滿右側 */
+      background: linear-gradient(180deg, #151520 0%, #101018 100%);
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding: 15px 20px;
+      display: flex; flex-direction: column;
+    }
+    .dialogue-box {
+      background: rgba(30, 30, 45, 0.95); border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+      width: 100%; /* 確保撐滿 */
+      flex: 1; display: flex; flex-direction: column; overflow: hidden;
+    }
+    .dialogue-header {
+      display: flex; align-items: center;
+      padding: 12px 20px; /* 加大內距 */
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      background: rgba(0,0,0,0.2);
+    }
+    .color-block { width: 16px; height: 16px; border-radius: 3px; margin-right: 10px; }
+    .speaker-name { font-weight: bold; font-size: 1em; /* 稍微加大 */ }
+
+    .dialogue-content {
+      padding: 20px 25px; /* 加大內距 */
+      font-size: 1.05em; /* 稍微加大字體 */
+      line-height: 1.7;
+      display: flex; align-items: flex-start; gap: 12px;
+      flex: 1; position: relative;
+    }
+    .dialogue-emoji { font-size: 1.8em; flex-shrink: 0; /* 加大圖示 */ }
+    .dialogue-text { flex: 1; }
+
+
+    /* === 共用 Modal 樣式 === */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.85);
+      display: none; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal-title { text-align: center; color: #f5a623; margin-bottom: 15px; font-size: 1.1em; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 15px; }
+    .modal-btn {
+      flex: 1; padding: 10px; border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.05); color: #aaa;
+      cursor: pointer; font-size: 0.9em; font-family: inherit;
+    }
+    .modal-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .modal-btn.primary { background: linear-gradient(90deg, #4ecdc4, #44a08d); border: none; color: #fff; }
+
+
+
+
+    /* === Toast === */
+    .effect-toast {
+      position: fixed; top: 20px; left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: rgba(126, 211, 33, 0.95);
+      color: #fff; padding: 10px 20px;
+      border-radius: 25px; font-weight: bold; font-size: 0.9em;
+      opacity: 0; transition: all 0.4s; z-index: 200;
+      pointer-events: none;
+    }
+    .effect-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  </style>
+</head>
+<body>
+
+  <!-- ====== 左側面板 ====== -->
+  <div class="left-panel">
+    <div class="date-section">
+      <div class="date-year" id="date-year">元年</div>
+      <div class="date-month" id="date-month">一月 上旬</div>
+      <div class="date-day" id="date-day">第一天</div>
+    </div>
+    <div class="avatar-section">
+      <div class="avatar-box" id="avatar-box">🔨</div>
+      <div class="avatar-name" id="avatar-name">小哈</div>
+    </div>
+    <div class="stats-section">
+      <div class="stat-row"><span class="stat-label">力量</span><span class="stat-value" id="str-val">0</span></div>
+      <div class="stat-row"><span class="stat-label">智力</span><span class="stat-value" id="int-val">0</span></div>
+      <div class="stat-row"><span class="stat-label">敏捷</span><span class="stat-value" id="dex-val">0</span></div>
+      <div class="stat-row"><span class="stat-label">幸運</span><span class="stat-value" id="luck-val">0</span></div>
+      <div class="stat-row"><span class="stat-label">💰 金錢</span><span class="stat-value" id="money-val">0</span></div>
+    </div>
+    <div class="bar-section">
+      <div class="bar-item">
+        <div class="bar-header"><span class="bar-label">心情</span></div>
+        <div class="bar-icons"><span>🌋</span><span>🌸</span></div>
+        <div class="bar-track"><div class="bar-fill" id="mood-bar" style="width: 50%"></div></div>
+      </div>
+      <div class="bar-item">
+        <div class="bar-header"><span class="bar-label">壓力</span></div>
+        <div class="bar-icons"><span>☀️</span><span>🌪️</span></div>
+        <div class="bar-track"><div class="bar-fill" id="stress-bar" style="width: 25%"></div></div>
+      </div>
+    </div>
+    <div class="equip-section">
+      <div class="equip-label">裝備</div>
+      <div class="equip-slot">
+        <span class="equip-icon">🩲</span>
+        <span class="equip-name">師父的內褲</span>
+        <span class="equip-effect">心情+10</span>
+      </div>
+    </div>
+    <div class="save-section">
+      <button class="save-btn" onclick="GameSystem.save()">💾 儲存</button>
+      <button class="save-btn" onclick="GameSystem.load()">📂 讀取</button>
+    </div>
+  </div>
+
+  <!-- ====== 右側主區 ====== -->
+  <div class="right-main">
+    <!-- 操作區 -->
+    <div class="operation-area">
+      <div class="room-header" id="room-header">
+        <!-- 由 ForgeScene.renderHeader() 填入 -->
+      </div>
+      <div id="room-content">
+        <!-- 由 ForgeScene.renderContent() 填入 -->
+        <div style="color: #444; font-size: 0.9em;">載入中...</div>
+      </div>
+    </div>
+
+    <!-- 對話區 -->
+    <div class="dialogue-area">
+      <div class="dialogue-box">
+        <div class="dialogue-header">
+          <div class="color-block" id="speaker-color"></div>
+          <div class="speaker-name" id="speaker-name"></div>
+        </div>
+        <div class="dialogue-content">
+          <span class="dialogue-emoji" id="dialogue-emoji">🔨</span>
+          <span class="dialogue-text" id="dialogue-text">該起床了!</span>
+        </div>
+        <!-- 設計圖評論區（已廢棄，評論現在在卡片內）-->
+        <div id="design-comments"></div>
+      </div>
+    </div>
+
+ 
+
+  <!-- ====== Toast ====== -->
+  <div class="effect-toast" id="toast"></div>
+
+  <!-- ======================================================
+       Script 載入順序（依賴關係由上往下）
+       ====================================================== -->
+
+  <!-- 1. 核心：CSV 資料載入（其他一切的基礎）-->
+  <script src="js/core/csv-loader.js"></script>
+
+  <!-- 2. 系統：角色 / 對話 / 遊戲狀態 -->
+  <script src="js/systems/character.js"></script>
+  <script src="js/systems/dialogue.js?v=20260212-03"></script>
+  <script src="js/systems/game.js"></script>
+
+  <!-- 3. 核心：各系統計算邏輯 -->
+  <script src="js/core/design.js"></script>
+  <script src="js/core/crafting.js"></script>
+  <script src="js/core/smelt.js"></script>
+  <script src="js/core/decoration.js"></script>
+  <script src="js/core/commission.js"></script>
+
+  <!-- 4. 場景：各 UI 彈窗 -->
+  <script src="js/scenes/forge.js"></script>
+  <script src="js/scenes/design-ui.js?v=20260212-05"></script></script>
+  <script src="js/scenes/crafting-ui.js"></script>
+  <script src="js/scenes/smelt-ui.js"></script>
+  <script src="js/scenes/decoration-ui.js"></script>
+  <script src="js/scenes/commission-ui.js"></script>
+  <script src="js/scenes/forge-utils.js"></script>
+
+</body>
+</html>
