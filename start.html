@@ -35,7 +35,21 @@
     .game-subtitle {
       font-size: 1.2em;
       color: #888;
-      margin-bottom: 60px;
+      margin-bottom: 40px;
+    }
+    
+    .save-status {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 10px;
+      font-size: 0.9em;
+      color: #888;
+    }
+    
+    .save-status.has-save {
+      border: 1px solid rgba(126, 211, 33, 0.3);
+      color: #7ed321;
     }
     
     .menu-buttons {
@@ -70,6 +84,30 @@
     
     .menu-btn.primary:hover {
       box-shadow: 0 10px 40px rgba(245, 87, 108, 0.4);
+    }
+    
+    .menu-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+    
+    .clear-save-btn {
+      margin-top: 40px;
+      padding: 10px 20px;
+      font-size: 0.9em;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      background: rgba(255,0,0,0.1);
+      color: #f5576c;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: inherit;
+    }
+    
+    .clear-save-btn:hover {
+      background: rgba(255,0,0,0.2);
+      border-color: #f5576c;
     }
     
     /* 命名視窗 */
@@ -169,14 +207,23 @@
     <h1 class="game-title">FLORAL FORGER</h1>
     <p class="game-subtitle">花之鍛造師</p>
     
+    <!-- 存檔狀態提示 -->
+    <div class="save-status" id="saveStatus">
+      檢查存檔中...
+    </div>
+    
     <div class="menu-buttons">
       <button class="menu-btn primary" onclick="startNewGame()">
         🔨 鍛造開始
       </button>
-      <button class="menu-btn" onclick="continueGame()">
+      <button class="menu-btn" id="continueBtn" onclick="continueGame()" disabled>
         ⚒️ 繼續鍛造
       </button>
     </div>
+    
+    <button class="clear-save-btn" id="clearSaveBtn" onclick="clearSave()" style="display: none;">
+      🗑️ 清除存檔
+    </button>
   </div>
   
   <!-- 命名視窗 -->
@@ -200,8 +247,53 @@
   </div>
 
   <script>
+    // 檢查存檔狀態
+    function checkSaveStatus() {
+      const savedGame = localStorage.getItem('floralForger_save');
+      const statusEl = document.getElementById('saveStatus');
+      const continueBtn = document.getElementById('continueBtn');
+      const clearBtn = document.getElementById('clearSaveBtn');
+      
+      if (savedGame) {
+        try {
+          const data = JSON.parse(savedGame);
+          statusEl.textContent = `✅ 找到存檔：${data.name || '小哈'}`;
+          statusEl.classList.add('has-save');
+          continueBtn.disabled = false;
+          clearBtn.style.display = 'block';
+        } catch (e) {
+          statusEl.textContent = '⚠️ 存檔損壞';
+          continueBtn.disabled = true;
+          clearBtn.style.display = 'block';
+        }
+      } else {
+        statusEl.textContent = '📝 尚無存檔';
+        continueBtn.disabled = true;
+        clearBtn.style.display = 'none';
+      }
+    }
+    
+    // 清除存檔
+    function clearSave() {
+      if (!confirm('確定要清除所有存檔嗎？此操作無法復原！')) {
+        return;
+      }
+      
+      localStorage.removeItem('floralForger_save');
+      localStorage.removeItem('floralForger_newGame');
+      alert('✅ 存檔已清除！');
+      checkSaveStatus();
+    }
+    
     // 開始新遊戲
     function startNewGame() {
+      const savedGame = localStorage.getItem('floralForger_save');
+      if (savedGame) {
+        if (!confirm('目前有存檔，開始新遊戲會覆蓋舊存檔。確定要繼續嗎？')) {
+          return;
+        }
+      }
+      
       document.getElementById('nameModal').classList.add('show');
       document.getElementById('playerNameInput').focus();
     }
@@ -244,6 +336,8 @@
     
     // Enter 鍵確認
     document.addEventListener('DOMContentLoaded', () => {
+      checkSaveStatus();
+      
       const input = document.getElementById('playerNameInput');
       input.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
