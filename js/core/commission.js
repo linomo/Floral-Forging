@@ -87,10 +87,10 @@ const CommissionCore = {
         // MOOD +3
         player.mood = Math.min(100, (player.mood || 0) + 3);
 
-        // 街道好感 +1
+        // 街道好感 +10
         const street = this.getStreet(commission.commission_id);
         if (street && player.favor[street] !== undefined) {
-            player.favor[street] = Math.min(100, (player.favor[street] || 0) + 1);
+            player.favor[street] = Math.min(100, (player.favor[street] || 0) + 10);
         }
     }
 };
