@@ -83,7 +83,7 @@ const DesignUI = {
 
             /* === 評論容器（獨立區塊，在 wrapper 內）=== */
             .comments-container {
-                width: 570px; /* 比設計圖 Modal 寬 */
+                width: 570px; /* 380px × 1.5 */
                 max-width: 90%;
                 background: rgba(20, 20, 30, 0.95);
                 border-radius: 12px;
