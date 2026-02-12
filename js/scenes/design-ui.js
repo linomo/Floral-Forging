@@ -35,12 +35,11 @@ const DesignUI = {
             }
             .draw-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245, 87, 108, 0.3); }
 
-            /* === 設計圖卡片（居中，固定寬度）=== */
+            /* === 設計圖卡片 === */
             .card {
                 background: rgba(0,0,0,0.3); border-radius: 12px;
                 overflow: hidden; border: 2px solid #333;
-                width: 380px; /* 固定寬度 */
-                margin: 0 auto; /* 居中 */
+                width: 100%; /* 撐滿容器 */
             }
             .card.grade-爛 { border-color: #555; }
             .card.grade-普 { border-color: #4ecdc4; }
