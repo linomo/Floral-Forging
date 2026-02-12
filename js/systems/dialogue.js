@@ -6,18 +6,42 @@ const DialogueSystem = {
 
     // 顯示主對話框（左下角）
     showDialogue(charaId, text) {
+        console.log('🗣️ DialogueSystem.showDialogue 被呼叫');
+        console.log('  角色ID:', charaId);
+        console.log('  對話內容:', text);
+        
         const char = CharacterSystem.getCharacter(charaId);
-        if (!char) return;
+        console.log('  角色資料:', char);
+        
+        if (!char) {
+            console.error('❌ 找不到角色資料！');
+            return;
+        }
 
         const colorEl = document.getElementById('speaker-color');
         const nameEl  = document.getElementById('speaker-name');
-        const emojiEl = document.getElementById('dialogue-emoji');
         const textEl  = document.getElementById('dialogue-text');
+        
+        console.log('  DOM 元素檢查:');
+        console.log('    colorEl:', colorEl);
+        console.log('    nameEl:', nameEl);
+        console.log('    textEl:', textEl);
 
-        if (colorEl) colorEl.style.background = char.color;
-        if (nameEl) { nameEl.textContent = (charaId === 'PC' ? player.name : char.name); nameEl.style.color = char.color; }
-        if (emojiEl) emojiEl.textContent = char.icon;
-        if (textEl)  textEl.textContent  = text;
+        if (colorEl) {
+            colorEl.style.background = char.color;
+            console.log('  ✅ 設置色塊背景:', char.color);
+        }
+        if (nameEl) {
+            nameEl.textContent = (charaId === 'PC' ? player.name : char.name);
+            nameEl.style.color = char.color;
+            console.log('  ✅ 設置角色名稱:', nameEl.textContent, '顏色:', char.color);
+        }
+        if (textEl) {
+            textEl.textContent = text;
+            console.log('  ✅ 設置對話文字');
+        }
+        
+        console.log('✅ 對話顯示完成');
     },
 
     // 顯示設計圖評論（對話框下方 #design-comments）
