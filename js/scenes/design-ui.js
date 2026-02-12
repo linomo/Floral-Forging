@@ -14,7 +14,7 @@ const DesignUI = {
             .design-modal {
                 background: linear-gradient(180deg, #252535 0%, #1a1a28 100%);
                 border-radius: 16px; padding: 20px;
-                max-width: 380px; width: 90%;
+                max-width: 600px; width: 90%; /* 容器夠寬以容納評論框 */
             }
             .draw-btn {
                 width: 100%; padding: 12px; font-size: 1em;
@@ -25,10 +25,12 @@ const DesignUI = {
             }
             .draw-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245, 87, 108, 0.3); }
 
-            /* === 設計圖卡片 === */
+            /* === 設計圖卡片（居中，固定寬度）=== */
             .card {
                 background: rgba(0,0,0,0.3); border-radius: 12px;
                 overflow: hidden; border: 2px solid #333;
+                width: 380px; /* 固定寬度 */
+                margin: 0 auto; /* 居中 */
             }
             .card.grade-爛 { border-color: #555; }
             .card.grade-普 { border-color: #4ecdc4; }
@@ -70,11 +72,11 @@ const DesignUI = {
             .effect-tag.special  { color: #f5a623; background: rgba(245,166,35,0.2); }
             .card-placeholder { padding: 40px 20px; text-align: center; color: #444; font-size: 0.9em; }
 
-            /* === 評論容器（設計圖下方，1.5倍寬）=== */
+            /* === 評論容器（設計圖下方，1.5倍寬，獨立居中）=== */
             .comments-container {
-                margin: 15px auto 0;
-                width: 150%; /* 設計圖的 1.5 倍寬 */
-                max-width: 570px; /* 380 × 1.5 = 570 */
+                margin: 15px auto 0; /* 上方間距，左右自動居中 */
+                width: 570px; /* 380 × 1.5 = 570px */
+                max-width: 95%; /* 小螢幕時自適應 */
                 background: rgba(0,0,0,0.3);
                 border-radius: 12px;
                 border: 1px solid rgba(255,255,255,0.1);
