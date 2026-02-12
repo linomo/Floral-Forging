@@ -82,14 +82,6 @@ const DesignUI = {
             .comment-text { color: #bbb; }
         `;
         document.head.appendChild(style);
-
-        // 建立 #design-comments 元素（若不存在），掛到 .dialogue-box 尾端
-        if (!document.getElementById('design-comments')) {
-            const commentsEl = document.createElement('div');
-            commentsEl.id = 'design-comments';
-            const dialogueBox = document.querySelector('.dialogue-box');
-            if (dialogueBox) dialogueBox.appendChild(commentsEl);
-        }
     },
 
     open() {
@@ -105,7 +97,7 @@ const DesignUI = {
 
         modal.innerHTML = `
             <div class="design-modal">
-                <div class="modal-title">📝 繪製設計圖</div>
+                <div class="modal-title">📜 繪製設計圖</div>
                 <button class="draw-btn" onclick="drawDesign()">🎴 開始繪製！</button>
                 <div class="card" id="designCard">
                     <div class="card-placeholder">在腦中構思設計圖...</div>
@@ -194,6 +186,12 @@ const DesignUI = {
     },
 
     _renderCard(design) {
+        console.log('═══════════════════════════════════');
+        console.log('🎨 開始渲染設計圖卡片');
+        console.log('📊 設計圖資料:', design);
+        console.log('📝 評論數量:', design.comments ? design.comments.length : 'undefined');
+        console.log('📝 評論內容:', design.comments);
+        
         const card = document.getElementById('designCard');
         card.className = `card grade-${design.grade}`;
         card.innerHTML = `
@@ -205,14 +203,19 @@ const DesignUI = {
                 <div class="info-item"><span class="info-label">⚙️ 金</span><span class="info-value metal">${design.metalNeed}</span></div>
                 <div class="info-item"><span class="info-label">🥖 木</span><span class="info-value wood">${design.woodNeed}</span></div>
                 <div class="info-item"><span class="info-label">💰 圖紙</span><span class="info-value price">${design.blueprintPrice}</span></div>
-                <div class="info-item"><span class="info-label">⚡ 元氣</span><span class="info-value ep">${design.ep}</span></div>
+                <div class="info-item"><span class="info-label">⚡ EP</span><span class="info-value ep">${design.ep}</span></div>
             </div>
             <div class="card-effects">
                 <div class="effect-title">📝 讓我看看！</div>
                 <div class="effect-row">${design.effects.length > 0 ? design.effects.join('') : '&nbsp;'}</div>
             </div>
         `;
+        
+        console.log('🗣️ 準備呼叫 DialogueSystem.showDesignComments');
+        console.log('🗣️ 傳入評論:', design.comments);
         DialogueSystem.showDesignComments(design.comments);
+        console.log('✅ showDesignComments 呼叫完成');
+        console.log('═══════════════════════════════════');
     }
 };
 
