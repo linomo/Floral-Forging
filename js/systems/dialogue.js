@@ -23,17 +23,33 @@ const DialogueSystem = {
     // 顯示設計圖評論（對話框下方 #design-comments）
     // comments = grade_comments.csv 資料列陣列 [{grade, chara_id, comment}, ...]
     showDesignComments(comments) {
+        console.log('═══════════════════════════════════');
+        console.log('🗣️ DialogueSystem.showDesignComments 被呼叫');
+        console.log('📥 收到的評論:', comments);
+        
         const box = document.getElementById('design-comments');
-        if (!box) return;
+        console.log('📦 #design-comments 元素:', box);
+        
+        if (!box) {
+            console.error('❌ 找不到 #design-comments 元素！');
+            return;
+        }
 
         if (!comments || comments.length === 0) {
+            console.log('⚠️ 沒有評論，隱藏評論區');
             box.style.display = 'none';
             return;
         }
 
-        box.innerHTML = comments.map(c => {
+        console.log(`✅ 有 ${comments.length} 條評論，開始渲染`);
+        
+        box.innerHTML = comments.map((c, index) => {
+            console.log(`  評論 ${index + 1}:`, c);
+            
             // 透過 chara_id 取得角色資料
             const char = CharacterSystem.getCharacter(c.chara_id);
+            console.log(`    角色資料:`, char);
+            
             const icon = char ? char.icon : '❓';
             const color = char ? char.color : '#888';
             
@@ -45,6 +61,8 @@ const DialogueSystem = {
         }).join('');
 
         box.style.display = 'block';
+        console.log('✅ 評論區顯示完成');
+        console.log('═══════════════════════════════════');
     },
 
     hideDesignComments() {
