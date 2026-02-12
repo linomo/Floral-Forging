@@ -10,11 +10,21 @@ const DesignUI = {
         const style = document.createElement('style');
         style.id = 'design-system-styles';
         style.textContent = `
+            /* === 設計圖包裹容器 === */
+            .design-wrapper {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+            
             /* === 設計圖 Modal === */
             .design-modal {
                 background: linear-gradient(180deg, #252535 0%, #1a1a28 100%);
                 border-radius: 16px; padding: 20px;
-                max-width: 600px; width: 90%; /* 容器夠寬以容納評論框 */
+                max-width: 420px; width: 90%;
             }
             .draw-btn {
                 width: 100%; padding: 12px; font-size: 1em;
@@ -72,38 +82,37 @@ const DesignUI = {
             .effect-tag.special  { color: #f5a623; background: rgba(245,166,35,0.2); }
             .card-placeholder { padding: 40px 20px; text-align: center; color: #444; font-size: 0.9em; }
 
-            /* === 評論容器（設計圖下方，1.5倍寬，獨立居中）=== */
+            /* === 評論容器（獨立區塊，在 wrapper 內）=== */
             .comments-container {
-                margin: 15px auto 0; /* 上方間距，左右自動居中 */
-                width: 570px; /* 380 × 1.5 = 570px */
-                max-width: 95%; /* 小螢幕時自適應 */
-                background: rgba(0,0,0,0.3);
+                width: 570px; /* 比設計圖 Modal 寬 */
+                max-width: 90%;
+                background: rgba(20, 20, 30, 0.95);
                 border-radius: 12px;
-                border: 1px solid rgba(255,255,255,0.1);
-                overflow: hidden;
-            }
-            .comments-title {
-                padding: 10px 15px;
-                background: rgba(0,0,0,0.2);
-                border-bottom: 1px solid rgba(255,255,255,0.1);
-                font-size: 0.9em;
-                color: #f5a623;
-                text-align: center;
-                font-weight: bold;
+                border: 1px solid rgba(255,255,255,0.15);
+                padding: 15px 20px;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.5);
             }
             .comments-list {
-                padding: 12px 15px;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
             }
             .comment-line { 
                 display: flex; 
-                gap: 8px; 
-                margin-bottom: 8px; 
-                font-size: 0.85em; 
-                line-height: 1.5; 
+                gap: 10px; 
+                align-items: flex-start;
+                font-size: 0.9em; 
+                line-height: 1.6; 
             }
-            .comment-line:last-child { margin-bottom: 0; }
-            .comment-icon { font-size: 1.1em; flex-shrink: 0; }
-            .comment-text { flex: 1; }
+            .comment-icon { 
+                font-size: 1.3em; 
+                flex-shrink: 0;
+                margin-top: 2px;
+            }
+            .comment-text { 
+                flex: 1;
+                word-wrap: break-word;
+            }
 
             /* === 設計圖評論區塊（對話框下方，已廢棄）=== */
             #design-comments {
@@ -125,25 +134,27 @@ const DesignUI = {
         }
 
         modal.innerHTML = `
-            <div class="design-modal">
-                <div class="modal-title">📜 繪製設計圖</div>
-                <button class="draw-btn" onclick="drawDesign()">🎴 開始繪製！</button>
-                
-                <!-- 設計圖卡片（原本大小）-->
-                <div class="card" id="designCard">
-                    <div class="card-placeholder">在腦中構思設計圖...</div>
+            <div class="design-wrapper">
+                <div class="design-modal">
+                    <div class="modal-title">📜 繪製設計圖</div>
+                    <button class="draw-btn" onclick="drawDesign()">🎴 開始繪製！</button>
+                    
+                    <!-- 設計圖卡片 -->
+                    <div class="card" id="designCard">
+                        <div class="card-placeholder">在腦中構思設計圖...</div>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button class="modal-btn primary" onclick="closeDesignModal()">關閉</button>
+                    </div>
                 </div>
                 
-                <!-- 評論框（獨立，1.5倍寬）-->
+                <!-- 評論框（獨立顯示）-->
                 <div class="comments-container" id="commentsContainer" style="display: none;">
-                    <div class="comments-title">💬 眾人評論</div>
                     <div class="comments-list" id="commentsList"></div>
                 </div>
-                
-                <div class="modal-actions">
-                    <button class="modal-btn primary" onclick="closeDesignModal()">關閉</button>
-                </div>
-            </div>`;
+            </div>
+        `;
 
         this.currentDesign = null;
         modal.classList.add('show');
@@ -241,7 +252,7 @@ const DesignUI = {
                 <div class="info-item"><span class="info-label">⚙️ 金</span><span class="info-value metal">${design.metalNeed}</span></div>
                 <div class="info-item"><span class="info-label">🥖 木</span><span class="info-value wood">${design.woodNeed}</span></div>
                 <div class="info-item"><span class="info-label">💰 圖紙</span><span class="info-value price">${design.blueprintPrice}</span></div>
-                <div class="info-item"><span class="info-label">⚡ 元氣</span><span class="info-value ep">${design.ep}</span></div>
+                <div class="info-item"><span class="info-label">⚡ EP</span><span class="info-value ep">${design.ep}</span></div>
             </div>
             <div class="card-effects">
                 <div class="effect-title">📝 讓我看看！</div>
