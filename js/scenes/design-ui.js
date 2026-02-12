@@ -10,11 +10,22 @@ const DesignUI = {
         const style = document.createElement('style');
         style.id = 'design-system-styles';
         style.textContent = `
+            /* === 設計圖包裹容器 === */
+            .design-wrapper {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+            
             /* === 設計圖 Modal === */
             .design-modal {
                 background: linear-gradient(180deg, #252535 0%, #1a1a28 100%);
                 border-radius: 16px; padding: 20px;
-                max-width: 320px; width: 90%;
+                width: 380px;          /* 固定寬度 */
+                min-height: 450px;     /* 固定最小高度，確保繪製前後一樣大 */
             }
             .draw-btn {
                 width: 100%; padding: 12px; font-size: 1em;
@@ -29,6 +40,7 @@ const DesignUI = {
             .card {
                 background: rgba(0,0,0,0.3); border-radius: 12px;
                 overflow: hidden; border: 2px solid #333;
+                min-height: 250px;     /* 固定最小高度 */
             }
             .card.grade-爛 { border-color: #555; }
             .card.grade-普 { border-color: #4ecdc4; }
@@ -68,28 +80,49 @@ const DesignUI = {
             .effect-tag.positive { color: #7ed321; }
             .effect-tag.negative { color: #f5576c; }
             .effect-tag.special  { color: #f5a623; background: rgba(245,166,35,0.2); }
-            .card-placeholder { padding: 40px 20px; text-align: center; color: #444; font-size: 0.9em; }
-
-            /* === 設計圖評論區塊 === */
-            #design-comments {
-                display: none;
-                padding: 10px 15px;
-                border-top: 1px solid rgba(255,255,255,0.05);
-                background: rgba(0,0,0,0.15);
+            .card-placeholder { 
+                min-height: 250px;     /* 跟 card 一樣高 */
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-align: center; 
+                color: #444; 
+                font-size: 0.9em; 
             }
-            .comment-line { display: flex; gap: 6px; margin-bottom: 5px; font-size: 0.8em; line-height: 1.4; }
-            .comment-line:last-child { margin-bottom: 0; }
-            .comment-text { color: #bbb; }
+
+            /* === 評論容器（獨立區塊，在 wrapper 內）=== */
+            .comments-container {
+                width: 570px;          /* 380px × 1.5 */
+                max-width: 90%;
+                background: rgba(20, 20, 30, 0.95);
+                border-radius: 12px;
+                border: 1px solid rgba(255,255,255,0.15);
+                padding: 15px 20px;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            }
+            .comments-list {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .comment-line { 
+                display: flex; 
+                gap: 10px; 
+                align-items: flex-start;
+                font-size: 0.9em; 
+                line-height: 1.6; 
+            }
+            .comment-icon { 
+                font-size: 1.3em; 
+                flex-shrink: 0;
+                margin-top: 2px;
+            }
+            .comment-text { 
+                flex: 1;
+                word-wrap: break-word;
+            }
         `;
         document.head.appendChild(style);
-
-        // 建立 #design-comments 元素（若不存在），掛到 .dialogue-box 尾端
-        if (!document.getElementById('design-comments')) {
-            const commentsEl = document.createElement('div');
-            commentsEl.id = 'design-comments';
-            const dialogueBox = document.querySelector('.dialogue-box');
-            if (dialogueBox) dialogueBox.appendChild(commentsEl);
-        }
     },
 
     open() {
@@ -104,26 +137,31 @@ const DesignUI = {
         }
 
         modal.innerHTML = `
-            <div class="design-modal">
-                <div class="modal-title">📝 繪製設計圖</div>
-                <button class="draw-btn" onclick="drawDesign()">🎴 開始繪製！</button>
-                <div class="card" id="designCard">
-                    <div class="card-placeholder">在腦中構思設計圖...</div>
+            <div class="design-wrapper">
+                <div class="design-modal">
+                    <div class="modal-title">📝 繪製設計圖</div>
+                    <button class="draw-btn" onclick="drawDesign()">🎴 開始繪製！</button>
+                    <div class="card" id="designCard">
+                        <div class="card-placeholder">在腦中構思設計圖...</div>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="modal-btn primary" onclick="closeDesignModal()">關閉</button>
+                    </div>
                 </div>
-                <div class="modal-actions">
-                    <button class="modal-btn primary" onclick="closeDesignModal()">關閉</button>
+                
+                <!-- 評論框（獨立顯示）-->
+                <div class="comments-container" id="commentsContainer" style="display: none;">
+                    <div class="comments-list" id="commentsList"></div>
                 </div>
             </div>`;
 
         this.currentDesign = null;
-        DialogueSystem.hideDesignComments();
         modal.classList.add('show');
     },
 
     close() {
         const modal = document.getElementById('designModal');
         if (modal) modal.classList.remove('show');
-        DialogueSystem.hideDesignComments();
     },
 
     draw() {
@@ -212,7 +250,28 @@ const DesignUI = {
                 <div class="effect-row">${design.effects.length > 0 ? design.effects.join('') : '&nbsp;'}</div>
             </div>
         `;
-        DialogueSystem.showDesignComments(design.comments);
+        
+        // 渲染評論到獨立容器
+        const commentsContainer = document.getElementById('commentsContainer');
+        const commentsList = document.getElementById('commentsList');
+        
+        if (design.comments && design.comments.length > 0) {
+            const commentsHtml = design.comments.map(c => {
+                const char = CharacterSystem.getCharacter(c.chara_id);
+                const icon = char ? char.icon : '❓';
+                const color = char ? char.color : '#888';
+                return `
+                    <div class="comment-line">
+                        <span class="comment-icon" style="color: ${color}">${icon}</span>
+                        <span class="comment-text" style="color: ${color}">「${c.comment}」</span>
+                    </div>`;
+            }).join('');
+            
+            commentsList.innerHTML = commentsHtml;
+            commentsContainer.style.display = 'block';
+        } else {
+            commentsContainer.style.display = 'none';
+        }
     }
 };
 
