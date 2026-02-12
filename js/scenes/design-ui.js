@@ -24,7 +24,7 @@ const DesignUI = {
             .design-modal {
                 background: linear-gradient(180deg, #252535 0%, #1a1a28 100%);
                 border-radius: 16px; padding: 20px;
-                max-width: 380px; width: 90%;
+                max-width: 500px; width: 90%;
             }
             .draw-btn {
                 width: 100%; padding: 12px; font-size: 1em;
