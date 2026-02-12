@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FLORAL FORGER</title>
+  <!-- v20260212-05 -->
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -113,6 +114,7 @@
 
     .dialogue-area {
       flex: 4;
+      width: 100%; /* 確保撐滿右側 */
       background: linear-gradient(180deg, #151520 0%, #101018 100%);
       border-top: 1px solid rgba(255,255,255,0.1);
       padding: 15px 20px;
@@ -121,23 +123,26 @@
     .dialogue-box {
       background: rgba(30, 30, 45, 0.95); border-radius: 10px;
       border: 1px solid rgba(255,255,255,0.1);
+      width: 100%; /* 確保撐滿 */
       flex: 1; display: flex; flex-direction: column; overflow: hidden;
     }
     .dialogue-header {
       display: flex; align-items: center;
-      padding: 10px 15px;
+      padding: 12px 20px; /* 加大內距 */
       border-bottom: 1px solid rgba(255,255,255,0.1);
       background: rgba(0,0,0,0.2);
     }
     .color-block { width: 16px; height: 16px; border-radius: 3px; margin-right: 10px; }
-    .speaker-name { font-weight: bold; font-size: 0.95em; }
+    .speaker-name { font-weight: bold; font-size: 1em; /* 稍微加大 */ }
 
     .dialogue-content {
-      padding: 15px; font-size: 1em; line-height: 1.6;
-      display: flex; align-items: flex-start; gap: 10px;
+      padding: 20px 25px; /* 加大內距 */
+      font-size: 1.05em; /* 稍微加大字體 */
+      line-height: 1.7;
+      display: flex; align-items: flex-start; gap: 12px;
       flex: 1; position: relative;
     }
-    .dialogue-emoji { font-size: 1.2em; }
+    .dialogue-emoji { font-size: 1.8em; flex-shrink: 0; /* 加大圖示 */ }
     .dialogue-text { flex: 1; }
 
 
@@ -239,13 +244,14 @@
     <div class="dialogue-area">
       <div class="dialogue-box">
         <div class="dialogue-header">
-          <div class="color-block" id="speaker-color" style="background: #B5CAA0"></div>
-          <div class="speaker-name" id="speaker-name" style="color: #B5CAA0"></div>
-          </div>
-          <div class="dialogue-content">
-            <span class="dialogue-text" id="dialogue-text">該起床了!</span>
+          <div class="color-block" id="speaker-color"></div>
+          <div class="speaker-name" id="speaker-name"></div>
         </div>
-        <!-- 設計圖評論區（由 DialogueSystem 填入）-->
+        <div class="dialogue-content">
+          <span class="dialogue-emoji" id="dialogue-emoji">🔨</span>
+          <span class="dialogue-text" id="dialogue-text">該起床了!</span>
+        </div>
+        <!-- 設計圖評論區（已廢棄，評論現在在卡片內）-->
         <div id="design-comments"></div>
       </div>
     </div>
@@ -264,7 +270,7 @@
 
   <!-- 2. 系統：角色 / 對話 / 遊戲狀態 -->
   <script src="js/systems/character.js"></script>
-  <script src="js/systems/dialogue.js"></script>
+  <script src="js/systems/dialogue.js?v=20260212-03"></script>
   <script src="js/systems/game.js"></script>
 
   <!-- 3. 核心：各系統計算邏輯 -->
@@ -276,7 +282,7 @@
 
   <!-- 4. 場景：各 UI 彈窗 -->
   <script src="js/scenes/forge.js"></script>
-  <script src="js/scenes/design-ui.js"></script>
+  <script src="js/scenes/design-ui.js?v=20260212-04"></script>
   <script src="js/scenes/crafting-ui.js"></script>
   <script src="js/scenes/smelt-ui.js"></script>
   <script src="js/scenes/decoration-ui.js"></script>
