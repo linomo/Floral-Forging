@@ -14,7 +14,7 @@ const DesignUI = {
             .design-modal {
                 background: linear-gradient(180deg, #252535 0%, #1a1a28 100%);
                 border-radius: 16px; padding: 20px;
-                max-width: 320px; width: 90%;
+                max-width: 380px; width: 90%;
             }
             .draw-btn {
                 width: 100%; padding: 12px; font-size: 1em;
@@ -85,7 +85,7 @@ const DesignUI = {
             }
             .comment-line:last-child { margin-bottom: 0; }
             .comment-icon { font-size: 1em; }
-            .comment-text { color: #bbb; }
+            .comment-text { /* 顏色由角色決定 */ }
 
             /* === 設計圖評論區塊（對話框下方，已廢棄）=== */
             #design-comments {
@@ -219,7 +219,7 @@ const DesignUI = {
                 return `
                     <div class="comment-line">
                         <span class="comment-icon" style="color: ${color}">${icon}</span>
-                        <span class="comment-text">「${c.comment}」</span>
+                        <span class="comment-text" style="color: ${color}">「${c.comment}」</span>
                     </div>`;
             }).join('');
         }
@@ -235,7 +235,7 @@ const DesignUI = {
                 <div class="info-item"><span class="info-label">⚙️ 金</span><span class="info-value metal">${design.metalNeed}</span></div>
                 <div class="info-item"><span class="info-label">🥖 木</span><span class="info-value wood">${design.woodNeed}</span></div>
                 <div class="info-item"><span class="info-label">💰 圖紙</span><span class="info-value price">${design.blueprintPrice}</span></div>
-                <div class="info-item"><span class="info-label">⚡ 元氣</span><span class="info-value ep">${design.ep}</span></div>
+                <div class="info-item"><span class="info-label">⚡ EP</span><span class="info-value ep">${design.ep}</span></div>
             </div>
             <div class="card-effects">
                 <div class="effect-title">📝 讓我看看！</div>
