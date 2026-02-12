@@ -125,8 +125,16 @@ const DesignGenerator = {
             if (eff) effects.push(eff);
         }
 
-        // === 評論（回傳原始資料，由 DialogueSystem 渲染）===
-        const comments = CSVLoader.data.comments.filter(c => c.grade === displayGrade);
+        // === 評論過濾（處理 unlock_trigger）===
+        const comments = CSVLoader.data.comments.filter(c => {
+            if (c.grade !== displayGrade) return false;
+            
+            // 沒有解鎖條件的評論總是顯示
+            if (!c.unlock_trigger || c.unlock_trigger === '') return true;
+            
+            // 有解鎖條件的評論，需要檢查物理前綴是否符合
+            return physical.pp_id === c.unlock_trigger;
+        });
 
         return {
             grade:           displayGrade,
