@@ -1,6 +1,7 @@
 /**
  * DesignUI - 設計圖彈窗
  * js/scenes/design-ui.js
+ * 版本：v20260213-02 - 修正材料寬度、讓我看看高度、效果標籤置中
  */
 const DesignUI = {
     currentDesign: null,
@@ -58,25 +59,49 @@ const DesignUI = {
             .grade-好  { color: #ffe66d; }
             .grade-奇, .grade-奇‽ { color: #ff6b6b; }
             .card-weapon { font-size: 1.2em; font-weight: bold; color: #fff; }
+            
+            /* === 修正 1：材料區塊兩排寬度一致 === */
             .card-info {
                 padding: 10px 12px; background: rgba(0,0,0,0.2);
-                display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 0.8em;
+                display: grid; 
+                grid-template-columns: repeat(2, 1fr); /* 固定兩欄等寬 */
+                gap: 6px; 
+                font-size: 0.8em;
             }
-            .info-item  { display: flex; justify-content: space-between; }
+            .info-item  { 
+                display: flex; 
+                justify-content: space-between; 
+                align-items: center; /* 確保標籤和數值垂直對齊 */
+            }
             .info-label { color: #666; }
             .info-value { color: #fff; }
             .info-value.metal { color: #f5a623; }
             .info-value.wood  { color: #7ed321; }
             .info-value.price { color: #f5576c; }
             .info-value.ep    { color: #4ecdc4; }
+            
+            /* === 修正 2：讓我看看高度調整 + 修正 3：效果標籤置中 === */
             .card-effects {
                 padding: 8px 12px;
                 border-top: 1px solid rgba(255,255,255,0.05);
                 font-size: 0.75em;
             }
             .effect-title { color: #666; margin-bottom: 4px; }
-            .effect-row   { display: flex; flex-wrap: wrap; gap:6px; min-height: 40px; }
-            .effect-tag   { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 8px; }
+            .effect-row   { 
+                display: flex; 
+                flex-wrap: wrap; 
+                gap: 6px; 
+                min-height: 26px; /* 從 40px 降到 26px，剛好比標籤高一點 */
+                align-items: center; /* 確保標籤垂直置中 */
+            }
+            .effect-tag   { 
+                background: rgba(255,255,255,0.1); 
+                padding: 3px 8px; /* 從 2px 6px 改成 3px 8px，增加上下 padding */
+                border-radius: 8px; 
+                display: inline-flex; /* 改用 inline-flex */
+                align-items: center; /* 確保文字垂直置中 */
+                line-height: 1.2; /* 固定行高 */
+            }
             .effect-tag.positive { color: #7ed321; }
             .effect-tag.negative { color: #f5576c; }
             .effect-tag.special  { color: #f5a623; background: rgba(245,166,35,0.2); }
@@ -263,7 +288,7 @@ const DesignUI = {
                 return `
                     <div class="comment-line">
                         <span class="comment-icon" style="color: ${color}">${icon}</span>
-                        <span class="comment-text" style="color: ${color}">「${c.comment}」</span>
+                        <span class="comment-text" style="color: ${color}">${c.comment}</span>
                     </div>`;
             }).join('');
             
