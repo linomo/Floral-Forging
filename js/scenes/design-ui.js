@@ -75,7 +75,7 @@ const DesignUI = {
                 font-size: 0.75em;
             }
             .effect-title { color: #666; margin-bottom: 4px; }
-            .effect-row   { display: flex; flex-wrap: wrap; gap: 6px; min-height: 10px; }
+            .effect-row   { display: flex; flex-wrap: wrap; gap:3px; min-height: 10px; }
             .effect-tag   { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 8px; }
             .effect-tag.positive { color: #7ed321; }
             .effect-tag.negative { color: #f5576c; }
