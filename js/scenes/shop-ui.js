@@ -106,7 +106,7 @@ const ShopUI = {
             .shop-result {
                 background: rgba(0,0,0,0.3); border-radius: 10px;
                 padding: 15px; margin-bottom: 15px;
-                min-height: 60px;
+                min-height: 66px;
             }
             .shop-result-title {
                 font-size: 0.9em; color: #888;
