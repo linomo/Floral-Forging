@@ -18,7 +18,10 @@ const ShopUI = {
             .shop-modal {
                 background: linear-gradient(180deg, #252535 0%, #1a1a28 100%);
                 border-radius: 16px; padding: 20px;
-                max-width: 450px; width: 90%; max-height: 80vh; overflow-y: auto;
+                width: 450px;           /* 固定寬度 */
+                height: 580px;          /* 固定高度 */
+                display: flex;
+                flex-direction: column;
             }
             
             /* 行情顯示 */
@@ -58,7 +61,9 @@ const ShopUI = {
             .shop-list {
                 background: rgba(0,0,0,0.2); border-radius: 10px;
                 padding: 12px; margin-bottom: 15px;
-                max-height: 280px; overflow-y: auto;
+                height: 200px;          /* 固定高度 */
+                overflow-y: auto;
+                flex-shrink: 0;         /* 不縮小 */
             }
             .shop-item {
                 display: flex; align-items: center; gap: 10px;
