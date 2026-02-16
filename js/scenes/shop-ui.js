@@ -19,7 +19,7 @@ const ShopUI = {
                 background: linear-gradient(180deg, #252535 0%, #1a1a28 100%);
                 border-radius: 16px; padding: 20px;
                 width: 450px;           /* 固定寬度 */
-                height: 580px;          /* 固定高度 */
+                height: 600px;          /* 固定高度 */
                 display: flex;
                 flex-direction: column;
             }
