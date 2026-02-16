@@ -119,6 +119,7 @@ const ForgeScene = {
             case 'inventory_modal':  ForgeUtils.openInventory();     break;
             case 'decoration_modal':  DecorationUI.open();             break;
             case 'commission_modal':  CommissionUI.open();             break;
+            case 'shop_modal': ShopUI.open(); break;
             default: console.warn(`未知 modal: ${obj.action_param}`);
         }
     },
