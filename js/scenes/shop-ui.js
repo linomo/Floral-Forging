@@ -198,7 +198,7 @@ const ShopUI = {
                     <button class="shop-tab" data-tab="product">成品</button>
                 </div>
                 
-                <!-- 提示文字 -->
+ 
               
                 
                 <!-- 物品列表 -->
