@@ -427,30 +427,37 @@ const ShopUI = {
             showToast('請選擇要販售的物品！');
             return;
         }
+      // 分類收集要刪除的索引
+    const designIndicesToRemove = [];
+    const productIndicesToRemove = [];
+    
+    // 逐項處理（先加錢、記錄結果、收集索引）
+    this.selectedItems.forEach(item => {
+        player.money += item.price;
         
-        // 逐項處理
-        this.selectedItems.forEach(item => {
-            // 計算售價並加錢
-            player.money += item.price;
-            
-            // 移除物品
-            if (item.type === 'material') {
-                const isMetal = item.idOrIndex.startsWith('m');
-                const mats = isMetal ? player.materials.metal : player.materials.wood;
-                mats[item.idOrIndex] -= 10;
-            } else if (item.type === 'design') {
-                player.designs.splice(item.idOrIndex, 1);
-            } else if (item.type === 'product') {
-                player.products.splice(item.idOrIndex, 1);
-            }
-            
-            // 記錄結果
-            this.saleResults.push({
-                price: item.price,
-                isDaxia: item.isDaxia
-            });
+        if (item.type === 'material') {
+            const isMetal = item.idOrIndex.startsWith('m');
+            const mats = isMetal ? player.materials.metal : player.materials.wood;
+            mats[item.idOrIndex] -= 10;
+        } else if (item.type === 'design') {
+            designIndicesToRemove.push(item.idOrIndex);
+        } else if (item.type === 'product') {
+            productIndicesToRemove.push(item.idOrIndex);
+        }
+        
+        this.saleResults.push({
+            price: item.price,
+            isDaxia: item.isDaxia
         });
-        
+    });
+    
+    // 從大到小排序後刪除（避免索引錯位）
+    designIndicesToRemove.sort((a, b) => b - a).forEach(index => {
+        player.designs.splice(index, 1);
+    });
+    productIndicesToRemove.sort((a, b) => b - a).forEach(index => {
+        player.products.splice(index, 1);
+    });
         // 更新顯示
         updateStatsDisplay();
         document.getElementById('shopResultContent').innerHTML = this._renderResults();
