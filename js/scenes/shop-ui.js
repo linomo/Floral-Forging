@@ -213,7 +213,7 @@ const ShopUI = {
                 <div class="shop-result">
                     <div class="shop-result-title">販售結果</div>
                     <div class="shop-result-content" id="shopResultContent">
-                        ${this.saleResults.length === 0 ? '尚未販售...' : this._renderResults()}
+                        ${this.saleResults.length === 0 ? '尚未販售' : this._renderResults()}
                     </div>
                 </div>
                 
@@ -481,7 +481,7 @@ const ShopUI = {
     // === 渲染販售結果 ===
     _renderResults() {
         if (this.saleResults.length === 0) {
-            return '尚未販售...';
+            return '尚未販售';
         }
         
         // 取得大俠 ICON
