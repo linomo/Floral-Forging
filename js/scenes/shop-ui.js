@@ -250,7 +250,7 @@ const ShopUI = {
         
         // 更新提示文字
         if (this.currentTab === 'material') {
-            hintEl.textContent = '材料只能10個一組售出';
+            hintEl.textContent = '';
         } else {
             hintEl.textContent = '';
         }
