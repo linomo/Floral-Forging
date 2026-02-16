@@ -191,6 +191,9 @@ const ShopUI = {
                 <!-- 行情顯示 -->
                 <div class="shop-rate">行情：${this.currentMultiplier}</div>
                 
+                <!-- 提示文字 -->
+                <div class="shop-hint" id="shopHint"></div>
+                
                 <!-- Tab 切換 -->
                 <div class="shop-tabs">
                     <button class="shop-tab active" data-tab="material">材料</button>
