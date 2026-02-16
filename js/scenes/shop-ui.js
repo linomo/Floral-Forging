@@ -199,7 +199,7 @@ const ShopUI = {
                 </div>
                 
                 <!-- 提示文字 -->
-                <div class="shop-hint" id="shopHint">材料只能10個一組售出</div>
+              
                 
                 <!-- 物品列表 -->
                 <div class="shop-list" id="shopList">
