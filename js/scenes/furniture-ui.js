@@ -37,8 +37,8 @@ const FurnitureUI = {
             .furniture-item-icon { font-size: 1.8em; }
             .furniture-item-info { flex: 1; }
             .furniture-item-name { font-weight: bold; color: #f5a623; margin-bottom: 3px; }
-            .furniture-item-effect { font-size: 0.85em; color: #7ed321; }
-            .furniture-item-cost { font-size: 0.8em; color: #f5576c; }
+            .furniture-item-effect { font-size: 0.85em; color: #ccc; }
+            .furniture-item-cost { font-size: 0.8em; color: #ccc; }
             .furniture-empty {
                 text-align: center; color: #555; padding: 30px 0; font-size: 0.9em;
             }
