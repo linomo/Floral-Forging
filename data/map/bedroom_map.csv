@@ -1,0 +1,13 @@
+room_id,row,col,unlock,obj_id,name,icon,chara_id,comment,action_type,action_param,ep_cost,confirm_message,confirm_buttons,dynamic_data
+bedroom,1,1,initial,bedroom_bank,存錢筒,👛,PC,半瓶筒響叮噹。,open_modal,bank_modal,,,,
+bedroom,1,2,initial,bedroom_calendar,行事曆,📅,PC,下一旬要做什麼、吃飯、玩遊戲！,open_modal,calendar_modal,,,,
+bedroom,1,3,initial,bedroom_13,,,,可以放點什麼。,place_furniture,,,,,
+bedroom,1,4,expanded,bedroom_14,,,,可以放點什麼。,place_furniture,,,,,
+bedroom,2,1,initial,bedroom_bed,床,🛏️,PC,我最喜歡的地方。,open_modal,bed_modal,,,,
+bedroom,2,2,initial,bedroom_22,,,,可以放點什麼。,place_furniture,,,,,
+bedroom,2,3,initial,bedroom_23,,,,可以放點什麼。,place_furniture,,,,,
+bedroom,2,4,expanded,bedroom_24,,,,可以放點什麼。,place_furniture,,,,,
+bedroom,3,1,initial,bedroom_shelf,儲物櫃,📦,PC,有什麼有趣的東西可以放在頭上呢？蘋果？,open_modal,dress_modal,,,,
+bedroom,3,2,initial,bedroom_window,窗,🖼️,PC,太陽爺爺說你好。,dialogue,,,,,
+bedroom,3,3,initial,bedroom_door,門,🚪,PC,出去逛街囉！,open_modal,STReet_modal,,,,
+bedroom,3,4,expanded,bedroom_34,,,,可以放點什麼。,place_furniture,,,,,
