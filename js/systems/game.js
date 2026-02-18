@@ -41,7 +41,14 @@ const player = {
     // === 臥室系統 ===
     roomExpanded: false,                      // 是否已擴建
     ownedFurniture: ['furniture_1', 'furniture_2', 'furniture_3'],  // 擁有的家具（初始三個想像朋友）
-    placedFurniture: {}                       // { obj_id: furniture_id } 放置位置映射
+    placedFurniture: {},                      // { obj_id: furniture_id } 放置位置映射
+
+    // === 存錢筒系統 ===
+    bankSettings: {
+        lifestyle: '毫無物慾',    // 生活品質
+        family: '獨善其身',       // 補貼家用
+        donation: '先別先別'      // 善心捐款
+    }
 };
 
 // === 場景系統 ===
@@ -147,6 +154,10 @@ async function initGame() {
             if (player.roomExpanded === undefined)     player.roomExpanded = false;
             if (!player.ownedFurniture)                player.ownedFurniture = ['furniture_1', 'furniture_2', 'furniture_3'];
             if (!player.placedFurniture)               player.placedFurniture = {};
+            // 存錢筒系統新欄位
+            if (!player.bankSettings) {
+                player.bankSettings = { lifestyle: '毫無物慾', family: '獨善其身', donation: '先別先別' };
+            }
             console.log('📂 讀取存檔成功', player);
         } else {
             player.currentEP = Math.floor(2 * (player.str + player.int + player.dex) / 3);
@@ -212,6 +223,10 @@ const GameSystem = {
         if (player.roomExpanded === undefined)     player.roomExpanded = false;
         if (!player.ownedFurniture)                player.ownedFurniture = ['furniture_1', 'furniture_2', 'furniture_3'];
         if (!player.placedFurniture)               player.placedFurniture = {};
+        // 存錢筒系統新欄位
+        if (!player.bankSettings) {
+            player.bankSettings = { lifestyle: '毫無物慾', family: '獨善其身', donation: '先別先別' };
+        }
         updatePlayerDisplay();
         updateStatsDisplay();
         renderScene();
