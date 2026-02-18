@@ -171,7 +171,7 @@ const FurnitureUI = {
                     <div class="furniture-detail-icon">${furniture.icon}</div>
                     <div class="furniture-detail-name">${furniture.name}</div>
                     <div class="furniture-detail-effect">${effectText}</div>
-                    <div class="furniture-item-cost">維護費 ${parseInt(f.maintenance) || 0}元/旬</div>
+                    <div class="furniture-item-cost">維護費 ${parseInt(furniture.maintenance) || 0}元/旬</div>
                 </div>
                 <button class="furniture-btn secondary" onclick="FurnitureUI.openMoveModal('${furnitureId}')">
                     🔄 移動位置
