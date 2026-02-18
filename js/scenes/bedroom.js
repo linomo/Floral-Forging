@@ -131,8 +131,7 @@ const BedroomScene = {
         
         switch (obj.action_param) {
             case 'bank_modal':
-                showToast('💰 存錢筒功能開發中...');
-                DialogueSystem.showDialogue('PC', '我的錢錢～叮叮噹噹～');
+                BankUI.open();
                 break;
             case 'calendar_modal':
                 showToast('📅 行事曆功能開發中...');
