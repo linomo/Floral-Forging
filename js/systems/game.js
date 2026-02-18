@@ -35,14 +35,19 @@ const player = {
     unlockedAvatars: ['avatars01'],
 
     // 委託系統
-    currentCommissions:           [],   // 本旬板子上的三個 commission_id
-    completedCommissionsThisBoard: []   // 本旬已完成的 commission_id
+    currentCommissions:           [],
+    completedCommissionsThisBoard: [],
+
+    // === 臥室系統 ===
+    roomExpanded: false,                      // 是否已擴建
+    ownedFurniture: ['furniture_1', 'furniture_2', 'furniture_3'],  // 擁有的家具（初始三個想像朋友）
+    placedFurniture: {}                       // { obj_id: furniture_id } 放置位置映射
 };
 
 // === 場景系統 ===
 const SCENES = {
-    forge:    { name: '鍛造室',   icon: '📍' },
-    room:     { name: '小哈的房間', icon: '🏠' },
+    forge:   { name: '鍛造室',     icon: '⚒️' },
+    bedroom: { name: '小哈的房間', icon: '🏠' },
     schedule: { name: '行程表',   icon: '📅' }
 };
 
@@ -52,6 +57,13 @@ function switchScene(sceneId) {
     if (!SCENES[sceneId]) { console.error(`場景不存在: ${sceneId}`); return; }
     currentScene = sceneId;
     renderScene();
+    updateSceneSwitchButtons();
+}
+
+function updateSceneSwitchButtons() {
+    document.querySelectorAll('.scene-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.scene === currentScene);
+    });
 }
 
 async function renderScene() {
@@ -64,10 +76,12 @@ async function renderScene() {
         case 'forge':
             sceneData = typeof ForgeScene !== 'undefined'
                 ? await ForgeScene.render()
-                : { header: '📍 鍛造室', content: '<div style="text-align:center;color:#f5576c;padding:40px">錯誤：forge.js 未載入</div>' };
+                : { header: '⚒️ 鍛造室', content: '<div style="text-align:center;color:#f5576c;padding:40px">錯誤：forge.js 未載入</div>' };
             break;
-        case 'room':
-            sceneData = { header: '🏠 小哈的房間', content: '<div style="text-align:center;color:#666;padding:40px">房間場景開發中...</div>' };
+        case 'bedroom':
+            sceneData = typeof BedroomScene !== 'undefined'
+                ? await BedroomScene.render()
+                : { header: '🏠 小哈的房間', content: '<div style="text-align:center;color:#666;padding:40px">房間場景開發中...</div>' };
             break;
         case 'schedule':
             sceneData = { header: '📅 行程表', content: '<div style="text-align:center;color:#666;padding:40px">行程表開發中...</div>' };
@@ -82,33 +96,32 @@ function updateSceneValues() {
     if (currentScene === 'forge' && typeof ForgeScene !== 'undefined') {
         ForgeScene.updateValues();
     }
+    if (currentScene === 'bedroom' && typeof BedroomScene !== 'undefined') {
+        BedroomScene.updateValues();
+    }
 }
 
 // === 初始化遊戲 ===
 async function initGame() {
     console.log('🎮 初始化遊戲...');
 
-    // 檢查是否有「進入遊戲」標記
     const enterGame = localStorage.getItem('floralForger_enterGame');
     
     console.log('📋 狀態檢查:');
     console.log('  - floralForger_enterGame:', enterGame ? '✓' : '✗');
     
-    // 如果沒有進入遊戲標記，導回開始畫面
     if (!enterGame) {
         console.log('📝 無進入標記，立即導向開始畫面...');
         window.location.href = 'index.html';
         return;
     }
     
-    // 清除進入標記（下次開啟會回到 index.html）
     localStorage.removeItem('floralForger_enterGame');
     console.log('✅ 清除進入標記');
 
     const loaded = await CSVLoader.loadAll();
     if (!loaded) { alert('資料載入失敗，請重新整理頁面！'); return; }
 
-    // 檢查是新遊戲還是讀取存檔
     const newGameData = localStorage.getItem('floralForger_newGame');
     if (newGameData) {
         console.log('🆕 開始新遊戲');
@@ -123,7 +136,6 @@ async function initGame() {
         const saved = localStorage.getItem('floralForger_save');
         if (saved) {
             const savedData = JSON.parse(saved);
-            // 合併儲存資料（確保新欄位有預設值）
             Object.assign(player, savedData);
             // 補齊可能缺失的新欄位
             if (!player.favor.sunstreet)  player.favor.sunstreet  = 0;
@@ -131,6 +143,10 @@ async function initGame() {
             if (!player.favor.starstreet) player.favor.starstreet = 0;
             if (!player.currentCommissions)            player.currentCommissions            = [];
             if (!player.completedCommissionsThisBoard) player.completedCommissionsThisBoard = [];
+            // 臥室系統新欄位
+            if (player.roomExpanded === undefined)     player.roomExpanded = false;
+            if (!player.ownedFurniture)                player.ownedFurniture = ['furniture_1', 'furniture_2', 'furniture_3'];
+            if (!player.placedFurniture)               player.placedFurniture = {};
             console.log('📂 讀取存檔成功', player);
         } else {
             player.currentEP = Math.floor(2 * (player.str + player.int + player.dex) / 3);
@@ -141,9 +157,10 @@ async function initGame() {
     updatePlayerDisplay();
     updateStatsDisplay();
     await renderScene();
+    updateSceneSwitchButtons();
     document.getElementById('speaker-name').textContent = player.name;
     DialogueSystem.showDialogue('PC', '是時候展現真正的技術了！');
-    console.log('✅ 鍛造室初始化完成！', player);
+    console.log('✅ 遊戲初始化完成！', player);
 }
 
 // === 顯示更新 ===
@@ -191,6 +208,10 @@ const GameSystem = {
         if (!player.favor.starstreet) player.favor.starstreet = 0;
         if (!player.currentCommissions)            player.currentCommissions            = [];
         if (!player.completedCommissionsThisBoard) player.completedCommissionsThisBoard = [];
+        // 臥室系統新欄位
+        if (player.roomExpanded === undefined)     player.roomExpanded = false;
+        if (!player.ownedFurniture)                player.ownedFurniture = ['furniture_1', 'furniture_2', 'furniture_3'];
+        if (!player.placedFurniture)               player.placedFurniture = {};
         updatePlayerDisplay();
         updateStatsDisplay();
         renderScene();
@@ -198,7 +219,8 @@ const GameSystem = {
     }
 };
 
-window.player     = player;
-window.GameSystem = GameSystem;
+window.player       = player;
+window.GameSystem   = GameSystem;
+window.switchScene  = switchScene;
 
 document.addEventListener('DOMContentLoaded', initGame);
