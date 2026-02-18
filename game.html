@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FLORAL FORGER</title>
-  <!-- v20260212-07 -->
+  <!-- v20260218-01 臥室系統 -->
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -67,6 +67,26 @@
     .equip-slot .equip-name { font-size: 0.8em; color: #ccc; display: block; }
     .equip-slot .equip-effect { font-size: 0.75em; color: #7ed321; margin-top: 3px; display: block; }
 
+    /* === 場景切換按鈕 === */
+    .scene-switch-section {
+      background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px;
+    }
+    .scene-switch-label { font-size: 0.8em; color: #888; margin-bottom: 8px; text-align: center; }
+    .scene-switch-btns { display: flex; gap: 6px; }
+    .scene-btn {
+      flex: 1; padding: 8px 4px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px; color: #888;
+      cursor: pointer; font-size: 1.2em;
+      transition: all 0.2s; text-align: center;
+    }
+    .scene-btn:hover { background: rgba(255,255,255,0.1); color: #ccc; }
+    .scene-btn.active {
+      background: linear-gradient(90deg, #f5a623, #f5576c);
+      border-color: #f5a623; color: #fff;
+    }
+
     .save-section { display: flex; gap: 8px; margin-top: auto; }
     .save-btn {
       flex: 1; padding: 8px;
@@ -114,7 +134,7 @@
 
     .dialogue-area {
       flex: 4;
-      width: 100%; /* 確保撐滿右側 */
+      width: 100%;
       background: linear-gradient(180deg, #151520 0%, #101018 100%);
       border-top: 1px solid rgba(255,255,255,0.1);
       padding: 15px 20px;
@@ -123,21 +143,21 @@
     .dialogue-box {
       background: rgba(30, 30, 45, 0.95); border-radius: 10px;
       border: 1px solid rgba(255,255,255,0.1);
-      width: 100%; /* 確保撐滿 */
+      width: 100%;
       flex: 1; display: flex; flex-direction: column; overflow: hidden;
     }
     .dialogue-header {
       display: flex; align-items: center;
-      padding: 12px 20px; /* 加大內距 */
+      padding: 12px 20px;
       border-bottom: 1px solid rgba(255,255,255,0.1);
       background: rgba(0,0,0,0.2);
     }
     .color-block { width: 16px; height: 16px; border-radius: 3px; margin-right: 10px; }
-    .speaker-name { font-weight: bold; font-size: 1em; /* 稍微加大 */ }
+    .speaker-name { font-weight: bold; font-size: 1em; }
 
     .dialogue-content {
-      padding: 20px 25px; /* 加大內距 */
-      font-size: 1.05em; /* 稍微加大字體 */
+      padding: 20px 25px;
+      font-size: 1.05em;
       line-height: 1.7;
       flex: 1; position: relative;
     }
@@ -219,6 +239,16 @@
         <span class="equip-effect">心情+10</span>
       </div>
     </div>
+    
+    <!-- 場景切換按鈕 -->
+    <div class="scene-switch-section">
+      <div class="scene-switch-label">場景切換</div>
+      <div class="scene-switch-btns">
+        <button class="scene-btn active" data-scene="forge" onclick="switchScene('forge')" title="鍛造室">⚒️</button>
+        <button class="scene-btn" data-scene="bedroom" onclick="switchScene('bedroom')" title="臥室">🏠</button>
+      </div>
+    </div>
+    
     <div class="save-section">
       <button class="save-btn" onclick="GameSystem.save()">💾 儲存</button>
       <button class="save-btn" onclick="GameSystem.load()">📂 讀取</button>
@@ -230,10 +260,10 @@
     <!-- 操作區 -->
     <div class="operation-area">
       <div class="room-header" id="room-header">
-        <!-- 由 ForgeScene.renderHeader() 填入 -->
+        <!-- 由場景 render() 填入 -->
       </div>
       <div id="room-content">
-        <!-- 由 ForgeScene.renderContent() 填入 -->
+        <!-- 由場景 render() 填入 -->
         <div style="color: #444; font-size: 0.9em;">載入中...</div>
       </div>
     </div>
@@ -248,12 +278,10 @@
         <div class="dialogue-content">
           <span class="dialogue-text" id="dialogue-text">該起床了!</span>
         </div>
-        <!-- 設計圖評論區（已廢棄，評論現在在卡片內）-->
         <div id="design-comments"></div>
       </div>
     </div>
-
- 
+  </div>
 
   <!-- ====== Toast ====== -->
   <div class="effect-toast" id="toast"></div>
@@ -267,8 +295,8 @@
 
   <!-- 2. 系統：角色 / 對話 / 遊戲狀態 -->
   <script src="js/systems/character.js"></script>
-  <script src="js/systems/dialogue.js?v=20260212-07"></script></script>
-  <script src="js/systems/game.js"></script>
+  <script src="js/systems/dialogue.js?v=20260218-01"></script>
+  <script src="js/systems/game.js?v=20260218-01"></script>
 
   <!-- 3. 核心：各系統計算邏輯 -->
   <script src="js/core/design.js"></script>
@@ -277,6 +305,7 @@
   <script src="js/core/decoration.js"></script>
   <script src="js/core/commission.js"></script>
   <script src="js/core/shop.js"></script>
+  <script src="js/core/furniture.js?v=20260218-01"></script>
 
   <!-- 4. 場景：各 UI 彈窗 -->
   <script src="js/scenes/forge.js"></script>
@@ -287,5 +316,7 @@
   <script src="js/scenes/commission-ui.js"></script>
   <script src="js/scenes/forge-utils.js"></script>
   <script src="js/scenes/shop-ui.js"></script>
+  <script src="js/scenes/bedroom.js?v=20260218-01"></script>
+  <script src="js/scenes/furniture-ui.js?v=20260218-01"></script>
 </body>
 </html>
