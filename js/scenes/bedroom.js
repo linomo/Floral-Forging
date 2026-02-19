@@ -8,7 +8,7 @@ const BedroomScene = {
     renderHeader() {
         const expandStatus = player.roomExpanded ? '（已擴建）' : '';
         return `
-            <span style="font-weight:bold;font-size:1.1em">🏠 小房間 ${expandStatus}</span>
+            <span style="font-weight:bold;font-size:1.1em">🏠 小哈的房間 ${expandStatus}</span>
             <span style="margin-left:15px;color:#888">
                 🛋️ 家具：<span style="color:#f5a623;font-weight:bold">${this._countPlacedFurniture()}</span> 個
             </span>`;
@@ -142,8 +142,7 @@ const BedroomScene = {
                 DialogueSystem.showDialogue('PC', '好想睡覺喔～');
                 break;
             case 'dress_modal':
-                showToast('📦 儲物櫃功能開發中...');
-                DialogueSystem.showDialogue('PC', '有什麼好東西呢？');
+                StorageUI.open();
                 break;
             case 'street_modal':
                 showToast('🚪 街道功能開發中...');
