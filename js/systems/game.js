@@ -28,7 +28,8 @@ const player = {
 
     designs:         [],
     products:        [],
-    equipment:       ['equip01'],
+    ownedEquipment:  ['equip_1', 'equip_2', 'equip_3'],  // 擁有的裝備（初始三個）
+    equippedItem:    'equip_1',                          // 目前裝備（師父的內褲）
     books:           ['book01'],
     readBooks:       [],
     unlockedWeapons: [],
@@ -158,6 +159,9 @@ async function initGame() {
             if (!player.bankSettings) {
                 player.bankSettings = { lifestyle: '毫無物慾', family: '獨善其身', donation: '先別先別' };
             }
+            // 裝備系統新欄位
+            if (!player.ownedEquipment)              player.ownedEquipment = ['equip_1', 'equip_2', 'equip_3'];
+            if (player.equippedItem === undefined)   player.equippedItem = 'equip_1';
             console.log('📂 讀取存檔成功', player);
         } else {
             player.currentEP = Math.floor(2 * (player.str + player.int + player.dex) / 3);
@@ -227,6 +231,9 @@ const GameSystem = {
         if (!player.bankSettings) {
             player.bankSettings = { lifestyle: '毫無物慾', family: '獨善其身', donation: '先別先別' };
         }
+        // 裝備系統新欄位
+        if (!player.ownedEquipment)              player.ownedEquipment = ['equip_1', 'equip_2', 'equip_3'];
+        if (player.equippedItem === undefined)   player.equippedItem = 'equip_1';
         updatePlayerDisplay();
         updateStatsDisplay();
         renderScene();
