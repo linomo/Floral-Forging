@@ -10,7 +10,8 @@ const CSVLoader = {
         comments: [], luckRandom: [], books: [],
         forgeMap: [], bedroomMap: [], modalEpCost: [],
         commissions: [],
-        furniture: []
+        furniture: [],
+        equipment: []
     },
 
     async loadCSV(path) {
@@ -45,6 +46,7 @@ const CSVLoader = {
         this.data.metal     = await this.loadCSV('data/items/metal.csv');
         this.data.wood      = await this.loadCSV('data/items/wood.csv');
         this.data.furniture = await this.loadCSV('data/items/furniture.csv');
+        this.data.equipment = await this.loadCSV('data/items/equipment.csv');
 
         // 鍛造規則
         this.data.grades   = await this.loadCSV('data/forging/prefixes_grade.csv');
@@ -98,6 +100,15 @@ const CSVLoader = {
     // 取得玩家擁有的家具（根據 source 過濾）
     getOwnedFurniture(ownedIds) {
         return this.data.furniture.filter(f => ownedIds.includes(f.furniture_id));
+    },
+
+    getEquipment(equipmentId) {
+        return this.data.equipment.find(e => e.equipment_id === equipmentId);
+    },
+
+    // 取得玩家擁有的裝備
+    getOwnedEquipment(ownedIds) {
+        return this.data.equipment.filter(e => ownedIds.includes(e.equipment_id));
     }
 };
 
