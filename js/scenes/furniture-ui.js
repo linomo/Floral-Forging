@@ -135,7 +135,7 @@ const FurnitureUI = {
         if (success) {
             const furniture = CSVLoader.getFurniture(furnitureId);
             showToast(`🛋️ 放置了 ${furniture ? furniture.name : '家具'}！`);
-            DialogueSystem.showDialogue('PC', `${furniture ? furniture.icon : '📦'} 放好了！房間變得更溫馨了～`);
+            DialogueSystem.showDialogue('PC', `${furniture ? furniture.icon : '📦'} 放好了！房間超讚讚！`);
             this.close();
             renderScene();  // 重新渲染場景
             updateStatsDisplay();
