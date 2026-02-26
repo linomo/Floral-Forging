@@ -354,7 +354,8 @@ const BankUI = {
                 const text = BankCore.formatEffect(stat, value);
                 const cls = value >= 0 ? 'positive' : 'negative';
                 return `<span class="bank-effect-tag ${cls}">${text}</span>`;
-            }).join('');
+            })
+            .join('');
         }
     },
 
