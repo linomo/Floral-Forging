@@ -1,4 +1,4 @@
-furniture_id,name,icon,source,price,effect_sta,effect_value,maINTenance
+furniture_id,name,icon,source,price,effect_sta,effect_value,maintenance
 furniture_1,想像朋友熊大海,🧸,initial,0,MOOD,5,10
 furniture_2,想像朋友貓小土,🐈,initial,0,STRESS,-5,10
 furniture_3,想像朋友狗中空,🐕,initial,0,currentEP,5,10
@@ -23,4 +23,5 @@ furniture_21,小師兄給的乾淨水晶,🧼,SS,0,STR,3,150
 furniture_22,大俠給的精密玩具,🔐,DS,0,INT,3,150
 furniture_23,師父不要的小椅子,🪑,SF,0,SF_favor,5,300
 furniture_24,小師兄丟掉的洗衣籃,🧺,SS,0,SS_favor,5,300
+
 furniture_25,大俠弄壞的大包包,🎒,DS,0,DS_favor,5,300
