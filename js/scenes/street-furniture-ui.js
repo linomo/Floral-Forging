@@ -137,7 +137,13 @@ const StreetFurnitureUI = {
             if (furniture.effect_sta && furniture.effect_value) {
                 const value = parseInt(furniture.effect_value) || 0;
                 const sign = value >= 0 ? '+' : '';
-                effectText = `${furniture.effect_sta} ${sign}${value}`;
+                const nameMap = {
+                    'STR': '力量', 'INT': '智力', 'DEX': '敏捷',
+                    'MOOD': '心情', 'STRESS': '壓力',
+                    'CURRENTEP': '元氣', 'currentEP': '元氣'
+                };
+                const statLabel = nameMap[furniture.effect_sta] || furniture.effect_sta;
+                effectText = `${statLabel} ${sign}${value}`;
             }
 
             return `
