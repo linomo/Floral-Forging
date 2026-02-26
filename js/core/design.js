@@ -74,9 +74,10 @@ const DesignGenerator = {
     _formatEffect(stat, value) {
         const val = parseInt(value) || 0;
         if (val === 0) return null;
-        const isSpecial = ['SF', 'SS', 'DS'].includes(stat);
-        const sign      = val > 0 ? '+' : '';
-        const cls       = isSpecial ? 'special' : (val > 0 ? 'positive' : 'negative');
+        // 好感度為隱藏數值，不顯示
+        if (['SF', 'SS', 'DS', 'SF_FAVOR', 'SS_FAVOR', 'DS_FAVOR'].includes(stat)) return null;
+        const sign = val > 0 ? '+' : '';
+        const cls  = val > 0 ? 'positive' : 'negative';
         return `<span class="effect-tag ${cls}">${stat}${sign}${val}</span>`;
     },
 
