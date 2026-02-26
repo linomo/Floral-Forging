@@ -144,8 +144,7 @@ const BedroomScene = {
                 StorageUI.open();
                 break;
             case 'street_modal':
-                showToast('🚪 街道功能開發中...');
-                DialogueSystem.showDialogue('PC', '出去逛逛囉！');
+                StreetUI.open();
                 break;
             default:
                 console.warn(`未知 modal: ${obj.action_param}`);
