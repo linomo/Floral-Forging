@@ -11,7 +11,8 @@ const CSVLoader = {
         forgeMap: [], bedroomMap: [], modalEpCost: [],
         commissions: [],
         furniture: [],
-        equipment: []
+        equipment: [],
+        actions: []
     },
 
     async loadCSV(path) {
@@ -65,6 +66,9 @@ const CSVLoader = {
         // 機率表
         this.data.luckRandom = await this.loadCSV('data/luck_random.csv');
 
+        // 排程
+        this.data.actions = await this.loadCSV('data/schedule/actions.csv');
+
         console.log('✅ 資料庫載入完畢', this.data);
         return true;
     },
@@ -109,6 +113,16 @@ const CSVLoader = {
     // 取得玩家擁有的裝備
     getOwnedEquipment(ownedIds) {
         return this.data.equipment.filter(e => ownedIds.includes(e.equipment_id));
+    },
+
+    getAction(actionId) {
+        return this.data.actions.find(a => a.action_id === actionId);
+    },
+
+    // 取得所有行動（可依 category 篩選）
+    getActions(category = null) {
+        if (!category) return this.data.actions;
+        return this.data.actions.filter(a => a.category === category);
     }
 };
 
