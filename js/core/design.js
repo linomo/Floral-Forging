@@ -121,10 +121,8 @@ const DesignGenerator = {
             const eff = this._formatEffect(mental[`effect_sta_${i}`], mental[`effect_value_${i}`]);
             if (eff) effects.push(eff);
         }
-        if (['SF', 'SS', 'DS'].includes(pStat) && pVal !== 0) {
-            const eff = this._formatEffect(pStat, pVal);
-            if (eff) effects.push(eff);
-        }
+        // 改成（直接刪掉這段，或改成空判斷）
+        // 物理前綴的角色好感效果不顯示
 
         // === 評論過濾（處理 unlock_trigger）===
         const comments = CSVLoader.data.comments.filter(c => {
