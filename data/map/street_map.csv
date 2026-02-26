@@ -1,0 +1,10 @@
+room_id,row,col,unlock,obj_id,name,icon,chara_id,comment,action_type,action_param,ep_cost,confirm_message,confirm_buttons,dynamic_data
+street,1,1,initial,street_flower,鮮花鋪,🌼,PC,香香的一股花風。,simple_event,event_flower,,,,
+street,1,2,initial,street_park,公園,🏞️,PC,去長椅睡個覺吧！,simple_event,event_park,,,,
+street,1,3,initial,street_square,廣場,⬜,PC,跳舞！莫生氣！生氣給小師兄留餘地！,open_modal,item_shop_modal,,,,
+street,2,1,initial,street_aquarium,水族店,🐠,PC,我來看看我的美貌會不會讓魚溺水。,simple_event,event_aquarium,,,,
+street,2,2,initial,street_pool,小湖,💫,PC,想要在水上睡覺！,simple_event,event_pool,,,,
+street,2,3,initial,street_teashop,茶坊,🍵,PC,檢茶一下。,simple_event,event_teashop,,,,
+street,3,1,initial,street_hardware,五金行,🔧,PC,看有沒有缺什麼叫師父買給我。,simple_event,event_hardware,,,,
+street,3,2,initial,street_saleman,商店,🏬,PC,我最喜歡花錢了！,open_modal,furniture_shop_modal,,,,
+street,3,3,initial,street_fortunetelling,占卜攤,🧙‍♀️,PC,有人看得我心裡發寒。,open_modal,fortune_modal,,,,
