@@ -1,0 +1,12 @@
+action_id,name,icon,category,days,effect_sta_1,effect_value_1,use_factor_1,effect_sta_2,effect_value_2,effect_sta_3,effect_value_3,action_type,action_param,description
+act_01,鍛造,⚒️,廬內,6,,,,,,,,open_modal,forge_modal,如果是鍛造師一定會這麼做的。
+act_02,小腦腦鍛鍊,🧠,廬內,1,INT,5,TRUE,STRESS,10,MOOD,-5,normal,,左三圈又三圈。
+act_03,小手手鍛鍊,💪,廬內,1,STR,5,TRUE,STRESS,10,MOOD,-5,normal,,前後前後拍拍手。
+act_04,小腳腳鍛鍊,🦵,廬內,1,DEX,5,TRUE,STRESS,10,MOOD,-5,normal,,向前兩步恰恰。
+act_05,睡覺,😴,廬內,1,INT,1,,STRESS,-50,MOOD,30,normal,,呼嚕呼嚕。
+act_06,閒晃,🚶,廬內,1,DEX,1,,STRESS,-30,MOOD,50,normal,,游來游去。
+act_07,近山,⛰️,廬外,1,STRESS,20,,MOOD,10,,,open_modal,gather_mountain_near,橫看成稜。
+act_08,遠山,🏞️,廬外,2,STRESS,30,,MOOD,-10,,,open_modal,gather_mountain_far,側成峰。
+act_09,近林,🌲,廬外,1,STRESS,20,,MOOD,10,,,open_modal,gather_forest_near,我見森林多嫵媚。
+act_10,遠林,🌳,廬外,2,STRESS,30,,MOOD,-10,,,open_modal,gather_forest_far,森林見我一定也是。
+act_11,市場,🏪,廬外,1,STRESS,10,,MOOD,10,,,open_modal,gather_market,不可以買X2。
