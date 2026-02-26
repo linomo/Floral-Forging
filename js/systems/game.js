@@ -49,7 +49,10 @@ const player = {
         lifestyle: '毫無物慾',    // 生活品質
         family: '獨善其身',       // 補貼家用
         donation: '先別先別'      // 善心捐款
-    }
+    },
+
+    // === 排程系統 ===
+    nextSchedule: []              // 下一旬排程 [action_id, ...]
 };
 
 // === 場景系統 ===
@@ -162,6 +165,8 @@ async function initGame() {
             // 裝備系統新欄位
             if (!player.ownedEquipment)              player.ownedEquipment = ['equip_1', 'equip_2', 'equip_3'];
             if (player.equippedItem === undefined)   player.equippedItem = 'equip_1';
+            // 排程系統新欄位
+            if (!player.nextSchedule)               player.nextSchedule = [];
             console.log('📂 讀取存檔成功', player);
         } else {
             player.currentEP = Math.floor(2 * (player.str + player.int + player.dex) / 3);
@@ -234,6 +239,8 @@ const GameSystem = {
         // 裝備系統新欄位
         if (!player.ownedEquipment)              player.ownedEquipment = ['equip_1', 'equip_2', 'equip_3'];
         if (player.equippedItem === undefined)   player.equippedItem = 'equip_1';
+        // 排程系統新欄位
+        if (!player.nextSchedule)               player.nextSchedule = [];
         updatePlayerDisplay();
         updateStatsDisplay();
         renderScene();
