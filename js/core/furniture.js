@@ -173,9 +173,7 @@ const FurnitureCore = {
             'MOOD': '心情',
             'STRESS': '壓力',
             'CURRENTEP': '元氣',
-            'SF_FAVOR': '師父好感',
-            'SS_FAVOR': '小師兄好感',
-            'DS_FAVOR': '大俠好感'
+// 移除好感三項
         };
         const name = statNames[stat] || stat;
         const sign = value >= 0 ? '+' : '';
