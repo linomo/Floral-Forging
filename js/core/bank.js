@@ -239,16 +239,13 @@ const BankCore = {
      * @returns {string}
      */
     formatEffect(stat, value) {
-        const statNames = {
-            'STR': '力量',
-            'INT': '智力',
-            'DEX': '敏捷',
-            'MOOD': '心情',
-            'STRESS': '壓力',
-            'SF_FAVOR': '師父好感',
-            'SS_FAVOR': '小師兄好感',
-            'DS_FAVOR': '大俠好感'
-        };
+    if (['SF_FAVOR', 'SS_FAVOR', 'DS_FAVOR'].includes(stat)) return null;  // 新增
+    const statNames = {
+        'STR': '力量', 'INT': '智力', 'DEX': '敏捷',
+        'MOOD': '心情', 'STRESS': '壓力'
+        // 移除 SF_FAVOR / SS_FAVOR / DS_FAVOR
+    };
+
         const name = statNames[stat] || stat;
         const sign = value >= 0 ? '+' : '';
         return `${name}${sign}${value}`;
