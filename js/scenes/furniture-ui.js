@@ -108,7 +108,7 @@ const FurnitureUI = {
                         <span class="furniture-item-icon">${f.icon}</span>
                         <div class="furniture-item-info">
                             <div class="furniture-item-name">${f.name}</div>
-                            <div class="furniture-item-effect">${effectText}</div>
+                            ${effectText ? `<div class="furniture-item-effect">${effectText}</div>` : ''}
                             <div class="furniture-item-cost">維護費 ${parseInt(f.maintenance) || 0}元/旬</div>
                         </div>
                     </div>`;
