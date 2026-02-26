@@ -350,7 +350,7 @@ const BankUI = {
         } else {
             listEl.innerHTML = Object.entries(allEffects).map(([stat, value]) => {
                 .filter(([stat]) => !['SF_FAVOR', 'SS_FAVOR', 'DS_FAVOR'].includes(stat))  // 新增
-                .map(([stat, value]) => { ... }).join('');
+                .map(([stat, value]) => 
                 const text = BankCore.formatEffect(stat, value);
                 const cls = value >= 0 ? 'positive' : 'negative';
                 return `<span class="bank-effect-tag ${cls}">${text}</span>`;
