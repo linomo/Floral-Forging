@@ -220,11 +220,13 @@ const StreetUI = {
             document.body.appendChild(modal);
         }
 
-        const effectsHtml = effects.filter(e => !e.stat.includes('FAVOR')).map(e => {
-            const text = StreetCore.formatEffect(e.stat, e.value);
-            const cls = e.value >= 0 ? 'positive' : 'negative';
-            return `<span class="event-effect-tag ${cls}">${text}</span>`;
-        }).join('');
+        const effectsHtml = effects
+            .filter(e => !['SF_FAVOR', 'SS_FAVOR', 'DS_FAVOR'].includes(e.stat))  // 新增
+            .map(e => {
+                const text = StreetCore.formatEffect(e.stat, e.value);
+                const cls = e.value >= 0 ? 'positive' : 'negative';
+                return `<span class="event-effect-tag ${cls}">${text}</span>`;
+            }).join('');
 
         modal.innerHTML = `
             <div class="street-event-modal">
