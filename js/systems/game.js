@@ -52,7 +52,10 @@ const player = {
     },
 
     // === 排程系統 ===
-    nextSchedule: []              // 下一旬排程 [action_id, ...]
+    nextSchedule: [],              // 下一旬排程 [action_id, ...]
+
+    // === 街道系統 ===
+    streetVisits: 3                // 本旬剩餘外出次數
 };
 
 // === 場景系統 ===
@@ -167,6 +170,8 @@ async function initGame() {
             if (player.equippedItem === undefined)   player.equippedItem = 'equip_1';
             // 排程系統新欄位
             if (!player.nextSchedule)               player.nextSchedule = [];
+            // 街道系統新欄位
+            if (player.streetVisits === undefined)  player.streetVisits = 3;
             console.log('📂 讀取存檔成功', player);
         } else {
             player.currentEP = Math.floor(2 * (player.str + player.int + player.dex) / 3);
@@ -241,6 +246,8 @@ const GameSystem = {
         if (player.equippedItem === undefined)   player.equippedItem = 'equip_1';
         // 排程系統新欄位
         if (!player.nextSchedule)               player.nextSchedule = [];
+        // 街道系統新欄位
+        if (player.streetVisits === undefined)  player.streetVisits = 3;
         updatePlayerDisplay();
         updateStatsDisplay();
         renderScene();
