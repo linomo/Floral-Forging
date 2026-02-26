@@ -173,6 +173,7 @@ const FurnitureCore = {
             'MOOD': '心情',
             'STRESS': '壓力',
             'CURRENTEP': '元氣',
+            'currentEP': '元氣', 
 // 移除好感三項
         };
         const name = statNames[stat] || stat;
