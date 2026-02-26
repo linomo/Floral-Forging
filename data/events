@@ -1,7 +1,0 @@
-event_id,obj_id,chara_id,dialogue,effect_sta_1,effect_value_1,effect_sta_2,effect_value_2
-event_flower,street_flower,PC,遇到師父了！跟師父一起逛街。,SF_FAVOR,8,MOOD,10
-event_park,street_park,PC,在長椅上睡覺，夢到了一頭牛。,SF_FAVOR,3,STRESS,-10
-event_aquarium,street_aquarium,PC,遇到小師兄！他跟我介紹很多魚魚！,SS_FAVOR,3,MOOD,10
-event_pool,street_pool,PC,在小舟上睡著了，夢到好多奇怪的大魚。,SF_FAVOR,1,STRESS,-10
-event_teashop,street_teashop,PC,好油喔，喝口茶。呸呸。被以為在表演拿到打賞。,DS_FAVOR,1,MONEY,300
-event_hardware,street_hardware,PC,遇到了大俠，我說幾九得八十一，他給了我一百塊獎金。,DS_FAVOR,3,MONEY,100
