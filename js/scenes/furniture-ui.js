@@ -162,7 +162,16 @@ const FurnitureUI = {
             document.body.appendChild(modal);
         }
 
-        const effectText = FurnitureCore.formatEffect(furniture.effect_sta, parseInt(furniture.effect_value));
+        // _buildFurnitureList 的 effectText 計算
+        let effectText = '';
+        if (furniture.effect_sta && furniture.effect_value) {
+            // 好感度不顯示
+            if (!['SF_FAVOR', 'SS_FAVOR', 'DS_FAVOR'].includes(furniture.effect_sta)) {  // 新增
+                const value = parseInt(furniture.effect_value) || 0;
+                const sign = value >= 0 ? '+' : '';
+                effectText = `${furniture.effect_sta} ${sign}${value}`;
+            }
+        }
 
         modal.innerHTML = `
             <div class="furniture-modal">
