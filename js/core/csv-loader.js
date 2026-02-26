@@ -8,11 +8,12 @@ const CSVLoader = {
         grades: [], physical: [], mental: [],
         weapons: [], metal: [], wood: [],
         comments: [], luckRandom: [], books: [],
-        forgeMap: [], bedroomMap: [], modalEpCost: [],
+        forgeMap: [], bedroomMap: [], streetMap: [], modalEpCost: [],
         commissions: [],
         furniture: [],
         equipment: [],
-        actions: []
+        actions: [],
+        streetEvents: []
     },
 
     async loadCSV(path) {
@@ -62,6 +63,10 @@ const CSVLoader = {
         // 地圖
         this.data.forgeMap   = await this.loadCSV('data/map/forge_map.csv');
         this.data.bedroomMap = await this.loadCSV('data/map/bedroom_map.csv');
+        this.data.streetMap  = await this.loadCSV('data/map/street_map.csv');
+
+        // 事件
+        this.data.streetEvents = await this.loadCSV('data/events/street_events.csv');
 
         // 機率表
         this.data.luckRandom = await this.loadCSV('data/luck_random.csv');
@@ -123,6 +128,14 @@ const CSVLoader = {
     getActions(category = null) {
         if (!category) return this.data.actions;
         return this.data.actions.filter(a => a.category === category);
+    },
+
+    getStreetObject(objId) {
+        return this.data.streetMap.find(o => o.obj_id === objId);
+    },
+
+    getStreetEvent(eventId) {
+        return this.data.streetEvents.find(e => e.event_id === eventId);
     }
 };
 
