@@ -134,8 +134,7 @@ const BedroomScene = {
                 BankUI.open();
                 break;
             case 'calendar_modal':
-                showToast('📅 行事曆功能開發中...');
-                DialogueSystem.showDialogue('PC', '下一旬要做什麼呢？');
+                ScheduleUI.open();
                 break;
             case 'bed_modal':
                 showToast('🛏️ 床功能開發中...');
