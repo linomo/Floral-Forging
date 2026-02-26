@@ -280,9 +280,7 @@ const StreetCore = {
             'MOOD': '心情',
             'STRESS': '壓力',
             'LUCK': '幸運',
-            'SF_FAVOR': '師父好感',
-            'SS_FAVOR': '小師兄好感',
-            'DS_FAVOR': '大俠好感',
+        // 移除好感三項
             'MONEY': '金錢'
         };
         const name = statNames[stat] || stat;
