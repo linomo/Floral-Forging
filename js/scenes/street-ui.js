@@ -220,7 +220,7 @@ const StreetUI = {
             document.body.appendChild(modal);
         }
 
-        const effectsHtml = effects.map(e => {
+        const effectsHtml = effects.filter(e => !e.stat.includes('FAVOR')).map(e => {
             const text = StreetCore.formatEffect(e.stat, e.value);
             const cls = e.value >= 0 ? 'positive' : 'negative';
             return `<span class="event-effect-tag ${cls}">${text}</span>`;
