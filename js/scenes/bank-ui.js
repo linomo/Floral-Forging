@@ -325,13 +325,13 @@ const BankUI = {
     },
 
     // === 更新效果預覽 ===
+  
     _updateEffectsPreview() {
         const listEl = document.getElementById('bankEffectsList');
         if (!listEl) return;
         
         const allEffects = {};
         
-        // 收集所有效果
         const lifestyle = BankCore.lifestyleOptions[player.bankSettings.lifestyle];
         const family = BankCore.familyOptions[player.bankSettings.family];
         const donation = BankCore.donationOptions[player.bankSettings.donation];
@@ -344,18 +344,18 @@ const BankUI = {
             }
         });
         
-        // 渲染
-        if (Object.keys(allEffects).length === 0) {
+        const filtered = Object.entries(allEffects)
+            .filter(([stat]) => !['SF_FAVOR', 'SS_FAVOR', 'DS_FAVOR'].includes(stat));
+        
+        if (filtered.length === 0) {
             listEl.innerHTML = '<span style="color:#666">無數值影響</span>';
         } else {
-            listEl.innerHTML = Object.entries(allEffects).map(([stat, value]) => {
-                .filter(([stat]) => !['SF_FAVOR', 'SS_FAVOR', 'DS_FAVOR'].includes(stat))  // 新增
-                .map(([stat, value]) => 
+            listEl.innerHTML = filtered.map(([stat, value]) => {
                 const text = BankCore.formatEffect(stat, value);
+                if (!text) return '';
                 const cls = value >= 0 ? 'positive' : 'negative';
                 return `<span class="bank-effect-tag ${cls}">${text}</span>`;
-            })
-            .join('');
+            }).filter(Boolean).join('');
         }
     },
 
