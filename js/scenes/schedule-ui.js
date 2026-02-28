@@ -130,7 +130,7 @@ const ScheduleUI = {
                 margin-left: 4px;
             }
 
-            /* 確認按鈕 */
+            /* 底部按鈕區 */
             .schedule-confirm {
                 margin-top: 20px; display: flex; gap: 10px;
             }
@@ -158,6 +158,16 @@ const ScheduleUI = {
             }
             .schedule-clear-btn:hover {
                 background: rgba(245, 87, 108, 0.3);
+            }
+            .schedule-close-btn {
+                padding: 12px 20px;
+                background: rgba(255,255,255,0.05);
+                border: 1px solid rgba(255,255,255,0.15);
+                border-radius: 10px; color: #aaa;
+                cursor: pointer; font-family: inherit;
+            }
+            .schedule-close-btn:hover {
+                background: rgba(255,255,255,0.1); color: #fff;
             }
 
             /* === 執行結果 Modal === */
@@ -206,7 +216,7 @@ const ScheduleUI = {
         this._updateDisplay();
     },
 
-    // === 關閉 ===
+    // === 關閉（不儲存）===
     close() {
         const modal = document.getElementById('scheduleModal');
         if (modal) modal.classList.remove('show');
@@ -214,7 +224,9 @@ const ScheduleUI = {
 
     // === 建構 Modal HTML ===
     _buildModalHTML() {
-        const indoorActions = ScheduleCore.getIndoorActions();
+        // 鍛造獨立，廬內排除鍛造
+        const forgeAction = CSVLoader.getAction('act_01');
+        const indoorActions = ScheduleCore.getIndoorActions().filter(a => a.action_id !== 'act_01');
         const outdoorActions = ScheduleCore.getOutdoorActions();
 
         return `
@@ -232,8 +244,18 @@ const ScheduleUI = {
                     ${this._buildSlots()}
                 </div>
 
-                <!-- 廬內行動 -->
+                <!-- 行動選擇 -->
                 <div class="schedule-actions">
+
+                    <!-- 鍛造（獨立，必須排在最後六天）-->
+                    <div class="schedule-category">
+                        <div class="schedule-category-title">⚒️ 鍛造（後六天）</div>
+                        <div class="schedule-action-list">
+                            ${forgeAction ? this._buildActionBtn(forgeAction) : '<span style="color:#666;font-size:0.85em">無資料</span>'}
+                        </div>
+                    </div>
+
+                    <!-- 廬內 -->
                     <div class="schedule-category">
                         <div class="schedule-category-title">🏠 廬內</div>
                         <div class="schedule-action-list">
@@ -241,7 +263,7 @@ const ScheduleUI = {
                         </div>
                     </div>
 
-                    <!-- 廬外行動 -->
+                    <!-- 廬外 -->
                     <div class="schedule-category">
                         <div class="schedule-category-title">🌄 廬外</div>
                         <div class="schedule-action-list">
@@ -250,11 +272,12 @@ const ScheduleUI = {
                     </div>
                 </div>
 
-                <!-- 確認按鈕 -->
+                <!-- 底部按鈕 -->
                 <div class="schedule-confirm">
                     <button class="schedule-clear-btn" onclick="ScheduleUI.clear()">清空</button>
+                    <button class="schedule-close-btn" onclick="ScheduleUI.close()">關閉</button>
                     <button class="schedule-confirm-btn" id="scheduleConfirmBtn" onclick="ScheduleUI.confirm()">
-                        確定排程
+                        決定
                     </button>
                 </div>
             </div>`;
@@ -314,6 +337,7 @@ const ScheduleUI = {
     // === 更新顯示 ===
     _updateDisplay() {
         const remaining = ScheduleCore.getRemainingDays(this.tempSchedule);
+        const hasForge = this.tempSchedule.includes('act_01');
 
         // 更新剩餘天數
         const daysEl = document.getElementById('scheduleDays');
@@ -325,7 +349,6 @@ const ScheduleUI = {
         // 更新格子
         const slotsContainer = document.getElementById('scheduleSlots');
         if (slotsContainer) {
-            // 先清空所有格子
             for (let i = 0; i < 9; i++) {
                 const slot = document.getElementById(`slot-${i}`);
                 if (slot) {
@@ -334,7 +357,6 @@ const ScheduleUI = {
                 }
             }
 
-            // 填入排程
             let dayIndex = 0;
             this.tempSchedule.forEach((actionId, scheduleIndex) => {
                 const action = CSVLoader.getAction(actionId);
@@ -346,7 +368,6 @@ const ScheduleUI = {
                     const slot = document.getElementById(`slot-${dayIndex}`);
                     if (slot) {
                         if (d === 0) {
-                            // 第一天：顯示完整資訊
                             slot.className = 'schedule-slot filled';
                             slot.innerHTML = `
                                 <span class="slot-day">${dayIndex + 1}</span>
@@ -356,7 +377,6 @@ const ScheduleUI = {
                                     `<span class="slot-remove" onclick="event.stopPropagation(); ScheduleUI.removeLastAction()">✕</span>` : ''}
                             `;
                         } else {
-                            // 後續天：顯示延續
                             slot.className = 'schedule-slot continuation';
                             slot.innerHTML = `
                                 <span class="slot-day">${dayIndex + 1}</span>
@@ -376,51 +396,22 @@ const ScheduleUI = {
             btn.disabled = !check.canAdd;
         });
 
-        // 更新確認按鈕（要排滿才能確認）
+        // 決定按鈕：有排程就能按
         const confirmBtn = document.getElementById('scheduleConfirmBtn');
         if (confirmBtn) {
-            confirmBtn.disabled = remaining > 0;
+            confirmBtn.disabled = this.tempSchedule.length === 0;
         }
     },
 
-    // === 確認排程 ===
+    // === 確認排程（儲存）===
     confirm() {
-        const remaining = ScheduleCore.getRemainingDays(this.tempSchedule);
-        if (remaining > 0) {
-            showToast(`❌ 還有 ${remaining} 天沒排！`);
-            return;
-        }
-
-        // 儲存排程
         player.nextSchedule = [...this.tempSchedule];
-        
         this.close();
         showToast('📅 排程已確定！');
         DialogueSystem.showDialogue('PC', '下一旬就這樣安排吧！');
-
-        // 顯示測試執行按鈕（開發用）
-        this._showTestButton();
     },
 
-    // === 測試執行按鈕（開發用）===
-    _showTestButton() {
-        let testBtn = document.getElementById('scheduleTestBtn');
-        if (!testBtn) {
-            testBtn = document.createElement('button');
-            testBtn.id = 'scheduleTestBtn';
-            testBtn.style.cssText = `
-                position: fixed; bottom: 20px; right: 20px;
-                padding: 10px 20px; background: #f5a623;
-                border: none; border-radius: 8px; color: #fff;
-                cursor: pointer; font-weight: bold; z-index: 100;
-            `;
-            testBtn.textContent = '🧪 執行排程（測試）';
-            testBtn.onclick = () => this.executeSchedule();
-            document.body.appendChild(testBtn);
-        }
-    },
-
-    // === 執行排程 ===
+    // === 執行排程（由床/旬推進呼叫）===
     executeSchedule() {
         if (!player.nextSchedule || player.nextSchedule.length === 0) {
             showToast('❌ 沒有排程！');
