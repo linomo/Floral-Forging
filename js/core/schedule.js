@@ -63,6 +63,25 @@ const ScheduleCore = {
         const days = parseInt(action.days) || 0;
         const remaining = this.getRemainingDays(schedule);
 
+        // 鍛造（act_01）特殊規則：
+        // 1. 每旬只能排一次
+        // 2. 必須剩餘恰好 6 天時才能加入（確保排在後六天）
+        if (actionId === 'act_01') {
+            if (schedule.includes('act_01')) {
+                return { canAdd: false, reason: '鍛造每旬只能安排一次' };
+            }
+            if (remaining !== 6) {
+                return { canAdd: false, reason: `鍛造需要剩餘恰好 6 天（目前剩 ${remaining} 天）` };
+            }
+            return { canAdd: true, reason: '' };
+        }
+
+        // 已有鍛造 → 不能再加其他行動（鍛造必須在最後）
+        if (schedule.includes('act_01')) {
+            return { canAdd: false, reason: '鍛造已排定，無法新增其他行程' };
+        }
+
+        // 一般行動：天數夠就能加
         if (days > remaining) {
             return { canAdd: false, reason: `天數不足（需要 ${days} 天，剩餘 ${remaining} 天）` };
         }
@@ -169,31 +188,26 @@ const ScheduleCore = {
 
         switch (actionParam) {
             case 'gather_mountain_near':
-                // 近山：原礦，(INT+STR+DEX)/3 - random(0,30)
                 type = 'metal';
                 amount = Math.floor(statSum / 3 - random30);
                 break;
 
             case 'gather_mountain_far':
-                // 遠山：原礦，(INT+STR+DEX - random(0,30)) * LUCK/100
                 type = 'metal';
                 amount = Math.floor((statSum - random30) * player.luck / 100);
                 break;
 
             case 'gather_forest_near':
-                // 近林：原木，(INT+STR+DEX)/3 - random(0,30)
                 type = 'wood';
                 amount = Math.floor(statSum / 3 - random30);
                 break;
 
             case 'gather_forest_far':
-                // 遠林：原木，(INT+STR+DEX - random(0,30)) * LUCK/100
                 type = 'wood';
                 amount = Math.floor((statSum - random30) * player.luck / 100);
                 break;
 
             case 'gather_market':
-                // 市場：金錢，(INT - random(0,30)) * LUCK/100
                 type = 'money';
                 amount = Math.floor((player.int - random30) * player.luck / 100);
                 break;
@@ -202,10 +216,7 @@ const ScheduleCore = {
                 return { type: 'none', amount: 0, message: '未知地點' };
         }
 
-        // 最少 0
         amount = Math.max(0, amount);
-
-        // 給予獎勵
         const message = this._giveGatherReward(type, amount);
 
         return { type, amount, message };
@@ -219,12 +230,10 @@ const ScheduleCore = {
 
         switch (type) {
             case 'metal':
-                // 給 m00（原礦）
                 player.materials.metal.m00 = (player.materials.metal.m00 || 0) + amount;
                 return `獲得原礦 ×${amount}`;
 
             case 'wood':
-                // 給 w00（原木）
                 player.materials.wood.w00 = (player.materials.wood.w00 || 0) + amount;
                 return `獲得原木 ×${amount}`;
 
@@ -239,6 +248,7 @@ const ScheduleCore = {
 
     /**
      * 執行整個旬的排程
+     * 鍛造（act_01）會被跳過實際效果，由床/旬推進在最後單獨處理
      * @param {array} schedule - [action_id, action_id, ...]
      * @returns {array} 執行結果陣列
      */
@@ -248,6 +258,18 @@ const ScheduleCore = {
         schedule.forEach((actionId, index) => {
             const action = CSVLoader.getAction(actionId);
             if (!action) return;
+
+            // 鍛造：不在這裡執行效果，標記後交給旬推進
+            if (actionId === 'act_01') {
+                results.push({
+                    index: index + 1,
+                    actionName: action.name,
+                    icon: action.icon,
+                    effects: [],
+                    needForge: true
+                });
+                return;
+            }
 
             // 執行基本效果
             const result = this.executeAction(actionId);
@@ -259,11 +281,6 @@ const ScheduleCore = {
             if (action.action_type === 'open_modal' && action.action_param?.startsWith('gather_')) {
                 const gatherResult = this.calcGatherResult(action.action_param);
                 result.gather = gatherResult;
-            }
-
-            // 如果是鍛造，標記需要進入鍛造室
-            if (action.action_param === 'forge_modal') {
-                result.needForge = true;
             }
 
             results.push(result);
