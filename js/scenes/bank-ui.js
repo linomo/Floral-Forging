@@ -102,20 +102,6 @@ const BankUI = {
             }
             .bank-effect-tag.positive { color: #7ed321; }
             .bank-effect-tag.negative { color: #f5576c; }
-            
-            /* 測試按鈕 */
-            .bank-test-btn {
-                width: 100%; padding: 12px; font-size: 1em;
-                background: linear-gradient(90deg, #4ecdc4, #44a08d);
-                border: none; border-radius: 10px;
-                color: #fff; cursor: pointer; font-weight: bold;
-                font-family: inherit; transition: all 0.2s;
-                margin-top: 15px;
-            }
-            .bank-test-btn:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba(78, 205, 196, 0.3);
-            }
         `;
         document.head.appendChild(style);
     },
@@ -196,11 +182,6 @@ const BankUI = {
                     <div class="bank-effects-list" id="bankEffectsList"></div>
                 </div>
                 
-                <!-- 測試結算按鈕（開發用）-->
-                <button class="bank-test-btn" onclick="BankUI.testSettle()">
-                    🧪 測試結算（開發用）
-                </button>
-                
                 <div class="modal-actions">
                     <button class="modal-btn primary" onclick="BankUI.close()">確定</button>
                 </div>
@@ -280,7 +261,6 @@ const BankUI = {
 
     // === 刷新選項顯示 ===
     _refreshOptions() {
-        // 重新渲染所有選項區塊
         const sections = document.querySelectorAll('.bank-section');
         if (sections[0]) {
             sections[0].querySelector('.bank-options').innerHTML = this._buildLifestyleOptions();
@@ -298,14 +278,12 @@ const BankUI = {
         const costs = BankCore.previewCosts();
         const canAfford = player.money >= costs.total;
         
-        // 總費用
         const totalEl = document.getElementById('bankTotalCost');
         if (totalEl) {
             totalEl.textContent = `💰 ${costs.total} 元`;
             totalEl.className = 'bank-preview-cost' + (canAfford ? '' : ' bank-preview-warning');
         }
         
-        // 費用明細
         const detailEl = document.getElementById('bankCostDetail');
         if (detailEl) {
             if (!canAfford) {
@@ -315,17 +293,14 @@ const BankUI = {
             }
         }
         
-        // 各區塊費用
         document.getElementById('bankLifestyleCost').textContent = `${costs.lifestyle}元`;
         document.getElementById('bankFamilyCost').textContent = `${costs.family}元`;
         document.getElementById('bankDonationCost').textContent = `${costs.donation}元`;
         
-        // 效果預覽
         this._updateEffectsPreview();
     },
 
     // === 更新效果預覽 ===
-  
     _updateEffectsPreview() {
         const listEl = document.getElementById('bankEffectsList');
         if (!listEl) return;
@@ -357,31 +332,6 @@ const BankUI = {
                 return `<span class="bank-effect-tag ${cls}">${text}</span>`;
             }).filter(Boolean).join('');
         }
-    },
-
-    // === 測試結算（開發用）===
-    testSettle() {
-        const result = BankCore.settleNewPeriod();
-        
-        if (result.gameOver) {
-            alert(`💀 遊戲結束！\n\n${result.message}\n\n差 ${result.shortage} 元`);
-            return;
-        }
-        
-        updateStatsDisplay();
-        this._updatePreview();
-        
-        let effectsText = '';
-        if (result.effects.length > 0) {
-            effectsText = result.effects.map(e => 
-                `${e.source}: ${BankCore.formatEffect(e.stat, e.value)}`
-            ).join('\n');
-        }
-        
-        showToast(`💰 ${result.message}`);
-        DialogueSystem.showDialogue('PC', '這旬的生活費付完了～');
-        
-        console.log('📊 結算結果:', result);
     }
 };
 
