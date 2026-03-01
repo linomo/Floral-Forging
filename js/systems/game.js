@@ -379,51 +379,79 @@ const GameSystem = {
 
     // === 排程結果 HTML ===
     _buildScheduleSummaryHtml(results) {
-        if (!results || results.length === 0) {
-            return `<div style="background:rgba(0,0,0,0.2); border-radius:10px; padding:14px; color:#666; text-align:center; font-size:0.85em;">本旬無排程</div>`;
-        }
+    if (!results || results.length === 0) {
+        return `<div style="background:rgba(0,0,0,0.2); border-radius:10px; padding:14px; color:#666; text-align:center; font-size:0.85em;">本旬無排程</div>`;
+    }
 
-        const statNames = { STR:'力量', INT:'智力', DEX:'敏捷', MOOD:'心情', STRESS:'壓力', LUCK:'幸運' };
+    const statNames = { STR:'力量', INT:'智力', DEX:'敏捷', MOOD:'心情', STRESS:'壓力', LUCK:'幸運', MONEY:'金錢' };
 
-        const items = results.map(r => {
-            if (r.needForge) {
-                return `
-                    <div style="display:flex; align-items:center; gap:10px; padding:10px;
-                                background:rgba(245,166,35,0.08); border-radius:8px;">
-                        <span style="font-size:1.4em;">${r.icon}</span>
-                        <div>
-                            <div style="color:#f5a623; font-weight:bold;">${r.actionName}</div>
-                            <div style="font-size:0.8em; color:#888;">結束後進入鍛造室</div>
-                        </div>
-                    </div>`;
-            }
-
-            const effectStr = r.effects.map(e => {
-                const name  = statNames[e.stat] || e.stat;
-                const sign  = e.value >= 0 ? '+' : '';
-                const color = e.value >= 0 ? '#7ed321' : '#f5576c';
-                return `<span style="color:${color}">${name}${sign}${e.value}</span>`;
-            }).join('　');
-
-            const gatherStr = r.gather ? `<span style="color:#7ed321">🎁 ${r.gather.message}</span>` : '';
-
+    const items = results.map(r => {
+        if (r.needForge) {
             return `
                 <div style="display:flex; align-items:center; gap:10px; padding:10px;
-                            background:rgba(255,255,255,0.03); border-radius:8px;">
+                            background:rgba(245,166,35,0.08); border-radius:8px;">
                     <span style="font-size:1.4em;">${r.icon}</span>
-                    <div style="flex:1;">
-                        <div style="color:#fff; font-weight:bold; margin-bottom:2px;">${r.actionName}</div>
-                        <div style="font-size:0.8em;">${effectStr} ${gatherStr}</div>
+                    <div>
+                        <div style="color:#f5a623; font-weight:bold;">${r.actionName}</div>
+                        <div style="font-size:0.8em; color:#888;">結束後進入鍛造室</div>
                     </div>
                 </div>`;
-        }).join('');
+        }
+
+        // 合併行程效果＋事件效果
+        const mergedEffects = {};
+        r.effects.forEach(e => {
+            mergedEffects[e.stat] = (mergedEffects[e.stat] || 0) + e.value;
+        });
+        if (r.event && r.event.stat && r.event.value !== 0) {
+            mergedEffects[r.event.stat] = (mergedEffects[r.event.stat] || 0) + r.event.value;
+        }
+
+        // 過濾好感度（隱藏數值）
+        const visibleEffects = Object.entries(mergedEffects)
+            .filter(([stat]) => !['SF_FAVOR', 'SS_FAVOR', 'DS_FAVOR'].includes(stat));
+
+        const effectStr = visibleEffects.map(([stat, val]) => {
+            const name  = statNames[stat] || stat;
+            const sign  = val >= 0 ? '+' : '';
+            const color = val >= 0 ? '#7ed321' : '#f5576c';
+            return `<span style="color:${color}">${name}${sign}${val}</span>`;
+        }).join('　');
+
+        const gatherStr = r.gather && r.gather.amount > 0
+            ? `<span style="color:#7ed321">${r.gather.message}</span>`
+            : '';
+
+        const eventHtml = r.event ? `
+            <div style="margin-top:6px; padding:6px 10px;
+                        background:rgba(245,166,35,0.07);
+                        border-left:2px solid #f5a623; border-radius:4px;">
+                <div style="color:#f5a623; font-size:0.8em; font-weight:bold; margin-bottom:2px;">
+                    【遭遇事件】${r.event.name}
+                </div>
+                <div style="color:#ccc; font-size:0.8em;">${r.event.text}</div>
+            </div>` : '';
+
+        const bottomLine = [effectStr, gatherStr].filter(Boolean).join('　　');
 
         return `
-            <div style="background:rgba(0,0,0,0.2); border-radius:10px; padding:14px;">
-                <div style="color:#f5a623; font-weight:bold; margin-bottom:10px;">📋 本旬行程</div>
-                <div style="display:flex; flex-direction:column; gap:8px;">${items}</div>
+            <div style="display:flex; flex-direction:column; gap:4px; padding:10px;
+                        background:rgba(255,255,255,0.03); border-radius:8px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:1.4em;">${r.icon}</span>
+                    <div style="font-weight:bold; color:#fff;">${r.actionName}</div>
+                </div>
+                ${eventHtml}
+                ${bottomLine ? `<div style="font-size:0.82em; padding-left:4px;">${bottomLine}</div>` : ''}
             </div>`;
-    },
+    }).join('');
+
+    return `
+        <div style="background:rgba(0,0,0,0.2); border-radius:10px; padding:14px;">
+            <div style="color:#f5a623; font-weight:bold; margin-bottom:10px;">📋 本旬行程</div>
+            <div style="display:flex; flex-direction:column; gap:8px;">${items}</div>
+        </div>`;
+},
 
     // === 關閉結果 Modal 後的處理 ===
     _closePeriodResult(hasForge) {
