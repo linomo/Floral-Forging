@@ -12,7 +12,8 @@ const DialogueSystem = {
         const colorEl = document.getElementById('speaker-color');
         const nameEl  = document.getElementById('speaker-name');
         const textEl  = document.getElementById('dialogue-text');
-
+        const iconEl  = document.getElementById('speaker-icon');
+        if (iconEl)  iconEl.textContent  = char.icon;
         if (colorEl) colorEl.style.background = char.color;
         if (nameEl) {
             nameEl.textContent = (charaId === 'PC' ? player.name : char.name);
