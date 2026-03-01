@@ -127,6 +127,7 @@
   {
     "chara": "SS",
     "text": "我想你應該忘記該怎麼鍛劍了，我有把材料與製作過程寫好，你記得先去複習。"
+    "highlight": "forge_shelf"
   },
   {
     "chara": "PC",
@@ -140,6 +141,7 @@
   {
     "chara": "PC",
     "text": "把我腦袋裡面的驚奇大作畫出來！"
+    "highlight": "forge_desk"
   },
   {
     "chara": "SS",
@@ -165,6 +167,7 @@
   {
     "chara": "SS",
     "text": "金屬材料要從爐子這邊冶鍊出來，木材則用旁邊的工作檯，總之就在這個區塊。"
+    "highlight": "forge_furnace"
   },
   {
     "chara": "SS",
@@ -181,30 +184,30 @@
   {
     "chara": "SS",
     "text": "總之有些東西不需要太好的材料，可以降質換量。",
-    "highlight": "forge_anvil"
   },
   {
     "chara": "SS",
     "text": "材料準備好後，就可以開始打鐵了。"
+    "highlight": "forge_anvil"
   },
   {
     "chara": "SF",
     "text": "但要注意你的元氣，太累了就不能做事。",
-    "highlight": "forge_clean"
   },
   {
     "chara": "SS",
     "text": "也要注意環境整潔，弄得太髒記得使用掃具處理。",
-    "highlight": "forge_decoration"
+    "highlight": "forge_clean"
   },
   {
     "chara": "SS",
     "text": "鍛造完成後可以前往裝飾台，對成品進行細一步的處理，但有時候，就你的審美來說可能是常常，反而弄得太醜降低價格。",
-    "highlight": "forge_shop"
+    "highlight": "forge_decoration"
   },
   {
     "chara": "SS",
     "text": "做好的東西，或者材料都可以透過販售台出售。"
+    "highlight": "forge_shop"
   },
   {
     "chara": "SS",
@@ -214,6 +217,7 @@
   {
     "chara": "SS",
     "text": "鄉里的人如果有需求都會貼在這，通常都會開出很好的價格。"
+    "highlight": "forge_board"
   },
   {
     "chara": "SS",
