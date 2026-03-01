@@ -76,7 +76,8 @@ const BedroomScene = {
 
                 // 固定物件
                 html += `
-                    <div class="room-item" onclick="BedroomScene.clickRoom('${obj.obj_id}')">
+                    <div class="room-item" id="${obj.obj_id}" onclick="BedroomScene.clickRoom('${obj.obj_id}')">
+
                         <span class="icon">${obj.icon}</span>
                         <span class="label">${obj.name}</span>
                     </div>`;
