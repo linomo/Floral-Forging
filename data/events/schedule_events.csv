@@ -16,4 +16,5 @@ sevt_014,act_11,20,爬呀爬,爬過去別人家的牆，才沒有！,DEX,60,gte,
 sevt_015,act_11,10,摸喔摸,到處亂摸野草野花。,SS_FAVOR,60,gte,MOOD,30,遇到師父了，師父跟我一起到處摸。,STRESS,30,不小心摸到刺刺的東西，好痛。,PC
 sevt_016,act_05,10,夢見花,有點眼熟。,INT,40,gte,SF_FAVOR,5,像師父的花！,MOOD,10,讓人心平氣和的花。,PC
 sevt_017,act_05,10,夢見魚,有點眼熟。,INT,40,gte,SS_FAVOR,5,像小師兄的魚！,MOOD,10,讓人一起游泳的魚。,PC
-sevt_018,act_05,10,夢見框,有點眼熟。,INT,40,gte,SF_FAVOR,5,像大俠的框！,MOOD,10,讓人想要研究的框。。,PC
+sevt_018,act_05,10,夢見框,有點眼熟。,INT,40,gte,DS_FAVOR,5,像大俠的框！,MOOD,10,讓人想要研究的框。。,PC
+
