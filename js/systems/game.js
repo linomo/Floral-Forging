@@ -35,31 +35,26 @@ const player = {
     unlockedWeapons: [],
     unlockedAvatars: ['avatars01'],
 
-    // 委託系統
     currentCommissions:           [],
     completedCommissionsThisBoard: [],
 
-    // === 臥室系統 ===
-    roomExpanded: false,
-    ownedFurniture: ['furniture_1', 'furniture_2', 'furniture_3'],
+    roomExpanded:    false,
+    ownedFurniture:  ['furniture_1', 'furniture_2', 'furniture_3'],
     placedFurniture: {},
 
-    // === 存錢筒系統 ===
     bankSettings: {
         lifestyle: '毫無物慾',
-        family: '獨善其身',
-        donation: '先別先別'
+        family:    '獨善其身',
+        donation:  '先別先別'
     },
 
-    // === 排程系統 ===
     nextSchedule: [],
-
-    // === 街道系統 ===
     streetVisits: 3,
 
-    // === 日期系統 ===
-    // period: 1=上旬 / 2=中旬 / 3=下旬
-    gameDate: { year: 1, month: 1, period: 1 }
+    gameDate: { year: 1, month: 1, period: 1 },
+
+    // 新手教學是否已完成
+    introCompleted: false
 };
 
 // === 日期常數 ===
@@ -72,7 +67,7 @@ const SCENES = {
     bedroom: { name: '小哈的房間', icon: '🏠' },
 };
 
-let currentScene = 'forge';
+let currentScene = 'bedroom';  // 預設從臥室開始
 
 function switchScene(sceneId) {
     if (!SCENES[sceneId]) { console.error(`場景不存在: ${sceneId}`); return; }
@@ -122,9 +117,9 @@ function updateDateDisplay() {
     const monthText  = MONTH_NAMES[d.month - 1] || `${d.month}月`;
     const periodText = PERIOD_NAMES[d.period - 1] || '上旬';
 
-    const yearEl   = document.getElementById('date-year');
-    const monthEl  = document.getElementById('date-month');
-    const dayEl    = document.getElementById('date-day');
+    const yearEl  = document.getElementById('date-year');
+    const monthEl = document.getElementById('date-month');
+    const dayEl   = document.getElementById('date-day');
 
     if (yearEl)  yearEl.textContent  = yearText;
     if (monthEl) monthEl.textContent = `${monthText} ${periodText}`;
@@ -147,14 +142,25 @@ async function initGame() {
 
     const newGameData = localStorage.getItem('floralForger_newGame');
     if (newGameData) {
+        // === 新遊戲 ===
         console.log('🆕 開始新遊戲');
         localStorage.removeItem('floralForger_save');
         const data    = JSON.parse(newGameData);
         player.name   = data.playerName;
         player.avatar = data.playerAvatar || '🔨';
         player.currentEP = Math.floor(2 * (player.str + player.int + player.dex) / 3);
+        player.introCompleted = false;
         localStorage.removeItem('floralForger_newGame');
+
+        updatePlayerDisplay();
+        updateStatsDisplay();
+        updateDateDisplay();
+
+        // 播放開場劇情
+        await IntroSystem.start();
+
     } else {
+        // === 讀取存檔 ===
         const saved = localStorage.getItem('floralForger_save');
         if (saved) {
             const savedData = JSON.parse(saved);
@@ -164,15 +170,17 @@ async function initGame() {
         } else {
             player.currentEP = Math.floor(2 * (player.str + player.int + player.dex) / 3);
         }
+
+        updatePlayerDisplay();
+        updateStatsDisplay();
+        updateDateDisplay();
+        currentScene = player.introCompleted ? 'bedroom' : 'forge';
+        await renderScene();
+        updateSceneSwitchButtons();
+        document.getElementById('speaker-name').textContent = player.name;
+        DialogueSystem.showDialogue('PC', '是時候展現真正的技術了！');
     }
 
-    updatePlayerDisplay();
-    updateStatsDisplay();
-    updateDateDisplay();
-    await renderScene();
-    updateSceneSwitchButtons();
-    document.getElementById('speaker-name').textContent = player.name;
-    DialogueSystem.showDialogue('PC', '是時候展現真正的技術了！');
     console.log('✅ 遊戲初始化完成！');
 }
 
@@ -192,6 +200,7 @@ function _patchPlayerFields() {
     if (!player.nextSchedule)                 player.nextSchedule = [];
     if (player.streetVisits === undefined)    player.streetVisits = 3;
     if (!player.gameDate)                     player.gameDate = { year: 1, month: 1, period: 1 };
+    if (player.introCompleted === undefined)  player.introCompleted = false;
 }
 
 // === 顯示更新 ===
@@ -246,21 +255,20 @@ const GameSystem = {
     },
 
     // =========================================
-    // === 旬推進（床）
+    // 旬推進（床）
     // =========================================
     advancePeriod() {
-
-        // 1. 存錢筒結算（扣錢 + 套用生活效果）
+        // 1. 存錢筒結算
         const bankResult = BankCore.settleNewPeriod();
         if (bankResult.gameOver) {
             this._showGameOver(bankResult);
             return;
         }
 
-        // 2. 執行排程（鍛造由後面另外處理）
-        const schedule  = player.nextSchedule || [];
-        const hasForge  = schedule.includes('act_01');
-        const results   = ScheduleCore.executeSchedule(schedule);
+        // 2. 執行排程
+        const schedule = player.nextSchedule || [];
+        const hasForge = schedule.includes('act_01');
+        const results  = ScheduleCore.executeSchedule(schedule);
         player.nextSchedule = [];
 
         // 3. 時間推進
@@ -273,32 +281,26 @@ const GameSystem = {
         updateStatsDisplay();
         updateDateDisplay();
 
-        // 6. 顯示本旬結果，結束後處理鍛造
+        // 6. 顯示本旬結果
         this._showPeriodResult(bankResult, results, hasForge);
     },
 
-    // === 日期推進 ===
     _advanceDate() {
         const d = player.gameDate;
         d.period++;
         if (d.period > 3) {
             d.period = 1;
             d.month++;
-            if (d.month > 12) {
-                d.month = 1;
-                d.year++;
-            }
+            if (d.month > 12) { d.month = 1; d.year++; }
         }
     },
 
-    // === 顯示旬結果 ===
     _showPeriodResult(bankResult, scheduleResults, hasForge) {
-        const d = player.gameDate;
+        const d          = player.gameDate;
         const yearText   = d.year === 1 ? '元年' : `第${d.year}年`;
         const periodText = `${MONTH_NAMES[d.month - 1]} ${PERIOD_NAMES[d.period - 1]}`;
 
-        // 建構結算摘要 HTML
-        const bankHtml = this._buildBankSummaryHtml(bankResult);
+        const bankHtml     = this._buildBankSummaryHtml(bankResult);
         const scheduleHtml = this._buildScheduleSummaryHtml(scheduleResults);
 
         let modal = document.getElementById('periodResultModal');
@@ -323,13 +325,8 @@ const GameSystem = {
                 <div style="text-align:center; color:#888; font-size:0.85em; margin-bottom:20px;">
                     下一旬：${yearText} ${periodText}
                 </div>
-
-                <!-- 財務結算 -->
                 ${bankHtml}
-
-                <!-- 排程結果 -->
                 ${scheduleHtml}
-
                 <div style="margin-top:20px; display:flex; gap:10px;">
                     <button class="modal-btn primary" style="flex:1; padding:12px; font-size:1em;"
                         onclick="GameSystem._closePeriodResult(${hasForge})">
@@ -341,10 +338,8 @@ const GameSystem = {
         modal.classList.add('show');
     },
 
-    // === 財務結算 HTML ===
     _buildBankSummaryHtml(bankResult) {
         const costs = bankResult.costs;
-        // 過濾隱藏數值後的效果
         const visibleEffects = bankResult.effects.filter(e =>
             !['SF_FAVOR', 'SS_FAVOR', 'DS_FAVOR'].includes(e.stat)
         );
@@ -377,89 +372,84 @@ const GameSystem = {
             </div>`;
     },
 
-    // === 排程結果 HTML ===
     _buildScheduleSummaryHtml(results) {
-    if (!results || results.length === 0) {
-        return `<div style="background:rgba(0,0,0,0.2); border-radius:10px; padding:14px; color:#666; text-align:center; font-size:0.85em;">本旬無排程</div>`;
-    }
+        if (!results || results.length === 0) {
+            return `<div style="background:rgba(0,0,0,0.2); border-radius:10px; padding:14px; color:#666; text-align:center; font-size:0.85em;">本旬無排程</div>`;
+        }
 
-    const statNames = { STR:'力量', INT:'智力', DEX:'敏捷', MOOD:'心情', STRESS:'壓力', LUCK:'幸運', MONEY:'金錢' };
+        const statNames = { STR:'力量', INT:'智力', DEX:'敏捷', MOOD:'心情', STRESS:'壓力', LUCK:'幸運', MONEY:'金錢' };
 
-    const items = results.map(r => {
-        if (r.needForge) {
-            return `
-                <div style="display:flex; align-items:center; gap:10px; padding:10px;
-                            background:rgba(245,166,35,0.08); border-radius:8px;">
-                    <span style="font-size:1.4em;">${r.icon}</span>
-                    <div>
-                        <div style="color:#f5a623; font-weight:bold;">${r.actionName}</div>
-                        <div style="font-size:0.8em; color:#888;">結束後進入鍛造室</div>
+        const items = results.map(r => {
+            if (r.needForge) {
+                return `
+                    <div style="display:flex; align-items:center; gap:10px; padding:10px;
+                                background:rgba(245,166,35,0.08); border-radius:8px;">
+                        <span style="font-size:1.4em;">${r.icon}</span>
+                        <div>
+                            <div style="color:#f5a623; font-weight:bold;">${r.actionName}</div>
+                            <div style="font-size:0.8em; color:#888;">結束後進入鍛造室</div>
+                        </div>
+                    </div>`;
+            }
+
+            const mergedEffects = {};
+            r.effects.forEach(e => {
+                mergedEffects[e.stat] = (mergedEffects[e.stat] || 0) + e.value;
+            });
+            if (r.event && r.event.stat && r.event.value !== 0) {
+                mergedEffects[r.event.stat] = (mergedEffects[r.event.stat] || 0) + r.event.value;
+            }
+
+            const visibleEffects = Object.entries(mergedEffects)
+                .filter(([stat]) => !['SF_FAVOR', 'SS_FAVOR', 'DS_FAVOR'].includes(stat));
+
+            const effectStr = visibleEffects.map(([stat, val]) => {
+                const name  = statNames[stat] || stat;
+                const sign  = val >= 0 ? '+' : '';
+                const color = val >= 0 ? '#7ed321' : '#f5576c';
+                return `<span style="color:${color}">${name}${sign}${val}</span>`;
+            }).join('　');
+
+            const gatherStr = r.gather && r.gather.amount > 0
+                ? `<span style="color:#7ed321">${r.gather.message}</span>`
+                : '';
+
+            const eventHtml = r.event ? `
+                <div style="margin-top:6px; padding:6px 10px;
+                            background:rgba(245,166,35,0.07);
+                            border-left:2px solid #f5a623; border-radius:4px;">
+                    <div style="color:#f5a623; font-size:0.8em; font-weight:bold; margin-bottom:2px;">
+                        【遭遇事件】${r.event.name}
                     </div>
+                    <div style="color:#ccc; font-size:0.8em;">${r.event.text}</div>
+                </div>` : '';
+
+            const bottomLine = [effectStr, gatherStr].filter(Boolean).join('　　');
+
+            return `
+                <div style="display:flex; flex-direction:column; gap:4px; padding:10px;
+                            background:rgba(255,255,255,0.03); border-radius:8px;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span style="font-size:1.4em;">${r.icon}</span>
+                        <div style="font-weight:bold; color:#fff;">${r.actionName}</div>
+                    </div>
+                    ${eventHtml}
+                    ${bottomLine ? `<div style="font-size:0.82em; padding-left:4px;">${bottomLine}</div>` : ''}
                 </div>`;
-        }
-
-        // 合併行程效果＋事件效果
-        const mergedEffects = {};
-        r.effects.forEach(e => {
-            mergedEffects[e.stat] = (mergedEffects[e.stat] || 0) + e.value;
-        });
-        if (r.event && r.event.stat && r.event.value !== 0) {
-            mergedEffects[r.event.stat] = (mergedEffects[r.event.stat] || 0) + r.event.value;
-        }
-
-        // 過濾好感度（隱藏數值）
-        const visibleEffects = Object.entries(mergedEffects)
-            .filter(([stat]) => !['SF_FAVOR', 'SS_FAVOR', 'DS_FAVOR'].includes(stat));
-
-        const effectStr = visibleEffects.map(([stat, val]) => {
-            const name  = statNames[stat] || stat;
-            const sign  = val >= 0 ? '+' : '';
-            const color = val >= 0 ? '#7ed321' : '#f5576c';
-            return `<span style="color:${color}">${name}${sign}${val}</span>`;
-        }).join('　');
-
-        const gatherStr = r.gather && r.gather.amount > 0
-            ? `<span style="color:#7ed321">${r.gather.message}</span>`
-            : '';
-
-        const eventHtml = r.event ? `
-            <div style="margin-top:6px; padding:6px 10px;
-                        background:rgba(245,166,35,0.07);
-                        border-left:2px solid #f5a623; border-radius:4px;">
-                <div style="color:#f5a623; font-size:0.8em; font-weight:bold; margin-bottom:2px;">
-                    【遭遇事件】${r.event.name}
-                </div>
-                <div style="color:#ccc; font-size:0.8em;">${r.event.text}</div>
-            </div>` : '';
-
-        const bottomLine = [effectStr, gatherStr].filter(Boolean).join('　　');
+        }).join('');
 
         return `
-            <div style="display:flex; flex-direction:column; gap:4px; padding:10px;
-                        background:rgba(255,255,255,0.03); border-radius:8px;">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <span style="font-size:1.4em;">${r.icon}</span>
-                    <div style="font-weight:bold; color:#fff;">${r.actionName}</div>
-                </div>
-                ${eventHtml}
-                ${bottomLine ? `<div style="font-size:0.82em; padding-left:4px;">${bottomLine}</div>` : ''}
+            <div style="background:rgba(0,0,0,0.2); border-radius:10px; padding:14px;">
+                <div style="color:#f5a623; font-weight:bold; margin-bottom:10px;">📋 本旬行程</div>
+                <div style="display:flex; flex-direction:column; gap:8px;">${items}</div>
             </div>`;
-    }).join('');
+    },
 
-    return `
-        <div style="background:rgba(0,0,0,0.2); border-radius:10px; padding:14px;">
-            <div style="color:#f5a623; font-weight:bold; margin-bottom:10px;">📋 本旬行程</div>
-            <div style="display:flex; flex-direction:column; gap:8px;">${items}</div>
-        </div>`;
-},
-
-    // === 關閉結果 Modal 後的處理 ===
     _closePeriodResult(hasForge) {
         const modal = document.getElementById('periodResultModal');
         if (modal) modal.classList.remove('show');
 
         if (hasForge) {
-            // 切換到鍛造室
             switchScene('forge');
             DialogueSystem.showDialogue('PC', '好！現在開始鍛造！');
         } else {
@@ -467,7 +457,6 @@ const GameSystem = {
         }
     },
 
-    // === 遊戲結束 ===
     _showGameOver(bankResult) {
         let modal = document.getElementById('periodResultModal');
         if (!modal) {
@@ -499,9 +488,9 @@ const GameSystem = {
     }
 };
 
-window.player      = player;
-window.GameSystem  = GameSystem;
-window.switchScene = switchScene;
+window.player            = player;
+window.GameSystem        = GameSystem;
+window.switchScene       = switchScene;
 window.updateDateDisplay = updateDateDisplay;
 
 document.addEventListener('DOMContentLoaded', initGame);
