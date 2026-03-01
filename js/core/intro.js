@@ -128,22 +128,29 @@ const IntroSystem = {
     // ================================
     // 黑屏 Overlay
     // ================================
-    _initOverlay() {
-        if (document.getElementById('intro-overlay')) {
-            this._overlay = document.getElementById('intro-overlay');
-            return;
-        }
-        const el = document.createElement('div');
-        el.id = 'intro-overlay';
-        el.style.cssText = `
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: #000; z-index: 50;
-            pointer-events: none;
-            opacity: 1; transition: opacity 1.5s ease;
-        `;
+   _initOverlay() {
+    if (document.getElementById('intro-overlay')) {
+        this._overlay = document.getElementById('intro-overlay');
+        return;
+    }
+    const el = document.createElement('div');
+    el.id = 'intro-overlay';
+    el.style.cssText = `
+        position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+        background: #000; z-index: 50;
+        pointer-events: none;
+        opacity: 1; transition: opacity 1.5s ease;
+    `;
+    // 只蓋 operation-area，不蓋對話框
+    const opArea = document.querySelector('.operation-area');
+    if (opArea) {
+        opArea.style.position = 'relative';
+        opArea.appendChild(el);
+    } else {
         document.body.appendChild(el);
-        this._overlay = el;
-    },
+    }
+    this._overlay = el;
+},
 
     _setBlack(on) {
         if (!this._overlay) return;
