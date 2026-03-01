@@ -1,67 +1,16 @@
 [
-  {
-    "chara": "SF",
-    "text": "該起床囉。",
-    "scene": "black"
-  },
-  {
-    "chara": "SS",
-    "text": "唉，師父你這樣叫沒有用。",
-    "scene": "black"
-  },
-  {
-    "chara": "PC",
-    "text": "說誰沒用。",
-    "scene": "black"
-  },
-  {
-    "chara": "SF",
-    "text": "你看，有用，小小徒弟醒了。",
-    "scene": "black"
-  },
-  {
-    "chara": "PC",
-    "text": "呼呼呼……",
-    "scene": "black"
-  },
-  {
-    "chara": "SS",
-    "text": "這個人不可能這麼簡單醒來的。",
-    "scene": "black"
-  },
-  {
-    "chara": "SF",
-    "text": "那只好用小徒弟的辦法囉。說起來劍要醒來，也都要用水焠火呢！",
-    "scene": "black"
-  },
-  {
-    "chara": "PC",
-    "text": "水？啊啊啊我醒了啦！",
-    "scene": "fade"
-  },
-  {
-    "chara": "SF",
-    "text": "早安，小小徒弟。"
-  },
-  {
-    "chara": "PC",
-    "text": "早安師父嘿嘿。早安小師兄！我馬上起來！"
-  },
-  {
-    "chara": "SS",
-    "text": "早餐放在你的桌子上了，你吃完到鍛造室來找我們。我們先走吧，師父。"
-  },
-  {
-    "chara": "SF",
-    "text": "好呦。"
-  },
-  {
-    "chara": "PC",
-    "text": "好。（咀嚼咀嚼）奇怪今天不是休息日嗎？（咀嚼咀嚼）"
-  },
-  {
-    "chara": "PC",
-    "text": "吃飽了！走吧！",
-    "transition": "forge"
-  }
-[
+  { "chara": "SF", "text": "該起床囉。", "scene": "black" },
+  { "chara": "SS", "text": "唉，師父你這樣叫沒有用。", "scene": "black" },
+  { "chara": "PC", "text": "說誰沒用。", "scene": "black" },
+  { "chara": "SF", "text": "你看，有用，小小徒弟醒了。", "scene": "black" },
+  { "chara": "PC", "text": "呼呼呼……", "scene": "black" },
+  { "chara": "SS", "text": "這個人不可能這麼簡單醒來的。", "scene": "black" },
+  { "chara": "SF", "text": "那只好用小徒弟的辦法囉。說起來劍要醒來，也都要用水焠火呢！", "scene": "black" },
+  { "chara": "PC", "text": "水？啊啊啊我醒了啦！", "scene": "fade" },
+  { "chara": "SF", "text": "早安，小小徒弟。" },
+  { "chara": "PC", "text": "早安師父嘿嘿。早安小師兄！我馬上起來！" },
+  { "chara": "SS", "text": "早餐放在你的桌子上了，你吃完到鍛造室來找我們。我們先走吧，師父。" },
+  { "chara": "SF", "text": "好呦。" },
+  { "chara": "PC", "text": "好。（咀嚼咀嚼）奇怪今天不是休息日嗎？（咀嚼咀嚼）" },
+  { "chara": "PC", "text": "吃飽了！走吧！", "transition": "forge" }
+]
