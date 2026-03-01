@@ -197,6 +197,15 @@
       pointer-events: none;
     }
     .effect-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+      /* === 新手教學高亮 === */
+    .intro-highlight {
+        box-shadow: 0 0 0 2px #f5a623, 0 0 20px rgba(245,166,35,0.5) !important;
+        animation: introGlow 1s ease-in-out infinite alternate;
+    }
+    @keyframes introGlow {
+        from { box-shadow: 0 0 0 2px #f5a623, 0 0 10px rgba(245,166,35,0.3); }
+        to   { box-shadow: 0 0 0 3px #f5a623, 0 0 28px rgba(245,166,35,0.7); }
+    }
   </style>
 </head>
 <body>
@@ -292,6 +301,7 @@
 
   <!-- 1. 核心：CSV 資料載入（其他一切的基礎）-->
   <script src="js/core/csv-loader.js"></script>
+  <script src="js/core/intro.js"></script>
 
   <!-- 2. 系統：角色 / 對話 / 遊戲狀態 -->
   <script src="js/systems/character.js"></script>
