@@ -5,7 +5,7 @@
 
 // === 玩家資料 ===
 const player = {
-    name:      '小哈',
+    name:      '',
     avatar:    '🔨',
     str:       30,
     int:       30,
