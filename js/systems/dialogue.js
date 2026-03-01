@@ -4,72 +4,75 @@
  */
 const DialogueSystem = {
 
-    // 顯示主對話框
     showDialogue(charaId, text) {
         const char = CharacterSystem.getCharacter(charaId);
         if (!char) { console.error('❌ 找不到角色資料！'); return; }
 
         const colorEl = document.getElementById('speaker-color');
+        const iconEl  = document.getElementById('speaker-icon');
         const nameEl  = document.getElementById('speaker-name');
         const textEl  = document.getElementById('dialogue-text');
-        const iconEl  = document.getElementById('speaker-icon');
-        if (iconEl)  iconEl.textContent  = char.icon;
+
         if (colorEl) colorEl.style.background = char.color;
+        if (iconEl)  iconEl.textContent        = char.icon;
         if (nameEl) {
             nameEl.textContent = (charaId === 'PC' ? player.name : char.name);
             nameEl.style.color = char.color;
         }
-        if (textEl) textEl.textContent = text;
+        if (textEl) {
+            textEl.textContent = text;
+            textEl.style.color = char.color;  // 對話文字用角色代表色
+        }
     },
 
     // ================================
-    // 繼續按鈕（供 intro 等系統使用）
+    // 繼續按鈕
     // ================================
-
-    // 顯示繼續按鈕，點擊後執行 callback
     showNextBtn(callback) {
         let btn = document.getElementById('dialogue-next-btn');
         if (!btn) {
             btn = document.createElement('button');
             btn.id = 'dialogue-next-btn';
-            btn.style.cssText = `
-            padding: 4px 14px;
-            background: rgba(245,166,35,0.15);
-            border: 1px solid #f5a623;
-            border-radius: 20px;
-            color: #f5a623; font-size: 0.8em;
-            font-family: inherit; cursor: pointer;
-            transition: background 0.2s;
-            margin-left: auto;
-        `;
             btn.textContent = '▶ 繼續';
+            btn.style.cssText = `
+                padding: 4px 14px;
+                background: rgba(245,166,35,0.15);
+                border: 1px solid #f5a623;
+                border-radius: 20px;
+                color: #f5a623; font-size: 0.8em;
+                font-family: inherit; cursor: pointer;
+                transition: background 0.2s;
+                margin-left: auto;
+                flex-shrink: 0;
+            `;
             btn.onmouseover = () => { btn.style.background = 'rgba(245,166,35,0.3)'; };
             btn.onmouseout  = () => { btn.style.background = 'rgba(245,166,35,0.15)'; };
 
             const dialogueHeader = document.querySelector('.dialogue-header');
             if (dialogueHeader) {
-                dialogueHeader.style.justifyContent = 'space-between';
+                dialogueHeader.style.justifyContent = 'flex-start';
                 dialogueHeader.appendChild(btn);
             }
         }
 
-        // 重新綁定 callback（每次點都是新的）
+        // 重新綁定 callback
         const newBtn = btn.cloneNode(true);
         newBtn.onmouseover = () => { newBtn.style.background = 'rgba(245,166,35,0.3)'; };
         newBtn.onmouseout  = () => { newBtn.style.background = 'rgba(245,166,35,0.15)'; };
         btn.parentNode.replaceChild(newBtn, btn);
 
         newBtn.addEventListener('click', callback);
-        newBtn.style.display = 'block';
+        newBtn.style.display = 'inline-block';
     },
 
-    // 隱藏繼續按鈕
     hideNextBtn() {
         const btn = document.getElementById('dialogue-next-btn');
         if (btn) btn.style.display = 'none';
     },
 
-    // 顯示設計圖評論
+    // ================================
+    // 設計圖評論
+    // ================================
     showDesignComments(comments) {
         const box = document.getElementById('design-comments');
         if (!box) return;
