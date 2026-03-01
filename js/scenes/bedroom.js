@@ -58,7 +58,6 @@ const BedroomScene = {
                 if (obj.action_type === 'place_furniture') {
                     const placedId = player.placedFurniture[obj.obj_id];
                     if (placedId) {
-                        // 已放置家具
                         const furniture = CSVLoader.getFurniture(placedId);
                         html += `
                             <div class="room-item" onclick="BedroomScene.clickFurniture('${obj.obj_id}')">
@@ -66,7 +65,6 @@ const BedroomScene = {
                                 <span class="label">${furniture ? furniture.name.slice(0, 4) : '家具'}</span>
                             </div>`;
                     } else {
-                        // 空格
                         html += `
                             <div class="room-item" style="border-style:dashed" onclick="BedroomScene.clickEmpty('${obj.obj_id}')">
                                 <span class="icon" style="opacity:0.3">➕</span>
@@ -137,8 +135,7 @@ const BedroomScene = {
                 ScheduleUI.open();
                 break;
             case 'bed_modal':
-                showToast('🛏️ 床功能開發中...');
-                DialogueSystem.showDialogue('PC', '好想睡覺喔～');
+                this._handleBed();
                 break;
             case 'dress_modal':
                 StorageUI.open();
@@ -153,6 +150,89 @@ const BedroomScene = {
 
     _handleDialogue(obj) {
         if (obj.comment) DialogueSystem.showDialogue(obj.chara_id, obj.comment);
+    },
+
+    // === 床：旬推進 ===
+    _handleBed() {
+        // 沒有排程時提醒但仍可繼續（讓玩家選擇空過這旬）
+        if (!player.nextSchedule || player.nextSchedule.length === 0) {
+            DialogueSystem.showDialogue('PC', '還沒安排下一旬的行程，就這樣過吧...');
+        }
+
+        // 確認視窗
+        this._showBedConfirm();
+    },
+
+    // === 確認是否結束這旬 ===
+    _showBedConfirm() {
+        const hasSchedule = player.nextSchedule && player.nextSchedule.length > 0;
+        const costs = BankCore.previewCosts();
+        const canAfford = player.money >= costs.total;
+
+        let modal = document.getElementById('bedConfirmModal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'bedConfirmModal';
+            modal.className = 'modal-overlay';
+            document.body.appendChild(modal);
+        }
+
+        const warningHtml = !canAfford
+            ? `<div style="color:#f5576c; font-size:0.85em; margin-bottom:12px; padding:8px 12px;
+                           background:rgba(245,87,108,0.1); border-radius:8px;">
+                   ⚠️ 錢不夠支付生活費！差 ${costs.total - player.money} 元，結算將導致遊戲結束。
+               </div>`
+            : '';
+
+        const scheduleHtml = !hasSchedule
+            ? `<div style="color:#888; font-size:0.85em; margin-bottom:12px; padding:8px 12px;
+                           background:rgba(255,255,255,0.04); border-radius:8px;">
+                   📋 本旬沒有安排行程，數值不會因行程增加。
+               </div>`
+            : `<div style="color:#888; font-size:0.85em; margin-bottom:12px; padding:8px 12px;
+                           background:rgba(255,255,255,0.04); border-radius:8px;">
+                   📋 已安排 ${player.nextSchedule.length} 個行程，結束後依序執行。
+               </div>`;
+
+        modal.innerHTML = `
+            <div style="
+                background: linear-gradient(180deg, #252535 0%, #1a1a28 100%);
+                border-radius: 16px; padding: 24px;
+                max-width: 400px; width: 92%;
+            ">
+                <div style="text-align:center; font-size:2em; margin-bottom:8px;">🛏️</div>
+                <div style="text-align:center; color:#f5a623; font-weight:bold;
+                            font-size:1.1em; margin-bottom:16px;">結束這一旬？</div>
+
+                <div style="color:#ccc; font-size:0.85em; margin-bottom:8px; text-align:center;">
+                    本旬生活費：<span style="color:#f5a623; font-weight:bold;">${costs.total} 元</span>
+                </div>
+
+                ${warningHtml}
+                ${scheduleHtml}
+
+                <div style="display:flex; gap:10px; margin-top:8px;">
+                    <button class="modal-btn" style="flex:1;"
+                        onclick="document.getElementById('bedConfirmModal').classList.remove('show')">
+                        取消
+                    </button>
+                    <button class="modal-btn primary" style="flex:1;"
+                        onclick="BedroomScene._confirmBed()">
+                        睡覺，結束這旬
+                    </button>
+                </div>
+            </div>`;
+
+        modal.classList.add('show');
+    },
+
+    // === 確認後執行旬推進 ===
+    _confirmBed() {
+        const modal = document.getElementById('bedConfirmModal');
+        if (modal) modal.classList.remove('show');
+
+        DialogueSystem.showDialogue('PC', '晚安～');
+        GameSystem.advancePeriod();
     }
 };
 
