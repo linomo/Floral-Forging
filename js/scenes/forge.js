@@ -72,7 +72,8 @@ const ForgeScene = {
                 const obj = forgeMap.find(o => parseInt(o.row) === r && parseInt(o.col) === c);
                 if (obj && obj.obj_id && obj.obj_id !== 'empty') {
                     html += `
-                        <div class="room-item" id="${obj.obj_id}" onclick="BedroomScene.clickRoom('${obj.obj_id}')">
+                        <div class="room-item" id="${obj.obj_id}" onclick="ForgeScene.clickRoom('${obj.obj_id}')">
+
                             <span class="icon">${obj.icon}</span>
                             <span class="label">${obj.name}</span>
                         </div>`;
