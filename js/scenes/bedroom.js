@@ -154,9 +154,10 @@ const BedroomScene = {
 
     // === 床：旬推進 ===
     _handleBed() {
-        // 沒有排程時提醒但仍可繼續（讓玩家選擇空過這旬）
+        // 沒有排程時不能睡覺
         if (!player.nextSchedule || player.nextSchedule.length === 0) {
-            DialogueSystem.showDialogue('PC', '還沒安排下一旬的行程，就這樣過吧...');
+            DialogueSystem.showDialogue('SS', '被小師兄叫起來安排行程了！');
+            return;
         }
 
         // 確認視窗
@@ -184,12 +185,7 @@ const BedroomScene = {
                </div>`
             : '';
 
-        const scheduleHtml = !hasSchedule
-            ? `<div style="color:#888; font-size:0.85em; margin-bottom:12px; padding:8px 12px;
-                           background:rgba(255,255,255,0.04); border-radius:8px;">
-                   📋 本旬沒有安排行程，數值不會因行程增加。
-               </div>`
-            : `<div style="color:#888; font-size:0.85em; margin-bottom:12px; padding:8px 12px;
+        const scheduleHtml = `<div style="color:#888; font-size:0.85em; margin-bottom:12px; padding:8px 12px;
                            background:rgba(255,255,255,0.04); border-radius:8px;">
                    📋 已安排 ${player.nextSchedule.length} 個行程，結束後依序執行。
                </div>`;
