@@ -128,6 +128,8 @@ function updateDateDisplay() {
 
 // === 初始化遊戲 ===
 async function initGame() {
+    IntroSystem._initOverlay();   // ← 加這行
+    IntroSystem._setBlack(true);  // ← 加這行
     console.log('🎮 初始化遊戲...');
 
     const enterGame = localStorage.getItem('floralForger_enterGame');
