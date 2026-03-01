@@ -33,23 +33,23 @@ const DialogueSystem = {
             btn = document.createElement('button');
             btn.id = 'dialogue-next-btn';
             btn.style.cssText = `
-                position: absolute; right: 20px; bottom: 16px;
-                padding: 8px 20px;
-                background: rgba(245,166,35,0.15);
-                border: 1px solid #f5a623;
-                border-radius: 20px;
-                color: #f5a623; font-size: 0.85em;
-                font-family: inherit; cursor: pointer;
-                transition: background 0.2s; z-index: 10;
-            `;
+            padding: 4px 14px;
+            background: rgba(245,166,35,0.15);
+            border: 1px solid #f5a623;
+            border-radius: 20px;
+            color: #f5a623; font-size: 0.8em;
+            font-family: inherit; cursor: pointer;
+            transition: background 0.2s;
+            margin-left: auto;
+        `;
             btn.textContent = '▶ 繼續';
             btn.onmouseover = () => { btn.style.background = 'rgba(245,166,35,0.3)'; };
             btn.onmouseout  = () => { btn.style.background = 'rgba(245,166,35,0.15)'; };
 
-            const dialogueContent = document.querySelector('.dialogue-content');
-            if (dialogueContent) {
-                dialogueContent.style.position = 'relative';
-                dialogueContent.appendChild(btn);
+            const dialogueHeader = document.querySelector('.dialogue-header');
+            if (dialogueHeader) {
+                dialogueHeader.style.justifyContent = 'space-between';
+                dialogueHeader.appendChild(btn);
             }
         }
 
