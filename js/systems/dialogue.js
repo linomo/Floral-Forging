@@ -4,89 +4,92 @@
  */
 const DialogueSystem = {
 
-    // 顯示主對話框（左下角）
+    // 顯示主對話框
     showDialogue(charaId, text) {
-        console.log('🗣️ DialogueSystem.showDialogue 被呼叫');
-        console.log('  角色ID:', charaId);
-        console.log('  對話內容:', text);
-        
         const char = CharacterSystem.getCharacter(charaId);
-        console.log('  角色資料:', char);
-        
-        if (!char) {
-            console.error('❌ 找不到角色資料！');
-            return;
-        }
+        if (!char) { console.error('❌ 找不到角色資料！'); return; }
 
         const colorEl = document.getElementById('speaker-color');
         const nameEl  = document.getElementById('speaker-name');
         const textEl  = document.getElementById('dialogue-text');
-        
-        console.log('  DOM 元素檢查:');
-        console.log('    colorEl:', colorEl);
-        console.log('    nameEl:', nameEl);
-        console.log('    textEl:', textEl);
 
-        if (colorEl) {
-            colorEl.style.background = char.color;
-            console.log('  ✅ 設置色塊背景:', char.color);
-        }
+        if (colorEl) colorEl.style.background = char.color;
         if (nameEl) {
             nameEl.textContent = (charaId === 'PC' ? player.name : char.name);
             nameEl.style.color = char.color;
-            console.log('  ✅ 設置角色名稱:', nameEl.textContent, '顏色:', char.color);
         }
-        if (textEl) {
-            textEl.textContent = text;
-            console.log('  ✅ 設置對話文字');
-        }
-        
-        console.log('✅ 對話顯示完成');
+        if (textEl) textEl.textContent = text;
     },
 
-    // 顯示設計圖評論（對話框下方 #design-comments）
-    // comments = grade_comments.csv 資料列陣列 [{grade, chara_id, comment}, ...]
-    showDesignComments(comments) {
-        console.log('═══════════════════════════════════');
-        console.log('🗣️ DialogueSystem.showDesignComments 被呼叫');
-        console.log('📥 收到的評論:', comments);
-        
-        const box = document.getElementById('design-comments');
-        console.log('📦 #design-comments 元素:', box);
-        
-        if (!box) {
-            console.error('❌ 找不到 #design-comments 元素！');
-            return;
+    // ================================
+    // 繼續按鈕（供 intro 等系統使用）
+    // ================================
+
+    // 顯示繼續按鈕，點擊後執行 callback
+    showNextBtn(callback) {
+        let btn = document.getElementById('dialogue-next-btn');
+        if (!btn) {
+            btn = document.createElement('button');
+            btn.id = 'dialogue-next-btn';
+            btn.style.cssText = `
+                position: absolute; right: 20px; bottom: 16px;
+                padding: 8px 20px;
+                background: rgba(245,166,35,0.15);
+                border: 1px solid #f5a623;
+                border-radius: 20px;
+                color: #f5a623; font-size: 0.85em;
+                font-family: inherit; cursor: pointer;
+                transition: background 0.2s; z-index: 10;
+            `;
+            btn.textContent = '▶ 繼續';
+            btn.onmouseover = () => { btn.style.background = 'rgba(245,166,35,0.3)'; };
+            btn.onmouseout  = () => { btn.style.background = 'rgba(245,166,35,0.15)'; };
+
+            const dialogueContent = document.querySelector('.dialogue-content');
+            if (dialogueContent) {
+                dialogueContent.style.position = 'relative';
+                dialogueContent.appendChild(btn);
+            }
         }
 
+        // 重新綁定 callback（每次點都是新的）
+        const newBtn = btn.cloneNode(true);
+        newBtn.onmouseover = () => { newBtn.style.background = 'rgba(245,166,35,0.3)'; };
+        newBtn.onmouseout  = () => { newBtn.style.background = 'rgba(245,166,35,0.15)'; };
+        btn.parentNode.replaceChild(newBtn, btn);
+
+        newBtn.addEventListener('click', callback);
+        newBtn.style.display = 'block';
+    },
+
+    // 隱藏繼續按鈕
+    hideNextBtn() {
+        const btn = document.getElementById('dialogue-next-btn');
+        if (btn) btn.style.display = 'none';
+    },
+
+    // 顯示設計圖評論
+    showDesignComments(comments) {
+        const box = document.getElementById('design-comments');
+        if (!box) return;
+
         if (!comments || comments.length === 0) {
-            console.log('⚠️ 沒有評論，隱藏評論區');
             box.style.display = 'none';
             return;
         }
 
-        console.log(`✅ 有 ${comments.length} 條評論，開始渲染`);
-        
-        box.innerHTML = comments.map((c, index) => {
-            console.log(`  評論 ${index + 1}:`, c);
-            
-            // 透過 chara_id 取得角色資料
-            const char = CharacterSystem.getCharacter(c.chara_id);
-            console.log(`    角色資料:`, char);
-            
-            const icon = char ? char.icon : '❓';
+        box.innerHTML = comments.map(c => {
+            const char  = CharacterSystem.getCharacter(c.chara_id);
+            const icon  = char ? char.icon  : '❓';
             const color = char ? char.color : '#888';
-            
             return `
                 <div class="comment-line">
-                    <span class="comment-icon" style="color: ${color}">${icon}</span>
+                    <span class="comment-icon" style="color:${color}">${icon}</span>
                     <span class="comment-text">「${c.comment}」</span>
                 </div>`;
         }).join('');
 
         box.style.display = 'block';
-        console.log('✅ 評論區顯示完成');
-        console.log('═══════════════════════════════════');
     },
 
     hideDesignComments() {
