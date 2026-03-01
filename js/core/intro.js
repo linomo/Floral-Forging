@@ -1,30 +1,69 @@
 /**
  * IntroSystem - 新遊戲開場劇情系統
  * js/core/intro.js
+ *
+ * 多段劇本佇列：
+ * _scripts = ['intro_drama.json', 'intro_forge.json', 'intro_bedroom.json', ...]
+ * 每段結束後自動載入下一段，全部結束才呼叫 _end()
  */
 const IntroSystem = {
 
-    _lines:   [],
-    _index:   0,
-    _overlay: null,
-    _playing: false,
+    _lines:       [],
+    _index:       0,
+    _overlay:     null,
+    _playing:     false,
+    _scriptQueue: [],   // 待播劇本佇列
 
+    // ================================
+    // 入口：新遊戲時呼叫
+    // ================================
     async start() {
-        this._playing = true;
-        this._index   = 0;
+        this._playing     = true;
+        this._index       = 0;
+        this._scriptQueue = [
+            'data/intro/intro_drama.json',
+            'data/intro/intro_forge.json',
+            'data/intro/intro_bedroom.json'
+            // 之後要加第四段就在這裡加一行
+        ];
 
+        // 切換到臥室場景
         currentScene = 'bedroom';
         await renderScene();
         updateSceneSwitchButtons();
 
+        // 黑屏
         this._setBlack(true);
 
-        const ok = await this._loadScript('data/intro/intro_drama.json');
-        if (!ok) { this._end(); return; }
+        // 載入第一段
+        await this._loadNextScript();
+    },
+
+    // ================================
+    // 載入佇列中的下一段劇本
+    // ================================
+    async _loadNextScript() {
+        if (this._scriptQueue.length === 0) {
+            // 所有劇本都播完了
+            this._end();
+            return;
+        }
+
+        const path = this._scriptQueue.shift();  // 取出第一個
+        const ok   = await this._loadScript(path);
+        if (!ok) {
+            // 載入失敗就跳過這段，繼續下一段
+            console.warn(`⚠️ 跳過劇本: ${path}`);
+            await this._loadNextScript();
+            return;
+        }
 
         this._renderLine();
     },
 
+    // ================================
+    // 載入單一劇本 JSON
+    // ================================
     async _loadScript(path) {
         try {
             const res = await fetch(`${path}?t=${Date.now()}`);
@@ -38,9 +77,13 @@ const IntroSystem = {
         }
     },
 
+    // ================================
+    // 渲染當前行
+    // ================================
     _renderLine() {
         if (this._index >= this._lines.length) {
-            this._end();
+            // 這段結束，載入下一段
+            this._loadNextScript();
             return;
         }
 
@@ -61,13 +104,15 @@ const IntroSystem = {
 
         DialogueSystem.showDialogue(chara || 'PC', text);
 
-        // 用 DialogueSystem 的按鈕推進
         DialogueSystem.showNextBtn(() => {
             this._index++;
             this._renderLine();
         });
     },
 
+    // ================================
+    // 場景切換
+    // ================================
     _switchScene(sceneId) {
         currentScene = sceneId;
         renderScene().then(() => {
@@ -76,6 +121,9 @@ const IntroSystem = {
         });
     },
 
+    // ================================
+    // 黑屏 Overlay（只蓋場景區）
+    // ================================
     _initOverlay() {
         const existing = document.getElementById('intro-overlay');
         if (existing) { this._overlay = existing; return; }
@@ -117,6 +165,9 @@ const IntroSystem = {
         }, 1600);
     },
 
+    // ================================
+    // 高亮
+    // ================================
     _highlightItem(objId) {
         const el = document.getElementById(objId)
                 || document.querySelector(`[data-obj-id="${objId}"]`);
@@ -128,6 +179,9 @@ const IntroSystem = {
             .forEach(el => el.classList.remove('intro-highlight'));
     },
 
+    // ================================
+    // 全部結束
+    // ================================
     _end() {
         this._playing = false;
         DialogueSystem.hideNextBtn();
