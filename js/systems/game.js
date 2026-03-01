@@ -28,8 +28,8 @@ const player = {
 
     designs:         [],
     products:        [],
-    ownedEquipment:  ['equip_1', 'equip_2', 'equip_3'],  // 擁有的裝備（初始三個）
-    equippedItem:    'equip_1',                          // 目前裝備（師父的內褲）
+    ownedEquipment:  ['equip_1', 'equip_2', 'equip_3'],
+    equippedItem:    'equip_1',
     books:           ['book01'],
     readBooks:       [],
     unlockedWeapons: [],
@@ -40,29 +40,36 @@ const player = {
     completedCommissionsThisBoard: [],
 
     // === 臥室系統 ===
-    roomExpanded: false,                      // 是否已擴建
-    ownedFurniture: ['furniture_1', 'furniture_2', 'furniture_3'],  // 擁有的家具（初始三個想像朋友）
-    placedFurniture: {},                      // { obj_id: furniture_id } 放置位置映射
+    roomExpanded: false,
+    ownedFurniture: ['furniture_1', 'furniture_2', 'furniture_3'],
+    placedFurniture: {},
 
     // === 存錢筒系統 ===
     bankSettings: {
-        lifestyle: '毫無物慾',    // 生活品質
-        family: '獨善其身',       // 補貼家用
-        donation: '先別先別'      // 善心捐款
+        lifestyle: '毫無物慾',
+        family: '獨善其身',
+        donation: '先別先別'
     },
 
     // === 排程系統 ===
-    nextSchedule: [],              // 下一旬排程 [action_id, ...]
+    nextSchedule: [],
 
     // === 街道系統 ===
-    streetVisits: 3                // 本旬剩餘外出次數
+    streetVisits: 3,
+
+    // === 日期系統 ===
+    // period: 1=上旬 / 2=中旬 / 3=下旬
+    gameDate: { year: 1, month: 1, period: 1 }
 };
+
+// === 日期常數 ===
+const MONTH_NAMES  = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
+const PERIOD_NAMES = ['上旬','中旬','下旬'];
 
 // === 場景系統 ===
 const SCENES = {
     forge:   { name: '鍛造室',     icon: '⚒️' },
     bedroom: { name: '小哈的房間', icon: '🏠' },
-    schedule: { name: '行程表',   icon: '📅' }
 };
 
 let currentScene = 'forge';
@@ -97,9 +104,6 @@ async function renderScene() {
                 ? await BedroomScene.render()
                 : { header: '🏠 小哈的房間', content: '<div style="text-align:center;color:#666;padding:40px">房間場景開發中...</div>' };
             break;
-        case 'schedule':
-            sceneData = { header: '📅 行程表', content: '<div style="text-align:center;color:#666;padding:40px">行程表開發中...</div>' };
-            break;
     }
 
     headerEl.innerHTML  = sceneData.header;
@@ -107,12 +111,24 @@ async function renderScene() {
 }
 
 function updateSceneValues() {
-    if (currentScene === 'forge' && typeof ForgeScene !== 'undefined') {
-        ForgeScene.updateValues();
-    }
-    if (currentScene === 'bedroom' && typeof BedroomScene !== 'undefined') {
-        BedroomScene.updateValues();
-    }
+    if (currentScene === 'forge'   && typeof ForgeScene   !== 'undefined') ForgeScene.updateValues();
+    if (currentScene === 'bedroom' && typeof BedroomScene !== 'undefined') BedroomScene.updateValues();
+}
+
+// === 日期顯示 ===
+function updateDateDisplay() {
+    const d = player.gameDate;
+    const yearText   = d.year === 1 ? '元年' : `第${d.year}年`;
+    const monthText  = MONTH_NAMES[d.month - 1] || `${d.month}月`;
+    const periodText = PERIOD_NAMES[d.period - 1] || '上旬';
+
+    const yearEl   = document.getElementById('date-year');
+    const monthEl  = document.getElementById('date-month');
+    const dayEl    = document.getElementById('date-day');
+
+    if (yearEl)  yearEl.textContent  = yearText;
+    if (monthEl) monthEl.textContent = `${monthText} ${periodText}`;
+    if (dayEl)   dayEl.textContent   = currentScene === 'bedroom' ? '家庭日' : '鍛造中';
 }
 
 // === 初始化遊戲 ===
@@ -120,18 +136,11 @@ async function initGame() {
     console.log('🎮 初始化遊戲...');
 
     const enterGame = localStorage.getItem('floralForger_enterGame');
-    
-    console.log('📋 狀態檢查:');
-    console.log('  - floralForger_enterGame:', enterGame ? '✓' : '✗');
-    
     if (!enterGame) {
-        console.log('📝 無進入標記，立即導向開始畫面...');
         window.location.href = 'index.html';
         return;
     }
-    
     localStorage.removeItem('floralForger_enterGame');
-    console.log('✅ 清除進入標記');
 
     const loaded = await CSVLoader.loadAll();
     if (!loaded) { alert('資料載入失敗，請重新整理頁面！'); return; }
@@ -145,47 +154,44 @@ async function initGame() {
         player.avatar = data.playerAvatar || '🔨';
         player.currentEP = Math.floor(2 * (player.str + player.int + player.dex) / 3);
         localStorage.removeItem('floralForger_newGame');
-        console.log(`👋 歡迎，${player.name}！初始 EP: ${player.currentEP}`);
     } else {
         const saved = localStorage.getItem('floralForger_save');
         if (saved) {
             const savedData = JSON.parse(saved);
             Object.assign(player, savedData);
-            // 補齊可能缺失的新欄位
-            if (!player.favor.sunstreet)  player.favor.sunstreet  = 0;
-            if (!player.favor.moonstreet) player.favor.moonstreet = 0;
-            if (!player.favor.starstreet) player.favor.starstreet = 0;
-            if (!player.currentCommissions)            player.currentCommissions            = [];
-            if (!player.completedCommissionsThisBoard) player.completedCommissionsThisBoard = [];
-            // 臥室系統新欄位
-            if (player.roomExpanded === undefined)     player.roomExpanded = false;
-            if (!player.ownedFurniture)                player.ownedFurniture = ['furniture_1', 'furniture_2', 'furniture_3'];
-            if (!player.placedFurniture)               player.placedFurniture = {};
-            // 存錢筒系統新欄位
-            if (!player.bankSettings) {
-                player.bankSettings = { lifestyle: '毫無物慾', family: '獨善其身', donation: '先別先別' };
-            }
-            // 裝備系統新欄位
-            if (!player.ownedEquipment)              player.ownedEquipment = ['equip_1', 'equip_2', 'equip_3'];
-            if (player.equippedItem === undefined)   player.equippedItem = 'equip_1';
-            // 排程系統新欄位
-            if (!player.nextSchedule)               player.nextSchedule = [];
-            // 街道系統新欄位
-            if (player.streetVisits === undefined)  player.streetVisits = 3;
-            console.log('📂 讀取存檔成功', player);
+            _patchPlayerFields();
+            console.log('📂 讀取存檔成功');
         } else {
             player.currentEP = Math.floor(2 * (player.str + player.int + player.dex) / 3);
-            console.log('📝 初次遊玩，初始化數值');
         }
     }
 
     updatePlayerDisplay();
     updateStatsDisplay();
+    updateDateDisplay();
     await renderScene();
     updateSceneSwitchButtons();
     document.getElementById('speaker-name').textContent = player.name;
     DialogueSystem.showDialogue('PC', '是時候展現真正的技術了！');
-    console.log('✅ 遊戲初始化完成！', player);
+    console.log('✅ 遊戲初始化完成！');
+}
+
+// === 補齊缺失欄位 ===
+function _patchPlayerFields() {
+    if (!player.favor.sunstreet)  player.favor.sunstreet  = 0;
+    if (!player.favor.moonstreet) player.favor.moonstreet = 0;
+    if (!player.favor.starstreet) player.favor.starstreet = 0;
+    if (!player.currentCommissions)            player.currentCommissions            = [];
+    if (!player.completedCommissionsThisBoard) player.completedCommissionsThisBoard = [];
+    if (player.roomExpanded === undefined)     player.roomExpanded = false;
+    if (!player.ownedFurniture)               player.ownedFurniture = ['furniture_1', 'furniture_2', 'furniture_3'];
+    if (!player.placedFurniture)              player.placedFurniture = {};
+    if (!player.bankSettings)                 player.bankSettings = { lifestyle: '毫無物慾', family: '獨善其身', donation: '先別先別' };
+    if (!player.ownedEquipment)               player.ownedEquipment = ['equip_1', 'equip_2', 'equip_3'];
+    if (player.equippedItem === undefined)    player.equippedItem = 'equip_1';
+    if (!player.nextSchedule)                 player.nextSchedule = [];
+    if (player.streetVisits === undefined)    player.streetVisits = 3;
+    if (!player.gameDate)                     player.gameDate = { year: 1, month: 1, period: 1 };
 }
 
 // === 顯示更新 ===
@@ -221,42 +227,253 @@ function nextDialogue() { showToast('（繼續中...）'); }
 
 // === 存讀檔 ===
 const GameSystem = {
-    save() { localStorage.setItem('floralForger_save', JSON.stringify(player)); showToast('💾 已儲存！'); },
+
+    save() {
+        localStorage.setItem('floralForger_save', JSON.stringify(player));
+        showToast('💾 已儲存！');
+    },
+
     load() {
         const saved = localStorage.getItem('floralForger_save');
         if (!saved) { showToast('❌ 沒有存檔！'); return; }
-        const savedData = JSON.parse(saved);
-        Object.assign(player, savedData);
-        // 補齊可能缺失的新欄位
-        if (!player.favor.sunstreet)  player.favor.sunstreet  = 0;
-        if (!player.favor.moonstreet) player.favor.moonstreet = 0;
-        if (!player.favor.starstreet) player.favor.starstreet = 0;
-        if (!player.currentCommissions)            player.currentCommissions            = [];
-        if (!player.completedCommissionsThisBoard) player.completedCommissionsThisBoard = [];
-        // 臥室系統新欄位
-        if (player.roomExpanded === undefined)     player.roomExpanded = false;
-        if (!player.ownedFurniture)                player.ownedFurniture = ['furniture_1', 'furniture_2', 'furniture_3'];
-        if (!player.placedFurniture)               player.placedFurniture = {};
-        // 存錢筒系統新欄位
-        if (!player.bankSettings) {
-            player.bankSettings = { lifestyle: '毫無物慾', family: '獨善其身', donation: '先別先別' };
-        }
-        // 裝備系統新欄位
-        if (!player.ownedEquipment)              player.ownedEquipment = ['equip_1', 'equip_2', 'equip_3'];
-        if (player.equippedItem === undefined)   player.equippedItem = 'equip_1';
-        // 排程系統新欄位
-        if (!player.nextSchedule)               player.nextSchedule = [];
-        // 街道系統新欄位
-        if (player.streetVisits === undefined)  player.streetVisits = 3;
+        Object.assign(player, JSON.parse(saved));
+        _patchPlayerFields();
         updatePlayerDisplay();
         updateStatsDisplay();
+        updateDateDisplay();
         renderScene();
         showToast('📂 讀取成功！');
+    },
+
+    // =========================================
+    // === 旬推進（床）
+    // =========================================
+    advancePeriod() {
+
+        // 1. 存錢筒結算（扣錢 + 套用生活效果）
+        const bankResult = BankCore.settleNewPeriod();
+        if (bankResult.gameOver) {
+            this._showGameOver(bankResult);
+            return;
+        }
+
+        // 2. 執行排程（鍛造由後面另外處理）
+        const schedule  = player.nextSchedule || [];
+        const hasForge  = schedule.includes('act_01');
+        const results   = ScheduleCore.executeSchedule(schedule);
+        player.nextSchedule = [];
+
+        // 3. 時間推進
+        this._advanceDate();
+
+        // 4. 重置旬度數值
+        player.streetVisits = 3;
+
+        // 5. 更新顯示
+        updateStatsDisplay();
+        updateDateDisplay();
+
+        // 6. 顯示本旬結果，結束後處理鍛造
+        this._showPeriodResult(bankResult, results, hasForge);
+    },
+
+    // === 日期推進 ===
+    _advanceDate() {
+        const d = player.gameDate;
+        d.period++;
+        if (d.period > 3) {
+            d.period = 1;
+            d.month++;
+            if (d.month > 12) {
+                d.month = 1;
+                d.year++;
+            }
+        }
+    },
+
+    // === 顯示旬結果 ===
+    _showPeriodResult(bankResult, scheduleResults, hasForge) {
+        const d = player.gameDate;
+        const yearText   = d.year === 1 ? '元年' : `第${d.year}年`;
+        const periodText = `${MONTH_NAMES[d.month - 1]} ${PERIOD_NAMES[d.period - 1]}`;
+
+        // 建構結算摘要 HTML
+        const bankHtml = this._buildBankSummaryHtml(bankResult);
+        const scheduleHtml = this._buildScheduleSummaryHtml(scheduleResults);
+
+        let modal = document.getElementById('periodResultModal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'periodResultModal';
+            modal.className = 'modal-overlay';
+            document.body.appendChild(modal);
+        }
+
+        const nextLabel = hasForge ? '前往鍛造室 ⚒️' : '繼續';
+
+        modal.innerHTML = `
+            <div style="
+                background: linear-gradient(180deg, #252535 0%, #1a1a28 100%);
+                border-radius: 16px; padding: 24px;
+                max-width: 480px; width: 92%; max-height: 80vh; overflow-y: auto;
+            ">
+                <div style="text-align:center; color:#f5a623; font-size:1.1em; margin-bottom:4px; font-weight:bold;">
+                    ✅ 旬結束
+                </div>
+                <div style="text-align:center; color:#888; font-size:0.85em; margin-bottom:20px;">
+                    下一旬：${yearText} ${periodText}
+                </div>
+
+                <!-- 財務結算 -->
+                ${bankHtml}
+
+                <!-- 排程結果 -->
+                ${scheduleHtml}
+
+                <div style="margin-top:20px; display:flex; gap:10px;">
+                    <button class="modal-btn primary" style="flex:1; padding:12px; font-size:1em;"
+                        onclick="GameSystem._closePeriodResult(${hasForge})">
+                        ${nextLabel}
+                    </button>
+                </div>
+            </div>`;
+
+        modal.classList.add('show');
+    },
+
+    // === 財務結算 HTML ===
+    _buildBankSummaryHtml(bankResult) {
+        const costs = bankResult.costs;
+        // 過濾隱藏數值後的效果
+        const visibleEffects = bankResult.effects.filter(e =>
+            !['SF_FAVOR', 'SS_FAVOR', 'DS_FAVOR'].includes(e.stat)
+        );
+
+        const effectTags = visibleEffects.map(e => {
+            const text = BankCore.formatEffect(e.stat, e.value);
+            if (!text) return '';
+            const color = e.value >= 0 ? '#7ed321' : '#f5576c';
+            return `<span style="
+                padding: 2px 8px; border-radius: 6px; font-size:0.8em;
+                background: rgba(255,255,255,0.07); color: ${color};
+            ">${text}</span>`;
+        }).filter(Boolean).join(' ');
+
+        return `
+            <div style="background:rgba(0,0,0,0.25); border-radius:10px; padding:14px; margin-bottom:12px;">
+                <div style="color:#f5a623; font-weight:bold; margin-bottom:10px;">💰 財務結算</div>
+                <div style="display:flex; justify-content:space-between; font-size:0.85em; color:#ccc; margin-bottom:6px;">
+                    <span>扣除費用</span>
+                    <span style="color:#f5576c;">－${costs.lifestyle + costs.family + costs.donation} 元</span>
+                </div>
+                <div style="font-size:0.75em; color:#666; margin-bottom:8px;">
+                    生活費${costs.lifestyle} ＋ 家用${costs.family} ＋ 捐款${costs.donation}
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:0.85em; color:#ccc;">
+                    <span>剩餘金錢</span>
+                    <span style="color:#f5a623; font-weight:bold;">${player.money} 元</span>
+                </div>
+                ${effectTags ? `<div style="margin-top:8px; display:flex; flex-wrap:wrap; gap:4px;">${effectTags}</div>` : ''}
+            </div>`;
+    },
+
+    // === 排程結果 HTML ===
+    _buildScheduleSummaryHtml(results) {
+        if (!results || results.length === 0) {
+            return `<div style="background:rgba(0,0,0,0.2); border-radius:10px; padding:14px; color:#666; text-align:center; font-size:0.85em;">本旬無排程</div>`;
+        }
+
+        const statNames = { STR:'力量', INT:'智力', DEX:'敏捷', MOOD:'心情', STRESS:'壓力', LUCK:'幸運' };
+
+        const items = results.map(r => {
+            if (r.needForge) {
+                return `
+                    <div style="display:flex; align-items:center; gap:10px; padding:10px;
+                                background:rgba(245,166,35,0.08); border-radius:8px;">
+                        <span style="font-size:1.4em;">${r.icon}</span>
+                        <div>
+                            <div style="color:#f5a623; font-weight:bold;">${r.actionName}</div>
+                            <div style="font-size:0.8em; color:#888;">結束後進入鍛造室</div>
+                        </div>
+                    </div>`;
+            }
+
+            const effectStr = r.effects.map(e => {
+                const name  = statNames[e.stat] || e.stat;
+                const sign  = e.value >= 0 ? '+' : '';
+                const color = e.value >= 0 ? '#7ed321' : '#f5576c';
+                return `<span style="color:${color}">${name}${sign}${e.value}</span>`;
+            }).join('　');
+
+            const gatherStr = r.gather ? `<span style="color:#7ed321">🎁 ${r.gather.message}</span>` : '';
+
+            return `
+                <div style="display:flex; align-items:center; gap:10px; padding:10px;
+                            background:rgba(255,255,255,0.03); border-radius:8px;">
+                    <span style="font-size:1.4em;">${r.icon}</span>
+                    <div style="flex:1;">
+                        <div style="color:#fff; font-weight:bold; margin-bottom:2px;">${r.actionName}</div>
+                        <div style="font-size:0.8em;">${effectStr} ${gatherStr}</div>
+                    </div>
+                </div>`;
+        }).join('');
+
+        return `
+            <div style="background:rgba(0,0,0,0.2); border-radius:10px; padding:14px;">
+                <div style="color:#f5a623; font-weight:bold; margin-bottom:10px;">📋 本旬行程</div>
+                <div style="display:flex; flex-direction:column; gap:8px;">${items}</div>
+            </div>`;
+    },
+
+    // === 關閉結果 Modal 後的處理 ===
+    _closePeriodResult(hasForge) {
+        const modal = document.getElementById('periodResultModal');
+        if (modal) modal.classList.remove('show');
+
+        if (hasForge) {
+            // 切換到鍛造室
+            switchScene('forge');
+            DialogueSystem.showDialogue('PC', '好！現在開始鍛造！');
+        } else {
+            DialogueSystem.showDialogue('PC', '又是新的一旬，加油！');
+        }
+    },
+
+    // === 遊戲結束 ===
+    _showGameOver(bankResult) {
+        let modal = document.getElementById('periodResultModal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'periodResultModal';
+            modal.className = 'modal-overlay';
+            document.body.appendChild(modal);
+        }
+
+        modal.innerHTML = `
+            <div style="
+                background: linear-gradient(180deg, #252535 0%, #1a1a28 100%);
+                border-radius: 16px; padding: 24px;
+                max-width: 420px; width: 92%; text-align: center;
+            ">
+                <div style="font-size:2em; margin-bottom:12px;">💀</div>
+                <div style="color:#f5576c; font-size:1.2em; font-weight:bold; margin-bottom:12px;">遊戲結束</div>
+                <div style="color:#ccc; font-size:0.9em; margin-bottom:8px;">${bankResult.message}</div>
+                <div style="color:#888; font-size:0.85em; margin-bottom:20px;">
+                    差 <span style="color:#f5576c;">${bankResult.shortage} 元</span>
+                </div>
+                <button class="modal-btn primary" style="width:100%; padding:12px;"
+                    onclick="window.location.href='index.html'">
+                    回到開始畫面
+                </button>
+            </div>`;
+
+        modal.classList.add('show');
     }
 };
 
-window.player       = player;
-window.GameSystem   = GameSystem;
-window.switchScene  = switchScene;
+window.player      = player;
+window.GameSystem  = GameSystem;
+window.switchScene = switchScene;
+window.updateDateDisplay = updateDateDisplay;
 
 document.addEventListener('DOMContentLoaded', initGame);
