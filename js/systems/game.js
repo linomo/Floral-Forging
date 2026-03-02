@@ -139,8 +139,10 @@ async function initGame() {
     }
     localStorage.removeItem('floralForger_enterGame');
 
+   document.getElementById('loading-bar').style.width = '40%';
     const loaded = await CSVLoader.loadAll();
     if (!loaded) { alert('資料載入失敗，請重新整理頁面！'); return; }
+    document.getElementById('loading-bar').style.width = '80%';
 
     const newGameData = localStorage.getItem('floralForger_newGame');
     if (newGameData) {
@@ -184,6 +186,17 @@ async function initGame() {
     }
 
     console.log('✅ 遊戲初始化完成！');
+    // 載入完成！
+    document.getElementById('loading-bar').style.width = '100%';
+    document.getElementById('loading-status').textContent = '載入完成 ✿';
+    document.getElementById('loading-status').classList.add('done');
+    setTimeout(() => {
+        document.getElementById('loading-screen').classList.add('fade-out');
+        setTimeout(() => {
+            const el = document.getElementById('loading-screen');
+            if (el) el.remove();
+        }, 900);
+    }, 600);
 }
 
 // === 補齊缺失欄位 ===
