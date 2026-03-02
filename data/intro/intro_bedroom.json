@@ -1,0 +1,156 @@
+[
+  {
+    "chara": "SS",
+    "text": "雖然你的房間你應該自己最了解，但你總是隨意過日子，根本沒有好好整理過。"
+  },
+  {
+    "chara": "PC",
+    "text": "有一點亂讓我更舒服──我馬上整理！咻咻咻。"
+  },
+  {
+    "chara": "SF",
+    "text": "小徒弟今天泡的茶也很好喝呢。"
+  },
+  {
+    "chara": "SS",
+    "text": "我有根據師父之前的建議做調整。"
+  },
+  {
+    "chara": "PC",
+    "text": "咻咻咻！好了！"
+  },
+  {
+    "chara": "SS",
+    "text": "終於能看到所有東西了。首先是存錢筒旁邊有個財產規劃表。"
+  },
+  {
+    "chara": "(highlight",
+    "text": "bedroom_bank)"
+  },
+  {
+    "chara": "SS",
+    "text": "為了讓你知道柴米油鹽有多貴，之後我都會跟你收取生活費，這取決於你想過怎樣的日子。",
+    "highlight": "bedroom_bank"
+  },
+  {
+    "chara": "SF",
+    "text": "那只是小小徒弟平時自己的伙食費而已。如果你對這個家充滿愛，例如對我們破損的屋頂有點憐憫，可以多花錢普貼家用喔！",
+    "highlight": "bedroom_bank"
+  },
+  {
+    "chara": "SF",
+    "text": "還有愛心捐款的部分，可以斟酌自己的能力。",
+    "highlight": "bedroom_bank"
+  },
+  {
+    "chara": "PC",
+    "text": "不知道有沒有人要可憐可憐我捐款給我嘻嘻。"
+  },
+  {
+    "chara": "SS",
+    "text": "然後是你的儲物櫃，裡面一定很亂，我就不靠近了，我沒有要靠近你不需要那麼緊張。"
+  },
+  {
+    "chara": "(highlight",
+    "text": "bedroom_shelf)"
+  },
+  {
+    "chara": "PC",
+    "text": "我、我才沒有緊張，我、我才沒有塞什麼怪東西在裡面！"
+  },
+  {
+    "chara": "(highlight",
+    "text": "bedroom_shelf)"
+  },
+  {
+    "chara": "SF",
+    "text": "小小徒弟你的口袋有東西露出來了，好眼熟這是我的內褲嗎？"
+  },
+  {
+    "chara": "PC",
+    "text": "不是！只是同款！同款布！"
+  },
+  {
+    "chara": "SS",
+    "text": "我還想說你之前怎麼突然主動說要幫忙處理舊衣物……"
+  },
+  {
+    "chara": "PC",
+    "text": "就說不是！"
+  },
+  {
+    "chara": "SS",
+    "text": "我不想聽你辯解。你出門時最好不要弄掉那個東西。破壞我們工坊名聲。"
+  },
+  {
+    "chara": "(highlight",
+    "text": "bedroom_door)"
+  },
+  {
+    "chara": "SS",
+    "text": "出門後可以抵達街道。可以散步或者買東西，例如傢俱，可以放在你的房間，或者購買其他人的內褲。",
+    "highlight": "bedroom_door"
+  },
+  {
+    "chara": "SF",
+    "text": "哈哈，我想應該沒有。如果需要可以跟我拿。"
+  },
+  {
+    "chara": "PC",
+    "text": "我要！不對！我不要！"
+  },
+  {
+    "chara": "SS",
+    "text": "最重要的是，為了治好你的懶散病，之後你都必須要在家庭日交一份下一旬的安排給我。",
+    "highlight": "bedroom_calendar"
+  },
+  {
+    "chara": "SF",
+    "text": "鍛造室固定只會在每一旬最後六天開放，而且一進去後就需要一直待在裡面，直到筋疲力盡為止。就是一份固定時間的工作。",
+    "highlight": "bedroom_calendar"
+  },
+  {
+    "chara": "SS",
+    "text": "確定好後我會來收走。你才能上床睡覺。"
+  },
+  {
+    "chara": "(highlight",
+    "text": "bedroom_bed)"
+  },
+  {
+    "chara": "SS",
+    "text": "理解嗎？"
+  },
+  {
+    "chara": "(highlight",
+    "text": "bedroom_bed)"
+  },
+  {
+    "chara": "PC",
+    "text": "我不想懂得！你們怎麼捨得讓我的汗流向地上！"
+  },
+  {
+    "chara": "SF",
+    "text": "因為你可愛，我相信你去顧店，我們的生意會變好。你說對吧？小徒弟。"
+  },
+  {
+    "chara": "SS",
+    "text": "不置可否。"
+  },
+  {
+    "chara": "PC",
+    "text": "既然師父都這樣說了！那我就勉為其難的接受了。"
+  },
+  {
+    "chara": "SS",
+    "text": "既然了解了，那我跟師父還要去處理其他事先走了。記得安排好行程，我晚點來收。"
+  },
+  {
+    "chara": "SF",
+    "text": "晚餐見，小小徒弟。"
+  },
+  {
+    "chara": "PC",
+    "text": "好！"
+  }
+]
