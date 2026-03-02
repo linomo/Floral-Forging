@@ -9,15 +9,15 @@ const player = {
     avatar:    '🔨',
     str:       30,
     int:       30,
-    dex:       100,
-    luck:      50,
-    mood:      50,
-    stress:    25,
+    dex:       30,
+    luck:      30,
+    mood:      30,
+    stress:    30,
     money:     1000,
     currentEP: 0,
     dirtiness: 0,
     favor: {
-        SF: 20, SS: 10, DS: 0,
+        SF: 0, SS: 0, DS: 0,
         sunstreet: 0, moonstreet: 0, starstreet: 0
     },
 
