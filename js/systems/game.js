@@ -438,6 +438,7 @@ const GameSystem = {
                         【遭遇事件】${r.event.name}
                     </div>
                     <div style="color:#ccc; font-size:0.8em;">${r.event.text}</div>
+                    <div style="color:#aaa; font-size:0.8em; margin-top:4px;">${r.event.text}</div>
                 </div>` : '';
 
             const bottomLine = [effectStr, gatherStr].filter(Boolean).join('　　');
