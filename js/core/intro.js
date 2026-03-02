@@ -34,6 +34,27 @@ const IntroSystem = {
         updateSceneSwitchButtons();
     
         this._setBlack(true);
+        // 加跳過按鈕
+        const skipBtn = document.createElement('button');
+        skipBtn.id = 'intro-skip-btn';
+        skipBtn.textContent = '跳過序章 »';
+        skipBtn.style.cssText = `
+            position: fixed; bottom: 20px; right: 20px;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 20px; color: #888;
+            cursor: pointer; font-size: 0.85em;
+            font-family: inherit; z-index: 9999;
+            transition: all 0.2s;
+        `;
+        skipBtn.onmouseover = () => { skipBtn.style.color = '#fff'; skipBtn.style.borderColor = 'rgba(255,255,255,0.4)'; };
+        skipBtn.onmouseout  = () => { skipBtn.style.color = '#888'; skipBtn.style.borderColor = 'rgba(255,255,255,0.2)'; };
+        skipBtn.onclick = () => this._skip();
+        document.body.appendChild(skipBtn);
+    
+        await this._loadNextScript();
+    },
         await this._loadNextScript();
     },
 
@@ -176,7 +197,12 @@ const IntroSystem = {
         document.querySelectorAll('.intro-highlight')
             .forEach(el => el.classList.remove('intro-highlight'));
     },
-
+    // 跳過序章
+    _skip() {
+        this._scriptQueue = [];  // 清空佇列
+        this._lines = [];        // 清空當前劇本
+        this._end();
+    },
     // ================================
     // 全部結束
     // ================================
@@ -188,7 +214,9 @@ const IntroSystem = {
     
         // 解鎖場景
         document.getElementById('room-content').style.pointerEvents = '';
-    
+        // 移除跳過按鈕
+        const skipBtn = document.getElementById('intro-skip-btn');
+        if (skipBtn) skipBtn.remove();
         player.introCompleted = true;
         updateDateDisplay();
         DialogueSystem.showDialogue('PC', '是時候展現真正的技術了！');
