@@ -12,5 +12,5 @@
   { "chara": "SS", "text": "早餐放在你的桌子上了，你吃完到鍛造室來找我們。我們先走吧，師父。" },
   { "chara": "SF", "text": "好呦。" },
   { "chara": "PC", "text": "好。（咀嚼咀嚼）奇怪今天不是休息日嗎？（咀嚼咀嚼）" },
-  { "chara": "PC", "text": "吃飽了！走吧！", "transition": "forge" },
+  { "chara": "PC", "text": "吃飽了！走吧！", "transition": "forge" }
 ]
