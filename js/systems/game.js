@@ -218,6 +218,7 @@ function _patchPlayerFields() {
     if (player.streetVisits === undefined)    player.streetVisits = 3;
     if (!player.gameDate)                     player.gameDate = { year: 1, month: 1, period: 1 };
     if (player.introCompleted === undefined)  player.introCompleted = false;
+    if (player._lastMaxEP === undefined) player._lastMaxEP = Math.floor(2 * (player.str + player.int + player.dex) / 3);
 }
 
 // === 顯示更新 ===
