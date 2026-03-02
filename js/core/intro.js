@@ -24,18 +24,16 @@ const IntroSystem = {
             'data/intro/intro_drama.json',
             'data/intro/intro_forge.json',
             'data/intro/intro_bedroom.json'
-            // 之後要加第四段就在這裡加一行
         ];
-
-        // 切換到臥室場景
+    
+        // 鎖住場景，intro 期間不能點擊
+        document.getElementById('room-content').style.pointerEvents = 'none';
+    
         currentScene = 'bedroom';
         await renderScene();
         updateSceneSwitchButtons();
-
-        // 黑屏
+    
         this._setBlack(true);
-
-        // 載入第一段
         await this._loadNextScript();
     },
 
@@ -187,6 +185,10 @@ const IntroSystem = {
         DialogueSystem.hideNextBtn();
         this._clearHighlights();
         this._fadeIn();
+    
+        // 解鎖場景
+        document.getElementById('room-content').style.pointerEvents = '';
+    
         player.introCompleted = true;
         updateDateDisplay();
         DialogueSystem.showDialogue('PC', '是時候展現真正的技術了！');
