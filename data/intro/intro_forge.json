@@ -229,4 +229,79 @@
     "chara": "PC",
     "text": "我記得！驚訝吧！"
   }
+  {
+    "chara": "SS",
+    "text": "嗯？好像有人在敲門，我去看看。啊是你啊，大俠。"
+  },
+  {
+    "chara": "DS",
+    "text": "你每次都叫我大俠，讓人挺害臊的。"
+  },
+  {
+    "chara": "SF",
+    "text": "這樣叫比較方便啊。"
+  },
+  {
+    "chara": "DS",
+    "text": "早安，鍛造師父。"
+  },
+  {
+    "chara": "SF",
+    "text": "早安呀，抱歉明明跟你有約，還是得請你先到內堂等一會，我處理一下我的小小徒弟。"
+  },
+  {
+    "chara": "DS",
+    "text": "小小徒弟？"
+  },
+  {
+    "chara": "PC",
+    "text": "嘿是我！"
+  },
+  {
+    "chara": "DS",
+    "text": "早安。我來這麼多次，倒沒見過……啊，是那位。"
+  },
+  {
+    "chara": "PC",
+    "text": "你認識我？"
+  },
+  {
+    "chara": "DS",
+    "text": "你師父跟小師兄有提起，特別愛睡的那一位。"
+  },
+  {
+    "chara": "PC",
+    "text": "怎麼沒有說我好話。"
+  },
+  {
+    "chara": "DS",
+    "text": "能好好睡覺是好事。"
+  },
+  {
+    "chara": "PC",
+    "text": "是好事！"
+  },
+  {
+    "chara": "SS",
+    "text": "內堂已經備好茶水，我們處理掉{name}……我是只處理好事情後立刻過去。"
+  },
+  {
+    "chara": "DS",
+    "text": "那我先過去了。"
+    "highlight": "forge_door"
+  },
+  {
+    "chara": "SS",
+    "text": "總之記得不要弄得太髒。走吧，換到你的臥室。",
+    "highlight": "forge_door"
+  },
+  {
+    "chara": "PC",
+    "text": "好！"
+  },
+  {
+    "chara": "PC",
+    "text": "好！",
+    "transition": "bedroom"
+  }
 ]
