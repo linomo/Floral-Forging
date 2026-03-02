@@ -139,10 +139,12 @@ const ForgeScene = {
         const msg     = obj.confirm_message || '確定要離開嗎？';
         const buttons = obj.confirm_buttons ? obj.confirm_buttons.split('│') : ['確定', '取消'];
         this.openConfirmModal(msg, buttons[0], buttons[1], () => {
-            showToast('離開鍛造室...');
+            switchScene('bedroom');
+            updateDateDisplay();
+            DialogueSystem.showDialogue('PC', '鍛造完成！回房間休息一下～');
+            showToast('✅ 離開鍛造室');
         });
     },
-
     // =========================================
     // === 確認彈窗
     // =========================================
