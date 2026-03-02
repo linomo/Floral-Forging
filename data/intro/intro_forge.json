@@ -171,7 +171,8 @@
   },
   {
     "chara": "SS",
-    "text": "可以將原料精煉出來，也能將高階的材料進行一些……"
+    "text": "可以將原料精煉出來，也能將高階的材料進行一些……",
+    "highlight": "forge_furnace"
   },
   {
     "chara": "PC",
@@ -192,7 +193,8 @@
   },
   {
     "chara": "SF",
-    "text": "但要注意你的元氣，太累了就不能做事。"
+    "text": "但要注意你的元氣，太累了就不能做事。",
+    "highlight": "forge_anvil"
   },
   {
     "chara": "SS",
