@@ -24,10 +24,6 @@
     "text": "終於能看到所有東西了。首先是存錢筒旁邊有個財產規劃表。"
   },
   {
-    "chara": "(highlight",
-    "text": "bedroom_bank)"
-  },
-  {
     "chara": "SS",
     "text": "為了讓你知道柴米油鹽有多貴，之後我都會跟你收取生活費，這取決於你想過怎樣的日子。",
     "highlight": "bedroom_bank"
@@ -48,20 +44,16 @@
   },
   {
     "chara": "SS",
-    "text": "然後是你的儲物櫃，裡面一定很亂，我就不靠近了，我沒有要靠近你不需要那麼緊張。"
-  },
-  {
-    "chara": "(highlight",
-    "text": "bedroom_shelf)"
+    "text": "然後是你的儲物櫃，裡面一定很亂，我就不靠近了，我沒有要靠近你不需要那麼緊張。",
+    "highlight": "bedroom_shelf"
+
   },
   {
     "chara": "PC",
-    "text": "我、我才沒有緊張，我、我才沒有塞什麼怪東西在裡面！"
+    "text": "我、我才沒有緊張，我、我才沒有塞什麼怪東西在裡面！",
+    "highlight": "bedroom_shelf"
   },
-  {
-    "chara": "(highlight",
-    "text": "bedroom_shelf)"
-  },
+
   {
     "chara": "SF",
     "text": "小小徒弟你的口袋有東西露出來了，好眼熟這是我的內褲嗎？"
@@ -80,11 +72,8 @@
   },
   {
     "chara": "SS",
-    "text": "我不想聽你辯解。你出門時最好不要弄掉那個東西。破壞我們工坊名聲。"
-  },
-  {
-    "chara": "(highlight",
-    "text": "bedroom_door)"
+    "text": "我不想聽你辯解。你出門時最好不要弄掉那個東西。破壞我們工坊名聲。",
+    "highlight": "bedroom_door"
   },
   {
     "chara": "SS",
@@ -111,19 +100,13 @@
   },
   {
     "chara": "SS",
-    "text": "確定好後我會來收走。你才能上床睡覺。"
-  },
-  {
-    "chara": "(highlight",
-    "text": "bedroom_bed)"
+    "text": "確定好後我會來收走。你才能上床睡覺。",
+    "highlight": "bedroom_bed"
   },
   {
     "chara": "SS",
-    "text": "理解嗎？"
-  },
-  {
-    "chara": "(highlight",
-    "text": "bedroom_bed)"
+    "text": "理解嗎？",
+    "highlight": "bedroom_bed"
   },
   {
     "chara": "PC",
