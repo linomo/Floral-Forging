@@ -74,6 +74,7 @@ function switchScene(sceneId) {
     currentScene = sceneId;
     renderScene();
     updateSceneSwitchButtons();
+    updateDateDisplay();
 }
 
 function updateSceneSwitchButtons() {
