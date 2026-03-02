@@ -184,6 +184,7 @@ async function initGame() {
         updateSceneSwitchButtons();
         document.getElementById('speaker-name').textContent = player.name;
         DialogueSystem.showDialogue('PC', '是時候展現真正的技術了！');
+        IntroSystem._fadeIn();
     }
 
     console.log('✅ 遊戲初始化完成！');
