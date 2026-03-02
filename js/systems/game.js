@@ -235,7 +235,7 @@ function updateStatsDisplay() {
 
     const moneyEl = document.getElementById('money-val');
     if (moneyEl) moneyEl.textContent = player.money;
-
+    syncMaxEP();
     updateSceneValues();
     localStorage.setItem('floralForger_save', JSON.stringify(player));
 }
@@ -293,7 +293,21 @@ const GameSystem = {
 
         // 4. 重置旬度數值
         player.streetVisits = 3;
-
+        //EP計算與更新
+        function syncMaxEP() {
+            const newMax = Math.floor(2 * (player.str + player.int + player.dex) / 3);
+            const oldMax = player._lastMaxEP || newMax;
+        
+            if (newMax > oldMax) {
+                // 最大值增加了，currentEP 同步增加相同差值
+                player.currentEP = Math.min(newMax, player.currentEP + (newMax - oldMax));
+            }
+        
+            // 確保 currentEP 不超過 max（防呆）
+            player.currentEP = Math.min(player.currentEP, newMax);
+        
+            player._lastMaxEP = newMax;
+        }
         // 5. 更新顯示
         updateStatsDisplay();
         updateDateDisplay();
