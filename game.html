@@ -232,14 +232,11 @@
       border-radius: 20px; overflow: hidden;
       border: 1px solid rgba(126,211,33,0.15);
       position: relative; margin-bottom: 20px;
-    }*/
-    
-    /* 整個 runner 不動，讓每個 span 自己跑 */
+    } 
     .flower-runner {
       position: absolute; top: 0; left: 0;
       width: 100%; height: 100%;
-    }
-    
+    }    
     .flower-runner span {
       position: absolute;
       top: 50%; transform: translateY(-50%);
@@ -247,21 +244,18 @@
       font-size: 1.1em;
       animation: flowerRun 2s linear infinite;
     }
-    
-    /* 每朵花不同的出發時間和速度 */
     .flower-runner span:nth-child(1)  { animation-delay: 0s;    color: #7ed321; }
     .flower-runner span:nth-child(2)  { animation-delay: 0.35s; color: #a8e063; }
     .flower-runner span:nth-child(3)  { animation-delay: 0.7s;  color: #4ecdc4; font-size: 0.85em; }
     .flower-runner span:nth-child(4)  { animation-delay: 1.05s; color: #7ed321; }
     .flower-runner span:nth-child(5)  { animation-delay: 1.4s;  color: #a8e063; font-size: 0.9em; }
     .flower-runner span:nth-child(6)  { animation-delay: 1.75s; color: #4ecdc4; }
-    
     @keyframes flowerRun {
       0%   { left: -20px; opacity: 0; transform: translateY(-50%) rotate(-15deg); }
       10%  { opacity: 1; }
       90%  { opacity: 1; }
       100% { left: calc(100% + 20px); opacity: 0; transform: translateY(-50%) rotate(15deg); }
-    }
+    }*/
 
     .loading-bar-track {
       width: 320px; height: 4px;
@@ -279,7 +273,14 @@
 </head>
 
 <body>
-
+  <div id="loading-screen">
+    <div class="loading-title">FLORAL FORGER</div>
+    <div class="loading-subtitle">花之鍛造師</div>
+    <div class="loading-bar-track">
+      <div class="loading-bar-fill" id="loading-bar"></div>
+    </div>
+    <div class="loading-status" id="loading-status">載入中...</div>
+  </div>
   <!-- ====== 左側面板 ====== -->
   <div class="left-panel">
     <div class="date-section">
@@ -412,14 +413,4 @@
   <script src="js/scenes/fortune-ui.js?v=20260219-01"></script>
 
 </body>
-    <div id="loading-screen">
-    <div class="loading-title">FLORAL FORGER</div>
-    <div class="loading-subtitle">花之鍛造師</div>
-    <!-- <div class="flower-track"> -->
-    </div>
-    <div class="loading-bar-track">
-      <div class="loading-bar-fill" id="loading-bar"></div>
-    </div>
-    <div class="loading-status" id="loading-status">載入中...</div>
-  </div>
 </html>
