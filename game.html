@@ -206,6 +206,75 @@
         from { box-shadow: 0 0 0 2px #f5a623, 0 0 10px rgba(245,166,35,0.3); }
         to   { box-shadow: 0 0 0 3px #f5a623, 0 0 28px rgba(245,166,35,0.7); }
     }
+        /* === 載入畫面 === */
+    #loading-screen {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: #0d0d14;
+      z-index: 9999;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      transition: opacity 0.8s ease;
+    }
+    #loading-screen.fade-out { opacity: 0; pointer-events: none; }
+
+    .loading-title {
+      font-size: 2em; font-weight: bold;
+      background: linear-gradient(90deg, #f093fb, #f5576c, #f5a623);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px; letter-spacing: 0.1em;
+    }
+    .loading-subtitle { font-size: 0.9em; color: #555; margin-bottom: 50px; }
+
+    .flower-track {
+      width: 320px; height: 36px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 20px; overflow: hidden;
+      border: 1px solid rgba(126,211,33,0.15);
+      position: relative; margin-bottom: 20px;
+    }
+    
+    /* 整個 runner 不動，讓每個 span 自己跑 */
+    .flower-runner {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+    }
+    
+    .flower-runner span {
+      position: absolute;
+      top: 50%; transform: translateY(-50%);
+      left: -20px;
+      font-size: 1.1em;
+      animation: flowerRun 2s linear infinite;
+    }
+    
+    /* 每朵花不同的出發時間和速度 */
+    .flower-runner span:nth-child(1)  { animation-delay: 0s;    color: #7ed321; }
+    .flower-runner span:nth-child(2)  { animation-delay: 0.35s; color: #a8e063; }
+    .flower-runner span:nth-child(3)  { animation-delay: 0.7s;  color: #4ecdc4; font-size: 0.85em; }
+    .flower-runner span:nth-child(4)  { animation-delay: 1.05s; color: #7ed321; }
+    .flower-runner span:nth-child(5)  { animation-delay: 1.4s;  color: #a8e063; font-size: 0.9em; }
+    .flower-runner span:nth-child(6)  { animation-delay: 1.75s; color: #4ecdc4; }
+    
+    @keyframes flowerRun {
+      0%   { left: -20px; opacity: 0; transform: translateY(-50%) rotate(-15deg); }
+      10%  { opacity: 1; }
+      90%  { opacity: 1; }
+      100% { left: calc(100% + 20px); opacity: 0; transform: translateY(-50%) rotate(15deg); }
+    }
+
+    .loading-bar-track {
+      width: 320px; height: 4px;
+      background: rgba(255,255,255,0.05); border-radius: 2px; overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .loading-bar-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, #7ed321, #4ecdc4);
+      border-radius: 2px; transition: width 0.4s ease;
+    }
+    .loading-status { font-size: 0.8em; color: #555; letter-spacing: 0.05em; transition: color 0.3s; }
+    .loading-status.done { color: #7ed321; }
   </style>
 </head>
 
@@ -347,7 +416,7 @@
     <div class="loading-title">FLORAL FORGER</div>
     <div class="loading-subtitle">花之鍛造師</div>
     <div class="flower-track">
-      <div class="flower-runner">
+      <div class="">
         <span>✿</span><span>❀</span><span>✾</span><span>✿</span>
         <span>❀</span><span>✾</span><span>✿</span><span>❀</span>
         <span>✾</span><span>✿</span><span>❀</span><span>✾</span>
