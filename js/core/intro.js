@@ -55,8 +55,7 @@ const IntroSystem = {
     
         await this._loadNextScript();
     },
-        await this._loadNextScript();
-    },
+
 
     // ================================
     // 載入佇列中的下一段劇本
